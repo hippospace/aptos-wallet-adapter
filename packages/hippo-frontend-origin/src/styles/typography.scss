@@ -1,0 +1,37 @@
+.header4 {
+  @apply font-normal text-2xl;
+  .bold {
+    @apply font-bold;
+  }
+}
+
+.header5 {
+  @apply font-normal text-xl;
+  .bold {
+    @apply font-bold;
+  }
+}
+
+.title {
+  @apply font-semibold text-lg;
+  .bold {
+    @apply font-bold;
+  }
+}
+
+.paragraph {
+  @apply font-normal text-base;
+  .bold {
+    @apply font-extrabold;
+  }
+}
+
+.helpText {
+  @apply font-normal text-sm;
+  .bold {
+    @apply font-semibold;
+  }
+  .hyperlink {
+    @apply underline;
+  }
+}
