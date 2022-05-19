@@ -1,0 +1,12 @@
+.button {
+  @apply cursor-pointer py-3 px-5 text-primary rounded-[20px] flex items-center justify-center text-center uppercase font-medium;
+
+  &.disabled {
+    @apply text-gray-400 pointer-events-none border-none cursor-not-allowed;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &.loading {
+    @apply flex items-center pointer-events-none cursor-not-allowed;
+  }
+}

@@ -1,7 +1,21 @@
 module.exports = {
-  ccontent: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './src/**/*.module.scss', './public/index.html'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#2D2D2D'
+      }
+    },
+    background: {
+      primary: '#F5F8FA'
+    },
+    backgroundColor: {
+      primary: '#F5F8FA',
+      secondary: '#FFFFFF'
+    },
+    boxShadow: {
+      md: '0px 4px 8px rgba(0, 0, 0, 0.02)'
+    },
     fontFamily: {
       Urbanist: 'Urbanist, sans-serif'
     },

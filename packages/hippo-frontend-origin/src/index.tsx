@@ -1,13 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.scss';
+import Providers from 'Providers';
+import { setAutoFreeze } from 'immer';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+import 'normalize.css';
+import './index.scss';
+
+setAutoFreeze(false);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <Providers>
+      <App />
+    </Providers>
   </React.StrictMode>
 );
 

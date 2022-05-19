@@ -1,0 +1,30 @@
+.menu {
+  &:global {
+    &.ant-menu.ant-menu-dark {
+      @apply bg-secondary;
+    }
+
+    // remove blue background
+    &.ant-menu.ant-menu-dark .ant-menu-item-selected,
+    &.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected,
+    &.ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover {
+      background: transparent;
+      a {
+        @apply text-primary;
+      }
+    }
+
+    &.ant-menu .ant-menu-item {
+      display: flex;
+      align-items: center;
+    }
+
+    // link color
+    &.ant-menu .ant-menu-item,
+    &.ant-menu .ant-menu-item-group-title,
+    &.ant-menu .ant-menu-item > a,
+    &.ant-menu .ant-menu-item > span > a {
+      @apply text-primary/50;
+    }
+  }
+}
