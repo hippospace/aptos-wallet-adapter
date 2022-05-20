@@ -1,6 +1,7 @@
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
 import Home from 'pages/Home';
+import Swap from 'pages/Swap';
 
 type TRoute = RouteObject & {
   name: string;
@@ -11,7 +12,7 @@ export const routes: TRoute[] = [
   {
     path: 'swap',
     name: 'Swap',
-    element: <Home />
+    element: <Swap />
   },
   {
     path: 'pools',

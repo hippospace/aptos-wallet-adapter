@@ -1,0 +1,23 @@
+.currencyInput {
+  :global {
+    .ant-input-number {
+      @apply border-none border-0;
+      box-shadow: none;
+      &:hover,
+      &:focus,
+      &:active {
+        @apply border-none border-0;
+        box-shadow: none;
+      }
+
+      input {
+        @apply text-right font-extrabold text-base text-primeBlack50 px-0;
+        box-shadow: none;
+
+        &:read-only {
+          @apply text-sm font-semibold;
+        }
+      }
+    }
+  }
+}

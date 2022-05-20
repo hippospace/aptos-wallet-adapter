@@ -3,15 +3,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#2D2D2D'
+        primary: '#2D2D2D',
+        primeBlack: 'rgba(45, 45, 45, 0.03)',
+        primeBlack50: 'rgba(45, 45, 45, 0.5)',
+        primeBlack80: 'rgba(45, 45, 45, 0.8)'
       }
-    },
-    background: {
-      primary: '#F5F8FA'
     },
     backgroundColor: {
       primary: '#F5F8FA',
-      secondary: '#FFFFFF'
+      secondary: '#FFFFFF',
+      prime: '#2D2D2D',
+      primeBlack: 'rgba(45, 45, 45, 0.03)',
+      input: '#F8F8F8'
     },
     boxShadow: {
       md: '0px 4px 8px rgba(0, 0, 0, 0.02)'

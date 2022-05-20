@@ -8,7 +8,7 @@ const PageLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <Antd.Layout className="relative min-h-screen bg-primary">
       <Header />
-      <Content className="">{children}</Content>
+      <Content className="mt-32 px-16 py-16">{children}</Content>
       <Footer />
     </Antd.Layout>
   );

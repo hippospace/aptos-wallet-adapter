@@ -5,3 +5,7 @@ export { ReactComponent as DiscordIcon } from './discord.svg';
 export { ReactComponent as GithubIcon } from './github.svg';
 export { ReactComponent as DocsIcon } from './docs.svg';
 export { ReactComponent as SearchIcon } from './search.svg';
+export { ReactComponent as SettingIcon } from './setting.svg';
+export { ReactComponent as SwapIcon } from './swap.svg';
+export { ReactComponent as CaretIcon } from './caret.svg';
+export { ReactComponent as CloseIcon } from './close.svg';

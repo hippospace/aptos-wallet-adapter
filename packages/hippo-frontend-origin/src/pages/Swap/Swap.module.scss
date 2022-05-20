@@ -1,0 +1,38 @@
+.popover {
+  &:global {
+    > .ant-popover-content {
+      @apply w-[392px];
+
+      .ant-popover-arrow {
+        display: none;
+      }
+
+      .ant-popover-inner {
+        @apply rounded-[20px];
+        .ant-popover-inner-content {
+          @apply p-6;
+        }
+      }
+
+      // style number input
+      .ant-input-number-input-wrap {
+        @apply h-full;
+        .ant-input-number-input {
+          @apply font-semibold text-base text-primary h-full;
+        }
+      }
+
+      ::placeholder {
+        @apply text-primeBlack50;
+      }
+      /* Edge */
+      ::-webkit-input-placeholder {
+        @apply text-primeBlack50;
+      }
+      /* Internet Explorer */
+      :-ms-input-placeholder {
+        @apply text-primeBlack50;
+      }
+    }
+  }
+}

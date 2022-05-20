@@ -20,7 +20,7 @@
 }
 
 .paragraph {
-  @apply font-normal text-base;
+  @apply font-semibold text-base;
   &.bold {
     @apply font-extrabold;
   }

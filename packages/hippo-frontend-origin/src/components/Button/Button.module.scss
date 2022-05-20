@@ -1,5 +1,40 @@
 .button {
-  @apply cursor-pointer py-3 px-5 text-primary rounded-[20px] flex items-center justify-center text-center uppercase font-medium;
+  @apply cursor-pointer py-3 px-5 rounded-[20px] flex items-center justify-center text-center uppercase font-medium;
+
+  &.solid {
+    @apply bg-prime text-white border-[3px] border-solid border-primary shadow-md;
+
+    &:hover {
+      @apply text-primary/80 bg-secondary;
+    }
+
+    &:active,
+    &:focus {
+      @apply text-primary/100 bg-primary;
+    }
+  }
+
+  &.outlined {
+    @apply text-primary/50 bg-secondary;
+
+    &:hover {
+      @apply text-primary/80 bg-primeBlack;
+    }
+
+    &:active,
+    &:focus {
+      @apply text-primary/100 bg-prime;
+    }
+  }
+
+  &:hover {
+    @apply text-primary/80;
+  }
+
+  &:active,
+  &:focus {
+    @apply text-primary/100;
+  }
 
   &.disabled {
     @apply text-gray-400 pointer-events-none border-none cursor-not-allowed;

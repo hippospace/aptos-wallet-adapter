@@ -7,17 +7,28 @@ type TProps = {
   children?: any;
   disabled?: boolean;
   isLoading?: boolean;
+  variant?: 'solid' | 'outlined';
   onClick?: (e: React.MouseEvent<HTMLElement>) => {} | void;
 };
 
 const Button: React.FC<TProps> = (props) => {
-  const { onClick = () => {}, isLoading, className, disabled, children, ...rest } = props;
+  const {
+    onClick = () => {},
+    isLoading,
+    className,
+    disabled,
+    children,
+    variant = 'solid',
+    ...rest
+  } = props;
 
   return (
     <button
       className={cx(styles.button, className, {
         [styles.disabled]: disabled,
-        [styles.loading]: isLoading
+        [styles.loading]: isLoading,
+        [styles.solid]: variant === 'solid',
+        [styles.outlined]: variant === 'outlined'
       })}
       onClick={onClick}
       disabled={disabled}
