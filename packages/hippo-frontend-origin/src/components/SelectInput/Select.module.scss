@@ -1,0 +1,33 @@
+.select {
+  @apply w-full;
+
+  :global {
+    .ant-select {
+      @apply w-full;
+      &:not(.ant-select-customize-input) {
+        .ant-select-selector {
+          height: 44px !important;
+          border: none;
+          border-radius: 5px;
+          @apply bg-primeBlack p-[10px];
+          .ant-select-selection-item {
+            background-color: transparent;
+            @apply text-sm text-primary font-semibold flex items-center;
+          }
+        }
+      }
+    }
+
+    ::placeholder {
+      @apply text-primeBlack50;
+    }
+    /* Edge */
+    ::-webkit-input-placeholder {
+      @apply text-primeBlack50;
+    }
+    /* Internet Explorer */
+    :-ms-input-placeholder {
+      @apply text-primeBlack50;
+    }
+  }
+}

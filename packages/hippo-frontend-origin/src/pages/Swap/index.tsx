@@ -1,37 +1,24 @@
 import { Popover } from 'components/Antd';
 import Card from 'components/Card';
 import { Formik } from 'formik';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
-import swapAction from 'modules/swap/actions';
 import { SettingIcon } from 'resources/icons';
 import SwapSetting from './components/SwapSetting';
 import styles from './Swap.module.scss';
 import { useSelector } from 'react-redux';
 import { getSwapSettings } from 'modules/swap/reducer';
 import TokenSwap from './components/TokenSwap';
+import useFetchToken from 'hooks/useFetchToken';
 
 const validationSchema = yup.object({
   // tierId: yup.number().required()
 });
 
 const Swap: React.FC = () => {
-  const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
   const swapSettings = useSelector(getSwapSettings);
-
-  const fetchTokenList = useCallback(async () => {
-    const resp = await fetch('/mock/tokenList.json');
-    const data = await resp.json();
-    dispatch(swapAction.SET_TOKEN_LIST(data));
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(swapAction.SET_IS_FETCHING);
-    // TO DO: implement real fetch
-    fetchTokenList();
-  });
+  useFetchToken();
 
   const renderCardHeader = useMemo(
     () => (

@@ -7,8 +7,8 @@ interface TProps {
 
 const CoinIcon: React.FC<TProps> = ({ logoSrc, className }) => {
   return (
-    <div className="w-6 h-6">
-      <img src={logoSrc} className={cx(className, 'w-full h-full rounded-full')} alt="" />
+    <div className={cx(className, 'w-6 h-6')}>
+      <img src={logoSrc} className="w-full h-full rounded-full" alt="" />
     </div>
   );
 };

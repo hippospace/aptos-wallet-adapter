@@ -1,0 +1,21 @@
+.switch {
+  :global {
+    .ant-switch {
+      @apply bg-primeBlack20 h-[24px];
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.05);
+      .ant-switch-handle {
+        @apply top-[3px] left-[3px];
+        &::before {
+          box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.05);
+        }
+      }
+
+      &.ant-switch-checked {
+        background-color: darkseagreen;
+        .ant-switch-handle {
+          left: calc(100% - 18px - 3px);
+        }
+      }
+    }
+  }
+}

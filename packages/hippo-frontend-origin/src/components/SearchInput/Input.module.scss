@@ -1,0 +1,29 @@
+.input {
+  :global {
+    .ant-input-affix-wrapper {
+      border: none;
+      border-radius: 5px;
+      @apply bg-primeBlack p-[10px];
+    }
+    .ant-input-prefix {
+      @apply mr-3;
+    }
+
+    .ant-input {
+      background-color: transparent;
+      @apply text-sm text-primary font-semibold;
+    }
+
+    ::placeholder {
+      @apply text-primeBlack50;
+    }
+    /* Edge */
+    ::-webkit-input-placeholder {
+      @apply text-primeBlack50;
+    }
+    /* Internet Explorer */
+    :-ms-input-placeholder {
+      @apply text-primeBlack50;
+    }
+  }
+}

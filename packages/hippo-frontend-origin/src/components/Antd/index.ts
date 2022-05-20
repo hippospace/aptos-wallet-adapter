@@ -12,9 +12,13 @@ export { default as Slider } from 'antd/lib/slider';
 export { default as Collapse } from 'antd/lib/collapse';
 export { default as Table } from 'antd/lib/table';
 export { default as Popover } from 'antd/lib/popover';
+export { default as Switch } from 'antd/lib/switch';
 export { default as InputNumber } from 'antd/lib/input-number';
 export { default as List } from 'antd/lib/list';
 export type { InputNumberProps } from 'antd/lib/input-number';
+export type { InputProps } from 'antd/lib/input';
+export type { SwitchProps } from 'antd/lib/switch';
+export type { SelectProps, OptionProps } from 'antd/lib/select';
 
 export { default as Tabs } from 'antd/lib/tabs';
 
