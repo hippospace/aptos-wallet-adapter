@@ -9,3 +9,7 @@ export { ReactComponent as SettingIcon } from './setting.svg';
 export { ReactComponent as SwapIcon } from './swap.svg';
 export { ReactComponent as CaretIcon } from './caret.svg';
 export { ReactComponent as CloseIcon } from './close.svg';
+export { ReactComponent as MetamaskIcon } from './metamask.svg';
+export { ReactComponent as CoinbaseIcon } from './coinbase.svg';
+export { ReactComponent as WalletConnectIcon } from './walletConnect.svg';
+export { ReactComponent as PhantomIcon } from './phantom.svg';

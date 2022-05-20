@@ -26,7 +26,7 @@ const Pool: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full flex h-full gap-6">
+    <div className="w-full flex h-full gap-14">
       <div className="w-[267px]">
         <SummaryPanel />
         <hr className="border-[1px] border-primeBlack20 my-10" />
