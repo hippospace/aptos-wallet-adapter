@@ -42,7 +42,7 @@ export const routes: TRoute[] = [
   {
     path: '*',
     name: '404',
-    element: <Navigate replace to="/" />
+    element: <Navigate replace to="/swap" />
   }
 ];
 

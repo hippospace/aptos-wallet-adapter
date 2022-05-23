@@ -45,7 +45,7 @@ const Swap: React.FC = () => {
       <Formik
         initialValues={swapSettings}
         validationSchema={validationSchema}
-        onSubmit={(values, actions) => {
+        onSubmit={(values) => {
           console.log('>>sumbit swap', values);
         }}>
         <Card className="w-[497px] min-h-[430px] flex flex-col pb-10">
