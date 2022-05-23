@@ -8,6 +8,7 @@ type TProps = {
   disabled?: boolean;
   isLoading?: boolean;
   variant?: 'solid' | 'outlined';
+  type?: 'button' | 'submit' | 'reset' | undefined;
   onClick?: (e: React.MouseEvent<HTMLElement>) => {} | void;
 };
 

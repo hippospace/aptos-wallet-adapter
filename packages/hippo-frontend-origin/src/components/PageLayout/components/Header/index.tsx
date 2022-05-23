@@ -47,19 +47,24 @@ const PageHeader: React.FC = () => {
   return (
     <Header className="fixed z-10 w-full px-16 pt-12 bg-primary h-auto">
       <div className="mx-auto h-[72px] top-0 left-0 flex items-center">
-        <Link
-          to="/"
-          className="min-w-[72px] h-full bg-secondary flex items-center justify-center rounded-[10px]">
-          <LogoIcon className="w-10 h-10" />
-        </Link>
-        <Antd.Menu
-          mode="horizontal"
-          theme="dark"
-          className={cx(styles.menu, 'shadow-md rounded-xl h-full ml-auto mr-10')}
-          selectedKeys={[selectedKey]}>
-          {renderNavItems()}
-        </Antd.Menu>
-        <WalletConnector />
+        <div className="grow h-full">
+          <Link
+            to="/"
+            className="w-[72px] h-full bg-secondary flex items-center justify-center rounded-[10px]">
+            <LogoIcon className="w-10 h-10" />
+          </Link>
+        </div>
+        <div className="flex grow items-center h-full">
+          <Antd.Menu
+            mode="horizontal"
+            theme="dark"
+            className={cx(styles.menu, 'shadow-md rounded-xl h-full mr-10')}
+            selectedKeys={[selectedKey]}>
+            {renderNavItems()}
+          </Antd.Menu>
+          <WalletConnector />
+        </div>
+        <div />
       </div>
     </Header>
   );

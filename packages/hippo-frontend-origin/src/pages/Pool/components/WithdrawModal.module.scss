@@ -1,0 +1,36 @@
+@import 'styles/mixins';
+
+.withdrawModal {
+  :global {
+    // coin seletor modal
+    .ant-modal-content {
+      @apply rounded-[20px];
+      .ant-modal-body {
+        @apply px-0;
+      }
+      .ant-modal-close-x svg {
+        @apply absolute bottom-2 left-0;
+      }
+    }
+
+    .ant-input {
+      box-shadow: none;
+      &:hover,
+      &:focus,
+      &:active {
+        box-shadow: none;
+      }
+    }
+
+    @include currencyInput;
+    .ant-input-number {
+      @apply flex items-center px-6;
+      .ant-input-number-input-wrap {
+        @apply w-full;
+        input {
+          @apply text-xl font-bold;
+        }
+      }
+    }
+  }
+}

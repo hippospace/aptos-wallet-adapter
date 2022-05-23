@@ -15,9 +15,14 @@ export { default as Popover } from 'antd/lib/popover';
 export { default as Switch } from 'antd/lib/switch';
 export { default as InputNumber } from 'antd/lib/input-number';
 export { default as List } from 'antd/lib/list';
+export { default as Checkbox } from 'antd/lib/checkbox';
+export { default as Form } from 'antd/lib/form';
 export type { InputNumberProps } from 'antd/lib/input-number';
 export type { InputProps } from 'antd/lib/input';
 export type { SwitchProps } from 'antd/lib/switch';
+export type { CheckboxProps } from 'antd/lib/checkbox';
+export type { FormProps } from 'antd/lib/form';
+export type { SliderSingleProps } from 'antd/lib/slider';
 export type { SelectProps, OptionProps } from 'antd/lib/select';
 
 export { default as Tabs } from 'antd/lib/tabs';

@@ -13,3 +13,4 @@ export { ReactComponent as MetamaskIcon } from './metamask.svg';
 export { ReactComponent as CoinbaseIcon } from './coinbase.svg';
 export { ReactComponent as WalletConnectIcon } from './walletConnect.svg';
 export { ReactComponent as PhantomIcon } from './phantom.svg';
+export { ReactComponent as PlusIcon } from './plus.svg';

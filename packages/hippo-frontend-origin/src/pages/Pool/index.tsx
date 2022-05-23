@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import poolAction from 'modules/pool/actions';
 import { useSelector } from 'react-redux';
-import { getFilteredPoolList, getPoolList } from 'modules/pool/reducer';
+import { getFilteredPoolList } from 'modules/pool/reducer';
 import useFetchToken from 'hooks/useFetchToken';
 import PoolList from './components/PoolList';
 import SummaryPanel from './components/SummaryPanel';

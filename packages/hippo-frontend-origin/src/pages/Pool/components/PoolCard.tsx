@@ -6,9 +6,11 @@ import TokenPair from './TokenPair';
 
 interface TProps {
   pool?: IPool;
+  onDeposit: () => void;
+  onWithdraw: () => void;
 }
 
-const PoolCard: React.FC<TProps> = ({ pool }) => {
+const PoolCard: React.FC<TProps> = ({ pool, onDeposit, onWithdraw }) => {
   if (!pool) return null;
   return (
     <Card className="w-full py-6 px-9 flex justify-between items-center">
@@ -18,10 +20,13 @@ const PoolCard: React.FC<TProps> = ({ pool }) => {
       <div className="flex gap-4">
         <Button
           variant="outlined"
+          onClick={onWithdraw}
           className="border-2 border-primary !text-primary paragraph bold active:!bg-primeBlack focus:!bg-primeBlack">
           Withdraw
         </Button>
-        <Button className="paragraph bold">Deposit</Button>
+        <Button className="paragraph bold" onClick={onDeposit}>
+          Deposit
+        </Button>
       </div>
     </Card>
   );

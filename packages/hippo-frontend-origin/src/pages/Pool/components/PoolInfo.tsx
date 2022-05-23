@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { IPool } from 'types/pool';
 
 interface TProps {
@@ -17,7 +16,7 @@ const PoolInfo: React.FC<TProps> = ({ pool }) => {
     },
     {
       label: 'APR',
-      value: `63.3 %`
+      value: '63.3 %'
     }
   ];
   return (
