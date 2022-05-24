@@ -19,9 +19,9 @@ const SelectInput: React.FC<TProps> = ({ className, options, ...rest }) => {
     <div className={cx(styles.select, className)}>
       <Select suffixIcon={<CaretIcon />} {...rest}>
         {options.map((option) => {
-          const { label, value, ...rest } = option;
+          const { label, value, ...optRest } = option;
           return (
-            <Select.Option value={value} {...rest} key={label}>
+            <Select.Option value={value} {...optRest} key={label}>
               {label}
             </Select.Option>
           );

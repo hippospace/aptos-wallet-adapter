@@ -8,10 +8,10 @@
       @apply text-primary/80 bg-secondary;
     }
 
-    &:active,
-    &:focus {
-      @apply text-primary/100 bg-primary;
-    }
+    // &:active,
+    // &:focus {
+    //   @apply text-primary/100 bg-primary;
+    // }
   }
 
   &.outlined {
@@ -31,10 +31,10 @@
     @apply text-primary/80;
   }
 
-  &:active,
-  &:focus {
-    @apply text-primary/100;
-  }
+  // &:active,
+  // &:focus {
+  //   @apply text-primary/100;
+  // }
 
   &.disabled {
     @apply text-gray-400 pointer-events-none border-none cursor-not-allowed;
