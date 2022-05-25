@@ -7,6 +7,7 @@ import CoinSelector from './CoinSelector';
 import { useMemo, useState } from 'react';
 import NumberInput from 'components/NumberInput';
 import CoinIcon from 'components/CoinIcon';
+import { Popover } from 'antd';
 
 interface TProps {
   actionType: 'currencyTo' | 'currencyFrom';
@@ -21,7 +22,7 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
   const coinSelectorButton = useMemo(() => {
     return (
       <div
-        className="flex items-center gap-2 paragraph bold cursor-pointer"
+        className="flex items-center gap-2 font-bold cursor-pointer"
         onClick={() => setIsVisible(true)}>
         {selectedCurrency?.token.symbol ? (
           <div className="flex gap-2 uppercase items-center">
@@ -31,17 +32,30 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
         ) : (
           <div>Select Currency</div>
         )}
-        <CaretIcon />
+        <CaretIcon className="fill-black" />
       </div>
     );
   }, [setIsVisible, selectedCurrency]);
 
   return (
-    <div className={cx(styles.currencyInput, 'bg-primeBlack w-full pt-5 pb-2 px-6')}>
+    <div
+      className={cx(
+        styles.currencyInput,
+        'bg-transparent w-full py-4 px-6 border-[3px] border-grey-900 rounded-xl'
+      )}>
       <div className="flex gap-1">
-        {coinSelectorButton}
+        <Popover
+          overlayClassName={styles.popover}
+          trigger="click"
+          visible={isVisibile}
+          onVisibleChange={(visible) => setIsVisible(visible)}
+          content={
+            <CoinSelector actionType={actionType} dismissiModal={() => setIsVisible(!isVisibile)} />
+          }>
+          {coinSelectorButton}
+        </Popover>
         <NumberInput
-          className="grow rounded-[10px] bg-input"
+          className="grow rounded-xl bg-transparent"
           min={0}
           placeholder="0.00"
           onFocus={() =>
@@ -61,11 +75,9 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
         />
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center gap-2 helpText bold text-primeBlack50">
-          Current Balance:
-        </div>
+        <small className="flex items-center gap-2 font-bold text-grey-500">Current Balance:</small>
         <NumberInput
-          className="grow rounded-[10px] bg-input"
+          className="grow bg-transparent"
           step="0.01"
           stringMode
           readOnly
@@ -78,11 +90,6 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
           value={(selectedCurrency?.balance || '0') as string}
         />
       </div>
-      <CoinSelector
-        actionType={actionType}
-        isVisible={isVisibile}
-        dismissiModal={() => setIsVisible(!isVisibile)}
-      />
     </div>
   );
 };

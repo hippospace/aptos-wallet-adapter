@@ -62,7 +62,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
           <div className="flex flex-col w-full gap-2">
             <label className="paragraph">Amount(estimated)</label>
             <NumberInput
-              className="w-full rounded-[10px] bg-input h-[56px] header5 bold"
+              className="w-full rounded-xl bg-input h-[56px] header5 bold"
               min={0}
               max={totalLiquidity}
               placeholder="0.00"
@@ -88,11 +88,11 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             <div className="flex flex-col w-full gap-2 mt-2">
               <div className="paragraph">You will receive:</div>
               <div className="flex w-full justify-between items-center">
-                <div className="header5 bold text-primary py-2 px-4 uppercase">
+                <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
                   {randomToken0.toFixed(7)} {tokenPair?.token0.symbol}
                 </div>
                 <PlusIcon />
-                <div className="header5 bold text-primary py-2 px-4 uppercase">
+                <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
                   {randomToken1.toFixed(7)} {tokenPair?.token1.symbol}
                 </div>
               </div>

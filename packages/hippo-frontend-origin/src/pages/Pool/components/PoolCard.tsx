@@ -21,7 +21,7 @@ const PoolCard: React.FC<TProps> = ({ pool, onDeposit, onWithdraw }) => {
         <Button
           variant="outlined"
           onClick={onWithdraw}
-          className="border-2 border-primary !text-primary paragraph bold active:!bg-primeBlack focus:!bg-primeBlack">
+          className="border-2 border-primary !text-grey-900 paragraph bold active:!bg-primeBlack focus:!bg-primeBlack">
           Withdraw
         </Button>
         <Button className="paragraph bold" onClick={onDeposit}>

@@ -24,11 +24,11 @@ const SwapDetail: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-2 py-4 mt-6 -mb-6 px-2 rounded-[10px] border-[1px] border-primeBlack50">
+    <div className="flex flex-col gap-2 py-4 mt-6 -mb-6 px-2">
       {details.map((detail) => (
         <div className="flex justify-between" key={detail.label}>
-          <div className="helpText bold text-black">{detail.label}</div>
-          <div className="helpText bold text-black">{detail.value}</div>
+          <small className="font-bold text-grey-900">{detail.label}</small>
+          <small className="font-bold text-grey-900">{detail.value}</small>
         </div>
       ))}
     </div>

@@ -1,9 +1,9 @@
 @import '~antd/dist/antd.css';
-@import 'styles/typography.scss';
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'styles/typography.scss';
 
 body {
   margin: 0;
@@ -11,6 +11,8 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  @apply text-base;
 }
 
 code {

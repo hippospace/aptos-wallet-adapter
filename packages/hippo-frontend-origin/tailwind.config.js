@@ -7,21 +7,53 @@ module.exports = {
         primeBlack: 'rgba(45, 45, 45, 0.03)',
         primeBlack20: 'rgba(45, 45, 45, 0.2)',
         primeBlack50: 'rgba(45, 45, 45, 0.5)',
-        primeBlack80: 'rgba(45, 45, 45, 0.8)'
+        primeBlack80: 'rgba(45, 45, 45, 0.8)',
+        grey: {
+          100: '#F8F8F8',
+          300: '#D5D5D5',
+          500: '#959595',
+          700: '#575757',
+          900: '#2D2D2D'
+        },
+        primePurple: {
+          100: '#F1EFFE',
+          300: '#B3A6FE',
+          900: '#414082'
+        }
       }
     },
     backgroundColor: {
-      primary: '#F5F8FA',
+      primary: '#F6F8FA',
       secondary: '#FFFFFF',
       prime: '#2D2D2D',
       primeBlack: 'rgba(45, 45, 45, 0.03)',
       primeBlack50: 'rgba(45, 45, 45, 0.5)',
       primeBlack20: 'rgba(45, 45, 45, 0.2)',
       primeBlack80: 'rgba(45, 45, 45, 0.8)',
-      input: '#F8F8F8'
+      input: '#F8F8F8',
+      transparent: 'transparent',
+      grey: {
+        100: '#F8F8F8',
+        300: '#D5D5D5',
+        500: '#959595',
+        700: '#575757',
+        900: '#2D2D2D'
+      },
+      primePurple: {
+        100: '#F1EFFE',
+        300: '#B3A6FE',
+        900: '#414082'
+      }
     },
     boxShadow: {
-      md: '0px 4px 8px rgba(0, 0, 0, 0.02)'
+      sm: '4px 4px 0px #2D2D2D',
+      md: '0px 4px 8px rgba(0, 0, 0, 0.25)',
+      figma: '8px 8px 0px #2D2D2D'
+    },
+    borderRadius: {
+      lg: '8px',
+      xl: '10px',
+      full: '9999px'
     },
     fontFamily: {
       Urbanist: 'Urbanist, sans-serif'

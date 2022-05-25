@@ -8,7 +8,7 @@
       }
 
       .ant-popover-inner {
-        @apply rounded-[20px];
+        @apply border-4 border-grey-900 shadow-figma;
         .ant-popover-inner-content {
           @apply p-6;
         }
@@ -18,20 +18,20 @@
       .ant-input-number-input-wrap {
         @apply h-full;
         .ant-input-number-input {
-          @apply font-semibold text-base text-primary h-full;
+          @apply font-semibold text-base text-grey-900 h-full;
         }
       }
 
       ::placeholder {
-        @apply text-primeBlack50;
+        @apply text-grey-500;
       }
       /* Edge */
       ::-webkit-input-placeholder {
-        @apply text-primeBlack50;
+        @apply text-grey-500;
       }
       /* Internet Explorer */
       :-ms-input-placeholder {
-        @apply text-primeBlack50;
+        @apply text-grey-500;
       }
     }
   }

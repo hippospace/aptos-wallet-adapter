@@ -7,11 +7,11 @@ const SummaryPanel: React.FC = () => {
     <div className="flex flex-col gap-8 text-center">
       <div className="flex flex-col gap-4">
         <div className="title text-primeBlack20">Total Value Locked</div>
-        <div className="header4 bold text-primary">${totalValueLocked.toFixed(2)}</div>
+        <div className="header4 bold text-grey-900">${totalValueLocked.toFixed(2)}</div>
       </div>
       <div className="flex flex-col gap-4">
         <div className="title text-primeBlack20">Total 24h Volume</div>
-        <div className="header4 bold text-primary">${total24Vol.toFixed(2)}</div>
+        <div className="header4 bold text-grey-900">${total24Vol.toFixed(2)}</div>
       </div>
     </div>
   );

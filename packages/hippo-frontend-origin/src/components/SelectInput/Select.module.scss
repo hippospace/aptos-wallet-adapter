@@ -12,22 +12,22 @@
           @apply bg-primeBlack p-[10px];
           .ant-select-selection-item {
             background-color: transparent;
-            @apply text-sm text-primary font-semibold flex items-center;
+            @apply text-sm text-grey-900 font-semibold flex items-center;
           }
         }
       }
     }
 
     ::placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
     /* Edge */
     ::-webkit-input-placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
     /* Internet Explorer */
     :-ms-input-placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
   }
 }

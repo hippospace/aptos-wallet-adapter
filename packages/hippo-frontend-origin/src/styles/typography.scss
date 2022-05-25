@@ -35,3 +35,39 @@
     @apply underline;
   }
 }
+
+h1 {
+  @apply text-[56px] leading-none;
+}
+
+h2 {
+  @apply text-[48px] leading-none;
+}
+
+h3 {
+  @apply text-[40px] leading-none;
+}
+
+h4 {
+  @apply text-[32px] leading-none;
+}
+
+h5 {
+  @apply text-2xl;
+}
+
+h6 {
+  @apply text-xl;
+}
+
+title {
+  @apply text-lg;
+}
+
+small {
+  @apply text-[14px];
+}
+
+.helpText {
+  @apply text-sm;
+}

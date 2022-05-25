@@ -17,6 +17,7 @@ export { default as InputNumber } from 'antd/lib/input-number';
 export { default as List } from 'antd/lib/list';
 export { default as Checkbox } from 'antd/lib/checkbox';
 export { default as Form } from 'antd/lib/form';
+export { default as message } from 'antd/lib/message';
 export type { InputNumberProps } from 'antd/lib/input-number';
 export type { InputProps } from 'antd/lib/input';
 export type { SwitchProps } from 'antd/lib/switch';

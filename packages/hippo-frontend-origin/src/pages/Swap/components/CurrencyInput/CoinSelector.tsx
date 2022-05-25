@@ -1,20 +1,18 @@
-import { Input, List, Modal } from 'components/Antd';
+import { Input, List } from 'components/Antd';
 import { useFormikContext } from 'formik';
 import { getTokenList } from 'modules/swap/reducer';
 import { ISwapSettings } from 'pages/Swap/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { CloseIcon } from 'resources/icons';
 import { ITokenInfo } from 'types/tokenList';
 import VirtualList from 'rc-virtual-list';
 import CoinRow from './CoinRow';
 
-import styles from './CoinSelector.module.scss';
 import CommonCoinButton from './CommonCoinButton';
 
 interface TProps {
   actionType: 'currencyTo' | 'currencyFrom';
-  isVisible: boolean;
+  // isVisible: boolean;
   dismissiModal: () => void;
 }
 
@@ -37,7 +35,7 @@ const commonCoins = [
   }
 ];
 
-const CoinSelector: React.FC<TProps> = ({ isVisible, dismissiModal, actionType }) => {
+const CoinSelector: React.FC<TProps> = ({ dismissiModal, actionType }) => {
   const { values, setFieldValue } = useFormikContext<ISwapSettings>();
   const tokenList = useSelector(getTokenList);
   const [filter, setFilter] = useState<string>('');
@@ -63,14 +61,7 @@ const CoinSelector: React.FC<TProps> = ({ isVisible, dismissiModal, actionType }
 
   const renderHeaderSearch = useMemo(() => {
     return (
-      <div className="px-[30px] flex flex-col gap-6">
-        <div className="header5 bold">Select a token</div>
-        <Input
-          className="py-4 px-2 header5 text-primeBlack80 rounded-[10px] bg-primeBlack border-primeBlack80 hover:!border-primeBlack80 focus:!border-primeBlack80"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value.toLowerCase())}
-          placeholder="Search name or paste address"
-        />
+      <div className="flex flex-col gap-2">
         <div className="flex gap-2">
           {commonCoins.map((coin) => (
             <CommonCoinButton
@@ -80,22 +71,28 @@ const CoinSelector: React.FC<TProps> = ({ isVisible, dismissiModal, actionType }
             />
           ))}
         </div>
+        <Input
+          className="py-4 px-6 font-bold text-base !border-[3px] !border-grey-900 text-grey-900 rounded-xl bg-transparent shadow-transparent"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value.toLowerCase())}
+          placeholder="Search"
+        />
       </div>
     );
   }, [filter, onSelectToken]);
 
   const renderTokenList = useMemo(() => {
     return (
-      <div className="px-[30px]">
-        <div className="flex justify-between mb-3">
-          <div className="helpText text-primeBlack80 font-semibold">Token</div>
-          <div className="helpText text-primeBlack80 font-semibold">Balance</div>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between">
+          <small className="text-grey-700 font-bold">Token</small>
+          <small className="text-grey-700 font-bold">Balance</small>
         </div>
         <List className="h-[376px] overflow-y-scroll border-0">
           <VirtualList data={filteredTokenList} height={376} itemHeight={56} itemKey="tokenList">
             {(item) => (
               <List.Item
-                className="!border-b-0 !px-0 cursor-pointer"
+                className="!border-b-0 !px-0 cursor-pointer p-1"
                 key={`${item.symbol}-${item.address}`}
                 onClick={() => onSelectToken(item)}>
                 <CoinRow item={item} />
@@ -108,21 +105,10 @@ const CoinSelector: React.FC<TProps> = ({ isVisible, dismissiModal, actionType }
   }, [filteredTokenList, onSelectToken]);
 
   return (
-    <Modal
-      onCancel={dismissiModal}
-      className=""
-      wrapClassName={styles.selectorModal}
-      visible={isVisible}
-      footer={null}
-      closeIcon={<CloseIcon />}>
+    <div className="flex flex-col gap-2">
       {renderHeaderSearch}
-      <hr className="w-full my-4 h-[2px] bg-[rgba(45, 45, 45, 0.2)]" />
       {renderTokenList}
-      <hr className="w-full my-4 h-[2px] bg-[rgba(45, 45, 45, 0.2)]" />
-      <div className="w-full text-center title bold text-primary cursor-pointer">
-        Manage Token Lists
-      </div>
-    </Modal>
+    </div>
   );
 };
 

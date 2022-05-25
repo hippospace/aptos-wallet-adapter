@@ -23,15 +23,15 @@ const Swap: React.FC = () => {
   const renderCardHeader = useMemo(
     () => (
       <div className="w-full flex my-8 justify-center relative">
-        <div className="paragraph bold">Swap</div>
+        <h5 className="font-bold">Swap</h5>
         <Popover
           overlayClassName={styles.popover}
           trigger="click"
           visible={isVisible}
           onVisibleChange={(visible) => setIsVisible(visible)}
           content={<SwapSetting onClose={() => setIsVisible(false)} />}
-          placement="bottomRight">
-          <button className="absolute right-9 top-0 opacity-50 hover:opacity-80 active:opacity-100 cursor-pointer">
+          placement="rightBottom">
+          <button className="absolute right-9 top-0 cursor-pointer">
             <SettingIcon />
           </button>
         </Popover>
@@ -48,7 +48,7 @@ const Swap: React.FC = () => {
         onSubmit={(values) => {
           console.log('>>sumbit swap', values);
         }}>
-        <Card className="w-[497px] min-h-[430px] flex flex-col pb-10">
+        <Card className="w-[497px] min-h-[430px] flex flex-col pb-10 border-4 border-grey-900 shadow-figma">
           {renderCardHeader}
           <TokenSwap />
         </Card>

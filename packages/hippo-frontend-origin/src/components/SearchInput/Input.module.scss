@@ -11,19 +11,19 @@
 
     .ant-input {
       background-color: transparent;
-      @apply text-sm text-primary font-semibold;
+      @apply text-sm text-grey-900 font-semibold;
     }
 
     ::placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
     /* Edge */
     ::-webkit-input-placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
     /* Internet Explorer */
     :-ms-input-placeholder {
-      @apply text-primeBlack50;
+      @apply text-grey-500;
     }
   }
 }

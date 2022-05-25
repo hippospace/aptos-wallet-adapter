@@ -9,12 +9,9 @@ interface TProps {
 
 const CommonCoinButton: React.FC<TProps> = ({ coin, onClickToken }) => {
   return (
-    <Button
-      variant="outlined"
-      onClick={onClickToken}
-      className="uppercase flex gap-2 border-[1px] rounded-[10px] border-primeBlack80 p-2 active:!bg-primeBlack focus:!bg-primeBlack">
+    <Button variant="outlined" onClick={onClickToken} className="p-0 overflow-hidden rounded-full">
       <CoinIcon logoSrc={coin.logoURI} />
-      {coin.symbol}
+      {/* {coin.symbol} */}
     </Button>
   );
 };

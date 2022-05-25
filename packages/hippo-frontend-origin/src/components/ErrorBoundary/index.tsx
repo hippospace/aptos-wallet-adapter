@@ -21,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="w-1/2 mx-auto mt-4 p-4 font-bold text-base text-center text-primary border border-solid border-primary">
+        <div className="w-1/2 mx-auto mt-4 p-4 font-bold text-base text-center text-grey-900 border border-solid border-primary">
           <span className="block py-2 font-bold ">Sorry, there was an unexpected issue !</span>
           <span className="block py-2 font-bold ">Our team has been notified !</span>
         </div>

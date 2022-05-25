@@ -10,12 +10,24 @@
     }
 
     input {
-      @apply text-right font-extrabold text-base text-primeBlack50 px-0;
+      @apply text-right font-extrabold text-base text-grey-900 px-0;
       box-shadow: none;
 
       &:read-only {
-        @apply text-sm font-semibold;
+        @apply text-[14px] font-bold text-grey-500;
       }
+    }
+
+    ::placeholder {
+      @apply text-grey-500;
+    }
+    /* Edge */
+    ::-webkit-input-placeholder {
+      @apply text-grey-500;
+    }
+    /* Internet Explorer */
+    :-ms-input-placeholder {
+      @apply text-grey-500;
     }
   }
 }

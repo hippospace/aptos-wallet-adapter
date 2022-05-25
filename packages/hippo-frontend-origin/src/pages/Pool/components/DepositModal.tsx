@@ -73,10 +73,10 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
           <div className="flex gap-10 w-full justify-between">
             <div className="flex gap-2 items-center">
               <CoinIcon logoSrc={logoUri && logoUri[0] ? logoUri[0] : ''} />
-              <div className="header5 bold text-primary">{token.symbol}</div>
+              <div className="header5 bold text-grey-900">{token.symbol}</div>
             </div>
             <NumberInput
-              className="grow rounded-[10px] bg-input h-[56px] max-w-[320px] header5 bold"
+              className="grow rounded-xl bg-input h-[56px] max-w-[320px] header5 bold"
               min={0}
               placeholder="0.00"
               onFocus={() => onHandleInput(inputField, null)}
@@ -114,9 +114,9 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             </div>
             <hr className="h-[2px] bg-[#D5D5D5] w-full my-4" />
             <div className="flex items-center justify-end w-full gap-6">
-              <div className="header5 bold text-primary">Total</div>
+              <div className="header5 bold text-grey-900">Total</div>
               <NumberInput
-                className="grow rounded-[10px] bg-input h-[56px] max-w-[320px] header5 bold"
+                className="grow rounded-xl bg-input h-[56px] max-w-[320px] header5 bold"
                 min={0}
                 placeholder="0.00"
                 readOnly
@@ -131,17 +131,17 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             </div>
             <div className="flex justify-between pt-12">
               <div className="flex gap-4 items-center">
-                <div className="header5 bold text-primary">$1.23</div>
-                <div className="paragraph text-primary">/ month</div>
+                <div className="header5 bold text-grey-900">$1.23</div>
+                <div className="paragraph text-grey-900">/ month</div>
               </div>
               <div className="flex gap-4 items-center">
-                <div className="header5 bold text-primary">100%</div>
-                <div className="paragraph text-primary">APR</div>
+                <div className="header5 bold text-grey-900">100%</div>
+                <div className="paragraph text-grey-900">APR</div>
               </div>
             </div>
           </div>
           <Checkbox>
-            <div className="helpText text-primary">
+            <div className="helpText text-grey-900">
               I verify that I have read the <TextLink href="">Orca Pools Guide</TextLink> and{' '}
               <TextLink href="">understand the risks of providing liquidity</TextLink>, including
               impermanent loss.

@@ -41,7 +41,7 @@ const FilterPanel: React.FC = () => {
         onChange={(e) => handleOnChange(e.target.value, e.target.name)}
       />
       <div className="flex gap-3 items-center">
-        <div className="paragraph bold text-primary">Filter</div>
+        <div className="paragraph bold text-grey-900">Filter</div>
         <SelectInput
           value={filterParams.filterBy}
           options={filterOptions}
@@ -49,7 +49,7 @@ const FilterPanel: React.FC = () => {
         />
       </div>
       <div className="flex gap-3 items-center">
-        <div className="paragraph bold text-primary">Sort</div>
+        <div className="paragraph bold text-grey-900">Sort</div>
         <SelectInput
           value={filterParams.sortBy}
           options={filterOptions}
@@ -57,7 +57,7 @@ const FilterPanel: React.FC = () => {
         />
       </div>
       <div className="flex gap-3 items-center">
-        <div className="paragraph bold text-primary">Show My Liquidity</div>
+        <div className="paragraph bold text-grey-900">Show My Liquidity</div>
         <SwitchInput
           checked={filterParams.showSelfLiquidity}
           onChange={(checked) => handleOnChange(checked, 'showSelfLiquidity')}

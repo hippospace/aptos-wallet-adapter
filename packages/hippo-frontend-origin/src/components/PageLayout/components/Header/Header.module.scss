@@ -1,7 +1,7 @@
 .menu {
   &:global {
     &.ant-menu.ant-menu-dark {
-      @apply bg-secondary;
+      @apply bg-primary;
     }
 
     // remove blue background
@@ -10,8 +10,12 @@
     &.ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover {
       background: transparent;
       a {
-        @apply text-primary;
+        @apply text-grey-900;
       }
+    }
+
+    &.ant-menu-dark .ant-menu-item-selected::after {
+      @apply border-b-grey-900 border-[3px] bottom-3;
     }
 
     &.ant-menu .ant-menu-item {
@@ -24,7 +28,7 @@
     &.ant-menu .ant-menu-item-group-title,
     &.ant-menu .ant-menu-item > a,
     &.ant-menu .ant-menu-item > span > a {
-      @apply text-primary/50;
+      @apply text-grey-900/50;
     }
   }
 }

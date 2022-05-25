@@ -37,7 +37,7 @@ const SwapSetting: React.FC<TProps> = ({ onClose }) => {
         <div className="paragraph text-primeBlack80">Slippage tolerance</div>
         <div className="flex w-full mt-4">
           <NumberInput
-            className="grow mr-4 rounded-[10px] bg-input"
+            className="grow mr-4 rounded-xl bg-transparent border-[3px] border-grey-900"
             name="slipTolerance"
             min={0}
             max={100}
@@ -54,7 +54,10 @@ const SwapSetting: React.FC<TProps> = ({ onClose }) => {
             value={values.slipTolerance}
             onChange={(val) => setFieldValue('slipTolerance', val)}
           />
-          <Button className="py-[6px]" onClick={handleAuto}>
+          <Button
+            className="py-[6px] border-[3px] border-grey-900 font-bold !text-grey-900"
+            variant="outlined"
+            onClick={handleAuto}>
             Auto
           </Button>
         </div>
@@ -63,7 +66,7 @@ const SwapSetting: React.FC<TProps> = ({ onClose }) => {
         <div className="paragraph text-primeBlack80">Transaction deadline</div>
         <div className="flex w-full mt-4 h-[39px] items-center">
           <NumberInput
-            className="w-[88px] h-full mr-4 rounded-[10px] bg-input"
+            className="w-[88px] h-full mr-4 rounded-xl bg-transparent  border-[3px] border-grey-900"
             name="trasactionDeadline"
             min={0}
             max={4320}
@@ -80,12 +83,12 @@ const SwapSetting: React.FC<TProps> = ({ onClose }) => {
       </div>
       <div className="mt-6 flex gap-6">
         <Button
-          className="border-2 border-primary grow paragraph active:!bg-primeBlack focus:!bg-primeBlack"
+          className="grow border-[3px] border-grey-900 font-bold !text-grey-900"
           variant="outlined"
           onClick={onResetSwapSetting}>
           Reset
         </Button>
-        <Button className="grow paragraph" variant="solid" onClick={onConfirm}>
+        <Button className="grow font-bold" variant="solid" onClick={onConfirm}>
           Confirm
         </Button>
       </div>

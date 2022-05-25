@@ -1,6 +1,7 @@
 import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Types, AptosClient } from 'aptos';
 import { stringToHex } from 'utils/utility';
+import { message as AntdMessage } from 'components/Antd';
 
 interface AptosWalletContextType {
   address: string | null;
@@ -8,6 +9,7 @@ interface AptosWalletContextType {
   createTransaction?: (props: TTransactionProps) => TransactionType;
   signAndSubmitTransaction?: (props: TransactionType) => {};
   getResource?: (props: TGetResourceProps) => Types.AccountResource[];
+  activate?: () => {};
 }
 
 interface TProviderProps {
@@ -49,7 +51,9 @@ const AptosWalletProvider: FC<TProviderProps> = ({ connectUri, children }) => {
   const [resources, setResources] = useState<Types.AccountResource[]>([]);
 
   useEffect(() => {
-    window.aptos.account().then(setAddress);
+    if (window.aptos) {
+      window.aptos.account().then(setAddress);
+    }
   }, []);
 
   useEffect(() => {
@@ -61,6 +65,14 @@ const AptosWalletProvider: FC<TProviderProps> = ({ connectUri, children }) => {
     if (!address) return;
     client.getAccountResources(address).then(setResources);
   }, [address, client]);
+
+  const activate = useCallback(async () => {
+    try {
+      await window.aptos.account().then(setAddress);
+    } catch (err) {
+      AntdMessage.error('Please install Aptos Wallet Extension');
+    }
+  }, []);
 
   const createTransaction = useCallback(
     ({ message, func }: TTransactionProps): TransactionType => {
@@ -88,7 +100,14 @@ const AptosWalletProvider: FC<TProviderProps> = ({ connectUri, children }) => {
 
   return (
     <AptosWalletContext.Provider
-      value={{ address, account, createTransaction, signAndSubmitTransaction, getResource }}>
+      value={{
+        address,
+        account,
+        createTransaction,
+        signAndSubmitTransaction,
+        getResource,
+        activate
+      }}>
       {children}
     </AptosWalletContext.Provider>
   );

@@ -5,12 +5,12 @@ export interface ISwapSettings {
   trasactionDeadline: number;
   currencyFrom?: {
     token: ITokenInfo;
-    amount: number;
+    amount?: number;
     balance: number;
   };
   currencyTo?: {
     token: ITokenInfo;
-    amount: number;
+    amount?: number;
     balance: number;
   };
 }

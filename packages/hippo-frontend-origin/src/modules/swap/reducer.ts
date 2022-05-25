@@ -22,12 +22,12 @@ const initState: SwapState = {
     trasactionDeadline: 0,
     currencyFrom: {
       token: {} as ITokenInfo,
-      amount: 0,
+      amount: undefined,
       balance: 0
     },
     currencyTo: {
       token: {} as ITokenInfo,
-      amount: 0,
+      amount: undefined,
       balance: 0
     }
   }

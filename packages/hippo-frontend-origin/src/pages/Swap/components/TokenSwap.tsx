@@ -38,7 +38,7 @@ const TokenSwap = () => {
   return (
     <div className="w-full flex flex-col px-8 gap-1">
       <CurrencyInput actionType="currencyFrom" />
-      <Button variant="outlined" className="!bg-secondary" onClick={onClickSwapToken}>
+      <Button variant="outlined" className="!bg-secondary !border-0" onClick={onClickSwapToken}>
         <SwapIcon />
       </Button>
       <CurrencyInput actionType="currencyTo" />

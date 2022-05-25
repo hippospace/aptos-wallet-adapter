@@ -1,39 +1,39 @@
 .button {
-  @apply cursor-pointer py-3 px-5 rounded-[20px] flex items-center justify-center text-center uppercase font-medium;
+  @apply cursor-pointer py-3 px-5 rounded-lg flex items-center justify-center text-center uppercase font-medium;
 
   &.solid {
-    @apply bg-prime text-white border-[3px] border-solid border-primary shadow-md;
+    @apply bg-prime text-white border-[3px] border-solid border-primary;
 
     &:hover {
-      @apply text-primary/80 bg-secondary;
+      @apply text-grey-900/80 bg-secondary;
     }
 
     // &:active,
     // &:focus {
-    //   @apply text-primary/100 bg-primary;
+    //   @apply text-grey-900/100 bg-primary;
     // }
   }
 
   &.outlined {
-    @apply text-primary/50 bg-secondary;
+    @apply border-2 border-grey-900 bg-transparent;
 
     &:hover {
-      @apply text-primary/80 bg-primeBlack;
+      @apply bg-primePurple-100;
     }
 
-    &:active,
-    &:focus {
-      @apply text-primary/100 bg-prime;
-    }
+    // &:active,
+    // &:focus {
+    //   @apply text-grey-900/100 bg-prime;
+    // }
   }
 
   &:hover {
-    @apply text-primary/80;
+    @apply text-grey-900/80;
   }
 
   // &:active,
   // &:focus {
-  //   @apply text-primary/100;
+  //   @apply text-grey-900/100;
   // }
 
   &.disabled {

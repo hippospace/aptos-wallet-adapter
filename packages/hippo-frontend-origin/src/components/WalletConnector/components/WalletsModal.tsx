@@ -33,7 +33,7 @@ const Option: React.FC<TOptionProps> = ({ onClick, label }) => {
   return (
     <Button onClick={onClick} className="flex gap-2 w-1/2 justify-start mt-2" variant="outlined">
       <div>{getWalletIcon()}</div>
-      <div className="paragraph bold text-black">{label}</div>
+      <div className="font-bold text-black">{label}</div>
     </Button>
   );
 };

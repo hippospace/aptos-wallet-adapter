@@ -18,7 +18,7 @@ const Link = ({ href, children }: { href: string; children: any }) => {
       target="_blank"
       rel="noreferrer"
       href={href}
-      className="flex header5 bold text-primary opacity-50 gap-2 hover:text-primary hover:opacity-100">
+      className="flex header5 bold text-grey-900 opacity-50 gap-2 hover:text-grey-900 hover:opacity-100">
       {children}
     </a>
   );
@@ -26,7 +26,7 @@ const Link = ({ href, children }: { href: string; children: any }) => {
 
 const PageFooter: React.FC = () => {
   return (
-    <Footer className="flex gap-8 justify-center py-16">
+    <Footer className="flex gap-8 justify-center py-16 bg-transparent">
       <Link href={URLs.discord}>
         <DiscordIcon />
         Discord

@@ -45,25 +45,25 @@ const PageHeader: React.FC = () => {
   }, [getNavSelected]);
 
   return (
-    <Header className="fixed z-10 w-full px-16 pt-12 bg-primary h-auto">
+    <Header className="fixed z-20 w-full px-16 pt-12 bg-transparent h-auto">
       <div className="mx-auto h-[72px] top-0 left-0 flex items-center">
         <div className="grow h-full">
           <Link
             to="/"
-            className="w-[72px] h-full bg-secondary flex items-center justify-center rounded-[10px]">
-            <LogoIcon className="w-10 h-10" />
+            className="w-[72px] h-full bg-secondary flex items-center justify-center rounded-xl">
+            <LogoIcon className="w-full h-full" />
           </Link>
         </div>
-        <div className="flex grow items-center h-full">
+        <div className="flex grow items-center h-full ml-[180px]">
           <Antd.Menu
             mode="horizontal"
             theme="dark"
-            className={cx(styles.menu, 'shadow-md rounded-xl h-full mr-10')}
+            className={cx(styles.menu, 'h-full')}
             selectedKeys={[selectedKey]}>
             {renderNavItems()}
           </Antd.Menu>
-          <WalletConnector />
         </div>
+        <WalletConnector />
         <div />
       </div>
     </Header>
