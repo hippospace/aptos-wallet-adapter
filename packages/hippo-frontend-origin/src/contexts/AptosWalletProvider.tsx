@@ -1,112 +1,154 @@
-import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { Types, AptosClient } from 'aptos';
-import { stringToHex } from 'utils/utility';
-import { message as AntdMessage } from 'components/Antd';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { createContext, FC, ReactNode, useCallback, useState } from 'react';
+import { AptosAccountState, ActiveAptosWallet, DecrypyedAptosWallet } from 'types/aptos';
+import {
+  ACTIVE_WALLET,
+  DECRYPTED_WALLET_LIST,
+  // DECRYPTED_WALLET_LIST,
+  ENCRYPTED_WALLET_LIST,
+  WALLET_STATE_NETWORK_LOCAL_STORAGE_KEY
+} from 'config/aptosConstants';
+import {
+  AptosNetwork,
+  getActiveWallet,
+  // connectAccount,
+  getDecryptedWalletList,
+  getEncryptedLocalState,
+  getLocalStorageNetworkState
+} from 'utils/aptosUtils';
+import CryptoJS from 'crypto-js';
 
 interface AptosWalletContextType {
-  address: string | null;
-  account: Types.Account | null;
-  createTransaction?: (props: TTransactionProps) => TransactionType;
-  signAndSubmitTransaction?: (props: TransactionType) => {};
-  getResource?: (props: TGetResourceProps) => Types.AccountResource[];
-  activate?: () => {};
+  activeWallet?: ActiveAptosWallet;
+  aptosNetwork: AptosNetwork | null;
+  disconnect: () => void;
+  updateNetworkState: (network: AptosNetwork) => void;
+  // updateWalletState: (props: UpdateWalletStateProps) => void;
+  initialized: boolean;
+  storeEncryptedWallet: (props: StoreWalletStateProp) => void;
+  walletList: DecrypyedAptosWallet[];
+  open: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+  connectAccount: (password: string, wallet?: string) => void;
 }
 
 interface TProviderProps {
-  connectUri: string;
   children: ReactNode;
 }
 
-interface TTransactionProps {
-  message: string;
-  func: string;
+const defaultValue: DecrypyedAptosWallet[] = [];
+
+const AptosWalletContext = createContext<AptosWalletContextType>({} as AptosWalletContextType);
+
+interface UpdateWalletStateProps {
+  aptosAccountState: AptosAccountState;
+  walletName: string;
 }
 
-interface TransactionType {
-  type: string;
-  function: string;
-  arguments: string[];
-  type_arguments: [];
+interface StoreWalletStateProp extends UpdateWalletStateProps {
+  password: string;
 }
 
-interface TGetResourceProps {
-  resourceType: string;
-}
+const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
+  const [open, setOpen] = useState(false);
+  const [initialized] = useState(() => !!getEncryptedLocalState());
+  const [walletList, setWalletList] = useState<DecrypyedAptosWallet[]>(
+    () => getDecryptedWalletList() ?? defaultValue
+  );
+  const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet | undefined>(() =>
+    getActiveWallet()
+  );
+  const [aptosNetwork, setAptosNetwork] = useState<AptosNetwork | null>(() =>
+    getLocalStorageNetworkState()
+  );
 
-declare global {
-  interface Window {
-    aptos: any;
-  }
-}
+  const storeEncryptedWallet = useCallback(
+    ({ aptosAccountState, walletName, password }: StoreWalletStateProp) => {
+      try {
+        const privateKeyObject = aptosAccountState?.toPrivateKeyObject();
+        const currentWallet = { walletName, aptosAccountObj: privateKeyObject };
+        const encryptedWallet = CryptoJS.AES.encrypt(
+          JSON.stringify([currentWallet, ...walletList]),
+          password
+        ).toString();
+        // window.localStorage.setItem(ACTIVE_WALLET, JSON.stringify(currentWallet));
+        window.localStorage.setItem(ENCRYPTED_WALLET_LIST, encryptedWallet);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      }
+    },
+    [walletList]
+  );
 
-const AptosWalletContext = createContext<AptosWalletContextType>({
-  address: '',
-  account: null
-});
-
-const AptosWalletProvider: FC<TProviderProps> = ({ connectUri, children }) => {
-  const client = useMemo(() => new AptosClient(connectUri), [connectUri]);
-  const [address, setAddress] = useState<string | null>(null);
-  const [account, setAccount] = useState<Types.Account | null>(null);
-  const [resources, setResources] = useState<Types.AccountResource[]>([]);
-
-  useEffect(() => {
-    if (window.aptos) {
-      window.aptos.account().then(setAddress);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!address) return;
-    client.getAccount(address).then(setAccount);
-  }, [address, client]);
-
-  useEffect(() => {
-    if (!address) return;
-    client.getAccountResources(address).then(setResources);
-  }, [address, client]);
-
-  const activate = useCallback(async () => {
+  const updateNetworkState = useCallback((network: AptosNetwork) => {
     try {
-      await window.aptos.account().then(setAddress);
-    } catch (err) {
-      AntdMessage.error('Please install Aptos Wallet Extension');
+      setAptosNetwork(network);
+      window.localStorage.setItem(WALLET_STATE_NETWORK_LOCAL_STORAGE_KEY, network);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
     }
   }, []);
 
-  const createTransaction = useCallback(
-    ({ message, func }: TTransactionProps): TransactionType => {
-      return {
-        type: 'script_function_payload',
-        function: `${address}::${func}`,
-        arguments: [stringToHex(message)],
-        type_arguments: []
-      };
-    },
-    [address]
-  );
-
-  const signAndSubmitTransaction = useCallback(async (transaction: TransactionType) => {
-    await window.aptos.signAndSubmitTransaction(transaction);
+  const connectAccount = useCallback((password: string, walletName?: string) => {
+    const currentWallet = getActiveWallet();
+    if (!password) throw new Error('password is missing');
+    if (!currentWallet) {
+      const encryptedWalletList = getEncryptedLocalState();
+      if (!encryptedWalletList) throw new Error('wallet is not yet initialized');
+      let decryptedWalletList: DecrypyedAptosWallet[];
+      try {
+        const item = CryptoJS.AES.decrypt(encryptedWalletList, password);
+        decryptedWalletList = JSON.parse(item.toString(CryptoJS.enc.Utf8));
+      } catch (error) {
+        throw new Error('Incorrect password');
+      }
+      setWalletList(decryptedWalletList);
+      window.localStorage.setItem(DECRYPTED_WALLET_LIST, JSON.stringify(decryptedWalletList));
+      let selectedWallet: DecrypyedAptosWallet | undefined = decryptedWalletList[0];
+      if (walletName) {
+        selectedWallet = decryptedWalletList.find((wallet) => wallet.walletName === walletName);
+      }
+      if (!selectedWallet) throw new Error('Wallet not found');
+      window.localStorage.setItem(ACTIVE_WALLET, JSON.stringify(selectedWallet));
+      const activeAptosWallet = getActiveWallet();
+      if (!activeAptosWallet) throw new Error('Wallet not found in localStorage');
+      setActiveWallet(activeAptosWallet);
+    } else {
+      setActiveWallet(currentWallet);
+    }
   }, []);
 
-  const getResource = useCallback(
-    ({ resourceType }: TGetResourceProps) => {
-      const filteredResources = resources.filter((r) => r.type === resourceType);
-      return filteredResources;
-    },
-    [resources]
-  );
+  const disconnect = useCallback(() => {
+    // setAptosAccount(undefined);
+    setActiveWallet(undefined);
+    // setLocalStorageState({ aptosAccountObject: undefined });
+    window.localStorage.removeItem(ACTIVE_WALLET);
+  }, []);
+
+  const openModal = useCallback(() => setOpen(true), []);
+  const closeModal = useCallback(() => setOpen(false), []);
+  // const toggleModal = useCallback((isOpen: boolean) => setOpen(isOpen), []);
 
   return (
     <AptosWalletContext.Provider
       value={{
-        address,
-        account,
-        createTransaction,
-        signAndSubmitTransaction,
-        getResource,
-        activate
+        activeWallet,
+        aptosNetwork,
+        disconnect,
+        updateNetworkState,
+        walletList,
+        // updateWalletState,
+        storeEncryptedWallet,
+        // walletState: localStorageState,
+        open,
+        openModal,
+        closeModal,
+        connectAccount,
+        initialized
       }}>
       {children}
     </AptosWalletContext.Provider>

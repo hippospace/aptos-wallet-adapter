@@ -4,7 +4,6 @@ import { logger } from 'redux-logger';
 import { ErrorBoundary } from 'components';
 import reducer from 'modules/rootReducer';
 import { AptosWalletProvider } from 'contexts/AptosWalletProvider';
-import { DEVNET_NODE_URL } from 'config/aptosConstants';
 
 const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
@@ -27,7 +26,7 @@ type TProps = {
 const Providers: React.FC<TProps> = (props: TProps) => {
   return (
     <ErrorBoundary>
-      <AptosWalletProvider connectUri={DEVNET_NODE_URL ? DEVNET_NODE_URL : ''}>
+      <AptosWalletProvider>
         <ReduxProvider store={store}>{props.children}</ReduxProvider>
       </AptosWalletProvider>
     </ErrorBoundary>

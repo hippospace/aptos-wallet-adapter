@@ -3,6 +3,7 @@ import Button from 'components/Button';
 import { useMemo } from 'react';
 import { MetamaskIcon, WalletConnectIcon, CoinbaseIcon, PhantomIcon } from 'resources/icons';
 import useAptosWallet from 'hooks/useAptosWallet';
+import { walletAddressEllipsis } from 'utils/utility';
 
 type TOptionProps = {
   onClick?: () => {};
@@ -38,18 +39,22 @@ const Option: React.FC<TOptionProps> = ({ onClick, label }) => {
 
 const WalletSelector: React.FC = () => {
   const { SUPPORTED_WALLETS } = useConnector();
-  const { activate } = useAptosWallet();
+  const { activeWallet } = useAptosWallet();
 
   const renderButtonGroup = useMemo(() => {
     return Object.keys(SUPPORTED_WALLETS).map((key) => {
       const option = SUPPORTED_WALLETS[key];
-      return <Option key={key} label={option.name} onClick={activate ? activate : undefined} />;
+      return <Option key={key} label={option.name} onClick={() => true} />;
     });
-  }, [SUPPORTED_WALLETS, activate]);
+  }, [SUPPORTED_WALLETS]);
 
   return (
     <div className="">
-      <h6 className="font-bold text-black">Connect your wallet</h6>
+      <h6 className="font-bold text-black">
+        {activeWallet
+          ? walletAddressEllipsis(activeWallet?.aptosAccount?.address?.toString() || '')
+          : 'Connect your wallet'}
+      </h6>
       <div className="flex flex-wrap gap-2">{renderButtonGroup}</div>
     </div>
   );

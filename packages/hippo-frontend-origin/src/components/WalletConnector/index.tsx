@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Button from 'components/Button';
 import { useCallback } from 'react';
 import commonActions from 'modules/common/actions';
@@ -11,11 +13,13 @@ import { Popover } from 'components/Antd';
 import { getShowWalletConnector } from 'modules/common/reducer';
 import styles from './WalletConnector.module.scss';
 import WalletSelector from './components/WalletSelector';
+import WebWallet from 'components/WebWallet';
 
 const WalletConnector: React.FC = () => {
   const dispatch = useDispatch();
-  const { address } = useAptosWallet();
-  const showWalletConnector = useSelector(getShowWalletConnector);
+  const { activeWallet, openModal, open, closeModal } = useAptosWallet();
+  const privateKeyObject = activeWallet?.aptosAccount?.toPrivateKeyObject();
+  // const showWalletConnector = useSelector(getShowWalletConnector);
   // const { SUPPORTED_WALLETS } = useConnector();
 
   const toggleConnectModal = useCallback(
@@ -30,16 +34,18 @@ const WalletConnector: React.FC = () => {
       <Popover
         overlayClassName={styles.popover}
         trigger="click"
-        visible={!address && showWalletConnector}
-        onVisibleChange={(visible) => toggleConnectModal(visible)}
-        content={<WalletSelector />}
+        visible={open}
+        onVisibleChange={(visible) => (visible ? openModal() : closeModal())}
+        content={<WebWallet />}
         placement="bottomLeft">
         <div className="flex gap-4 items-center">
           <Button
             className="min-w-[156px] h-10 rounded-xl !shadow-sm !text-grey-900 !bg-primePurple-100 font-bold"
             // onClick={!address ? toggleConnectModal : undefined}
           >
-            {address ? walletAddressEllipsis(address) : 'Connect To Wallet'}
+            {activeWallet
+              ? walletAddressEllipsis(privateKeyObject?.address || '')
+              : 'Connect To Wallet'}
           </Button>
           <CaretIcon className="fill-black" />
         </div>

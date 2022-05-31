@@ -29,5 +29,6 @@ export type { SelectProps, OptionProps } from 'antd/lib/select';
 export { default as Tabs } from 'antd/lib/tabs';
 
 export { default as Menu } from 'antd/lib/menu';
+export type { MenuProps } from 'antd/lib/menu';
 export { default as Spin } from 'antd/lib/spin';
 export { default as Input } from 'antd/lib/input';
