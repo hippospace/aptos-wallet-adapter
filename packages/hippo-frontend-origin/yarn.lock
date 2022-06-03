@@ -1785,20 +1785,22 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@manahippo/aptos-tsgen@^0.0.35":
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@manahippo/aptos-tsgen/-/aptos-tsgen-0.0.35.tgz#153ea6b286daca5c4d2479685d00194432c42deb"
-  integrity sha512-UH91XAl4cMuSLRX91SXsG6c+2vFtVuj/CrWu7XMyg3gWVUi1Whnv3SAgIKiDYwhA9UhJErkuuPwX+yXMh+W9eQ==
+"@manahippo/aptos-tsgen@^0.0.37":
+  version "0.0.37"
+  resolved "https://registry.yarnpkg.com/@manahippo/aptos-tsgen/-/aptos-tsgen-0.0.37.tgz#55ed592786fbaa988d2cf5edd9c069e3f691bf74"
+  integrity sha512-wiyriDJ4cfZ/1RCPtcBS7WmX+Xvj+MX+OMx7ncqlcxtezSa2HAx8S2hf+kEI05+EQXUFkGPVo9UW2A6yGY6kzQ==
   dependencies:
     aptos "^0.0.20"
     big-integer "^1.6.51"
     decimal.js "^10.3.1"
     path "^0.12.7"
 
-"@manahippo/hippo-sdk@file:../hippo-sdk":
-  version "0.0.9"
+"@manahippo/hippo-sdk@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.10.tgz#e863b572b8d4fe405037cc00c7550c6c2f264e2d"
+  integrity sha512-GsRaMiXujcxmvhIbpNfdz19uZqmFtTn4ZO+sfnRkNZIKJuxAhFALx3TAtAYhaJ9BVDlJFqSPhzWrlbGUI7fBiQ==
   dependencies:
-    "@manahippo/aptos-tsgen" "^0.0.35"
+    "@manahippo/aptos-tsgen" "^0.0.37"
     aptos "^0.0.20"
     commander "^9.3.0"
     yaml "^2.1.1"

@@ -1,5 +1,5 @@
-import { HippoWalletClient } from '@manahippo/hippo-sdk/src';
-import { getParserRepo } from '@manahippo/hippo-sdk/src/generated/repo';
+import { HippoWalletClient } from '@manahippo/hippo-sdk';
+import { getParserRepo } from '@manahippo/hippo-sdk/';
 import { AptosAccountState } from 'types/aptos';
 import { readConfig } from 'utils/hippoWalletUtil';
 

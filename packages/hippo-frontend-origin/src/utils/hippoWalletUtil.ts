@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { CONFIGS } from '@manahippo/hippo-sdk/src';
+import { CONFIGS } from '@manahippo/hippo-sdk';
 import { NODE_URL } from 'config/aptosConstants';
 
 export const readConfig = () => {
