@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ActiveAptosWallet, AptosWalletObject } from 'types/aptos';
 import {
   CONNECT_PASSWORD,
@@ -12,6 +12,7 @@ import {
   getLocalStorageNetworkState
 } from 'utils/aptosUtils';
 import CryptoJS from 'crypto-js';
+import { hippoWalletClient } from 'config/hippoWalletClient';
 
 interface AptosWalletContextType {
   activeWallet?: ActiveAptosWallet;
@@ -48,6 +49,13 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
     getLocalStorageNetworkState()
   );
   const savedPassword = window.localStorage.getItem(CONNECT_PASSWORD);
+  const hippoWallet = useMemo(() => {
+    if (activeWallet) {
+      return hippoWalletClient(activeWallet.aptosAccount);
+    }
+  }, [activeWallet]);
+
+  console.log('MEMEM>>', hippoWallet);
 
   useEffect(() => {
     if (walletList && walletList.length) {
