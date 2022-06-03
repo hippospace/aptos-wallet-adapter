@@ -3,11 +3,14 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { useFormik } from 'formik';
 import useAptosWallet from 'hooks/useAptosWallet';
-import { Link } from 'react-router-dom';
 import * as yup from 'yup';
 
 interface TFormProps {
   password: string;
+}
+
+interface TProps {
+  onCreateNew: () => void;
 }
 
 const formItemLayout = {
@@ -19,8 +22,8 @@ const connectWalletSchema = yup.object({
   password: yup.string().required()
 });
 
-const WalletLogin: React.FC = () => {
-  const { connectAccount, closeModal } = useAptosWallet();
+const WalletLogin: React.FC<TProps> = ({ onCreateNew }) => {
+  const { connectAccount } = useAptosWallet();
   const onSubmit = async (values: TFormProps) => {
     try {
       const { password } = values;
@@ -59,9 +62,9 @@ const WalletLogin: React.FC = () => {
       </Form.Item>
       <Button type="submit">Login</Button>
       <hr className="h-[2px] bg-[#D5D5D5] w-full my-4" />
-      <Link to={'wallet'} onClick={closeModal}>
-        Create or Import a wallet:
-      </Link>
+      <div className="text-grey-900 font-bold cursor-pointer" onClick={onCreateNew}>
+        Create or Import a wallet
+      </div>
     </form>
   );
 };

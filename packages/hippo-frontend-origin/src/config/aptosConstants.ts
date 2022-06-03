@@ -1,7 +1,6 @@
 export const KEY_LENGTH: number = 64;
 export const ENCRYPTED_WALLET_LIST = 'encryptedAptosWalletList';
-export const DECRYPTED_WALLET_LIST = 'decryptedAptosWalletList';
-export const ACTIVE_WALLET = 'activeAptosWallet';
+export const CONNECT_PASSWORD = 'aptosWalletPassword';
 
 export const WALLET_STATE_NETWORK_LOCAL_STORAGE_KEY = 'aptosWalletNetworkState';
 

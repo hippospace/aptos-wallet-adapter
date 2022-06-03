@@ -26,6 +26,7 @@
     "normalize.css": "^8.0.1",
     "rc-virtual-list": "^3.4.8",
     "react": "^18.1.0",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.1.0",
     "react-redux": "^8.0.1",
     "react-router-dom": "^6.3.0",
@@ -33,6 +34,7 @@
     "redux-logger": "^3.0.6",
     "sass": "^1.51.0",
     "typescript": "^4.4.2",
+    "usehooks-ts": "^2.5.4",
     "web-vitals": "^2.1.0",
     "web3": "^1.7.3",
     "yup": "^0.32.11"
@@ -64,6 +66,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
+    "@types/react-copy-to-clipboard": "^5.0.2",
     "@types/react-redux": "^7.1.24",
     "@types/redux-logger": "^3.0.9",
     "autoprefixer": "^10.4.7",

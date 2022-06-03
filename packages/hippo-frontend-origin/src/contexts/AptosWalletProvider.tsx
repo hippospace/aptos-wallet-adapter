@@ -1,19 +1,13 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createContext, FC, ReactNode, useCallback, useState } from 'react';
-import { AptosAccountState, ActiveAptosWallet, DecrypyedAptosWallet } from 'types/aptos';
+import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { ActiveAptosWallet, AptosWalletObject } from 'types/aptos';
 import {
-  ACTIVE_WALLET,
-  DECRYPTED_WALLET_LIST,
-  // DECRYPTED_WALLET_LIST,
+  CONNECT_PASSWORD,
   ENCRYPTED_WALLET_LIST,
   WALLET_STATE_NETWORK_LOCAL_STORAGE_KEY
 } from 'config/aptosConstants';
 import {
   AptosNetwork,
-  getActiveWallet,
-  // connectAccount,
-  getDecryptedWalletList,
+  getAptosAccountState,
   getEncryptedLocalState,
   getLocalStorageNetworkState
 } from 'utils/aptosUtils';
@@ -24,63 +18,84 @@ interface AptosWalletContextType {
   aptosNetwork: AptosNetwork | null;
   disconnect: () => void;
   updateNetworkState: (network: AptosNetwork) => void;
-  // updateWalletState: (props: UpdateWalletStateProps) => void;
   initialized: boolean;
   storeEncryptedWallet: (props: StoreWalletStateProp) => void;
-  walletList: DecrypyedAptosWallet[];
+  walletList: AptosWalletObject[];
   open: boolean;
   openModal: () => void;
   closeModal: () => void;
   connectAccount: (password: string, wallet?: string) => void;
+  setActiveAptosWallet: (walletName?: string) => void;
 }
 
 interface TProviderProps {
   children: ReactNode;
 }
 
-const defaultValue: DecrypyedAptosWallet[] = [];
-
 const AptosWalletContext = createContext<AptosWalletContextType>({} as AptosWalletContextType);
 
-interface UpdateWalletStateProps {
-  aptosAccountState: AptosAccountState;
-  walletName: string;
-}
-
-interface StoreWalletStateProp extends UpdateWalletStateProps {
-  password: string;
+interface StoreWalletStateProp {
+  updatedWalletList: AptosWalletObject[];
+  password?: string;
 }
 
 const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [initialized] = useState(() => !!getEncryptedLocalState());
-  const [walletList, setWalletList] = useState<DecrypyedAptosWallet[]>(
-    () => getDecryptedWalletList() ?? defaultValue
-  );
-  const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet | undefined>(() =>
-    getActiveWallet()
-  );
+  const [walletList, setWalletList] = useState<AptosWalletObject[]>([]);
+  const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet | undefined>(undefined);
   const [aptosNetwork, setAptosNetwork] = useState<AptosNetwork | null>(() =>
     getLocalStorageNetworkState()
   );
+  const savedPassword = window.localStorage.getItem(CONNECT_PASSWORD);
+
+  useEffect(() => {
+    if (walletList && walletList.length) {
+      const aptosWalletState = getAptosAccountState(walletList[walletList.length - 1]);
+      setActiveWallet(aptosWalletState);
+    }
+  }, [walletList]);
+
+  const connectAccount = useCallback((password: string) => {
+    if (!password) throw new Error('password is missing');
+    const encryptedWalletList = getEncryptedLocalState();
+    if (!encryptedWalletList) throw new Error('wallet is not yet initialized');
+    let decryptedWalletList: AptosWalletObject[];
+    try {
+      const item = CryptoJS.AES.decrypt(encryptedWalletList, password);
+      decryptedWalletList = JSON.parse(item.toString(CryptoJS.enc.Utf8));
+    } catch (error) {
+      throw new Error('Incorrect password');
+    }
+    setWalletList(decryptedWalletList);
+    const aptosWalletState = getAptosAccountState(decryptedWalletList[0]);
+    setActiveWallet(aptosWalletState);
+    // TODO: better no saving password in local storage
+    window.localStorage.setItem(CONNECT_PASSWORD, password);
+  }, []);
+
+  useEffect(() => {
+    if (savedPassword) {
+      connectAccount(savedPassword);
+    }
+  }, [savedPassword]);
 
   const storeEncryptedWallet = useCallback(
-    ({ aptosAccountState, walletName, password }: StoreWalletStateProp) => {
+    ({ updatedWalletList, password }: StoreWalletStateProp) => {
+      const encryptPassword = password || window.localStorage.getItem(CONNECT_PASSWORD) || '';
       try {
-        const privateKeyObject = aptosAccountState?.toPrivateKeyObject();
-        const currentWallet = { walletName, aptosAccountObj: privateKeyObject };
         const encryptedWallet = CryptoJS.AES.encrypt(
-          JSON.stringify([currentWallet, ...walletList]),
-          password
+          JSON.stringify(updatedWalletList),
+          encryptPassword
         ).toString();
-        // window.localStorage.setItem(ACTIVE_WALLET, JSON.stringify(currentWallet));
         window.localStorage.setItem(ENCRYPTED_WALLET_LIST, encryptedWallet);
+        setWalletList(updatedWalletList);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
       }
     },
-    [walletList]
+    []
   );
 
   const updateNetworkState = useCallback((network: AptosNetwork) => {
@@ -93,57 +108,39 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const connectAccount = useCallback((password: string, walletName?: string) => {
-    const currentWallet = getActiveWallet();
-    if (!password) throw new Error('password is missing');
-    if (!currentWallet) {
-      const encryptedWalletList = getEncryptedLocalState();
-      if (!encryptedWalletList) throw new Error('wallet is not yet initialized');
-      let decryptedWalletList: DecrypyedAptosWallet[];
-      try {
-        const item = CryptoJS.AES.decrypt(encryptedWalletList, password);
-        decryptedWalletList = JSON.parse(item.toString(CryptoJS.enc.Utf8));
-      } catch (error) {
-        throw new Error('Incorrect password');
-      }
-      setWalletList(decryptedWalletList);
-      window.localStorage.setItem(DECRYPTED_WALLET_LIST, JSON.stringify(decryptedWalletList));
-      let selectedWallet: DecrypyedAptosWallet | undefined = decryptedWalletList[0];
+  const setActiveAptosWallet = useCallback(
+    (walletName?: string) => {
+      if (!walletList || !walletList.length) throw new Error('Please login first');
+      let selectedWallet: AptosWalletObject | undefined = walletList[0];
       if (walletName) {
-        selectedWallet = decryptedWalletList.find((wallet) => wallet.walletName === walletName);
+        selectedWallet = walletList.find((wallet) => wallet.walletName === walletName);
       }
       if (!selectedWallet) throw new Error('Wallet not found');
-      window.localStorage.setItem(ACTIVE_WALLET, JSON.stringify(selectedWallet));
-      const activeAptosWallet = getActiveWallet();
-      if (!activeAptosWallet) throw new Error('Wallet not found in localStorage');
+      const activeAptosWallet = getAptosAccountState(selectedWallet);
       setActiveWallet(activeAptosWallet);
-    } else {
-      setActiveWallet(currentWallet);
-    }
-  }, []);
+    },
+    [setActiveWallet, walletList]
+  );
 
   const disconnect = useCallback(() => {
-    // setAptosAccount(undefined);
     setActiveWallet(undefined);
-    // setLocalStorageState({ aptosAccountObject: undefined });
-    window.localStorage.removeItem(ACTIVE_WALLET);
+    setWalletList([]);
+    window.localStorage.removeItem(CONNECT_PASSWORD);
   }, []);
 
   const openModal = useCallback(() => setOpen(true), []);
   const closeModal = useCallback(() => setOpen(false), []);
-  // const toggleModal = useCallback((isOpen: boolean) => setOpen(isOpen), []);
 
   return (
     <AptosWalletContext.Provider
       value={{
         activeWallet,
+        setActiveAptosWallet,
         aptosNetwork,
         disconnect,
         updateNetworkState,
         walletList,
-        // updateWalletState,
         storeEncryptedWallet,
-        // walletState: localStorageState,
         open,
         openModal,
         closeModal,

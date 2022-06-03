@@ -5,7 +5,6 @@ import { faucetClient } from 'config/faucetClient';
 import { useFormik } from 'formik';
 import useAptosWallet from 'hooks/useAptosWallet';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createNewAccount } from 'utils/aptosUtils';
 import * as yup from 'yup';
 
@@ -31,8 +30,7 @@ const createWalletSchema = yup.object({
 
 const CreateWallet: React.FC = () => {
   const [isAccountBeingCreated, setIsAccountBeingCreated] = useState<boolean>(false);
-  const { storeEncryptedWallet, connectAccount } = useAptosWallet();
-  const navigate = useNavigate();
+  const { storeEncryptedWallet, connectAccount, walletList } = useAptosWallet();
 
   const onSubmit = async (values: TFormProps) => {
     try {
@@ -40,11 +38,11 @@ const CreateWallet: React.FC = () => {
       setIsAccountBeingCreated(true);
       const account = createNewAccount();
       await faucetClient.fundAccount(account.address(), 0);
-      // updateWalletState({ aptosAccountState: account, walletName });
-      storeEncryptedWallet({ aptosAccountState: account, walletName, password });
-      connectAccount(password, walletName);
+      const privateKeyObject = account?.toPrivateKeyObject();
+      const updatedWalletList = [{ walletName, aptosAccountObj: privateKeyObject }, ...walletList];
+      storeEncryptedWallet({ updatedWalletList, password });
+      connectAccount(password);
       setIsAccountBeingCreated(false);
-      navigate('/');
     } catch (error) {
       console.log('create new wallet error:', error);
     }
@@ -61,20 +59,8 @@ const CreateWallet: React.FC = () => {
   });
 
   return (
-    <form className="flex flex-col items-center gap-6 w-1/2 m-auto" onSubmit={formik.handleSubmit}>
+    <form className="flex flex-col items-center gap-6 w-full" onSubmit={formik.handleSubmit}>
       <h5>Create Password</h5>
-      <Form.Item
-        {...formItemLayout}
-        className="w-full"
-        label="Wallet Name"
-        validateStatus={formik.errors.walletName ? 'error' : ''}
-        help={formik.errors.walletName}>
-        <TextInput
-          name="walletName"
-          value={formik.values.walletName}
-          onChange={formik.handleChange}
-        />
-      </Form.Item>
       <Form.Item
         {...formItemLayout}
         className="w-full"

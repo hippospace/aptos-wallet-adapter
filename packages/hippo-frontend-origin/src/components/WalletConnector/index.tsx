@@ -37,6 +37,7 @@ const WalletConnector: React.FC = () => {
         visible={open}
         onVisibleChange={(visible) => (visible ? openModal() : closeModal())}
         content={<WebWallet />}
+        destroyTooltipOnHide
         placement="bottomLeft">
         <div className="flex gap-4 items-center">
           <Button
