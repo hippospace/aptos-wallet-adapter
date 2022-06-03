@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { ActiveAptosWallet, AptosWalletObject } from 'types/aptos';
 import {
   CONNECT_PASSWORD,
@@ -12,7 +12,8 @@ import {
   getLocalStorageNetworkState
 } from 'utils/aptosUtils';
 import CryptoJS from 'crypto-js';
-import { hippoWalletClient } from 'config/hippoWalletClient';
+// import { hippoWalletClient } from 'config/hippoWalletClient';
+import { HippoWalletClient } from '@manahippo/hippo-sdk';
 
 interface AptosWalletContextType {
   activeWallet?: ActiveAptosWallet;
@@ -27,6 +28,7 @@ interface AptosWalletContextType {
   closeModal: () => void;
   connectAccount: (password: string, wallet?: string) => void;
   setActiveAptosWallet: (walletName?: string) => void;
+  hippoWallet?: HippoWalletClient;
 }
 
 interface TProviderProps {
@@ -49,13 +51,17 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
     getLocalStorageNetworkState()
   );
   const savedPassword = window.localStorage.getItem(CONNECT_PASSWORD);
-  const hippoWallet = useMemo(() => {
-    if (activeWallet) {
-      return hippoWalletClient(activeWallet.aptosAccount);
-    }
-  }, [activeWallet]);
+  // const [hippoWallet, setHippoWallet] = useState<HippoWalletClient>();
+  // const getHippoWalletClient = useCallback(async () => {
+  //   if (activeWallet) {
+  //     const client = await hippoWalletClient(activeWallet.aptosAccount);
+  //     setHippoWallet(client);
+  //   }
+  // }, [activeWallet]);
 
-  console.log('MEMEM>>', hippoWallet);
+  // useEffect(() => {
+  //   getHippoWalletClient();
+  // }, [activeWallet, getHippoWalletClient]);
 
   useEffect(() => {
     if (walletList && walletList.length) {
@@ -154,6 +160,7 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
         closeModal,
         connectAccount,
         initialized
+        // hippoWallet
       }}>
       {children}
     </AptosWalletContext.Provider>

@@ -1,16 +1,16 @@
 .popover {
   &:global {
     > .ant-popover-content {
-      @apply max-w-[600px] min-w-[400px] w-[33vw] h-1/3 overflow-y-scroll shadow-figma;
+      @apply max-w-[600px] min-w-[400px] w-[33vw] h-1/3 overflow-y-scroll rounded-[11px] shadow-figma;
 
       .ant-popover-arrow {
         display: none;
       }
 
       .ant-popover-inner {
-        @apply border-4 border-grey-900;
+        @apply border-4 border-grey-900 rounded-[11px];
         .ant-popover-inner-content {
-          @apply p-6;
+          @apply p-0;
         }
       }
 

@@ -1,14 +1,25 @@
-import { AptosClient } from 'aptos';
 import { CONFIGS } from '@manahippo/hippo-sdk';
-import { NODE_URL } from 'config/aptosConstants';
+import { AptosAccount, AptosClient, Types } from 'aptos';
 
 export const readConfig = () => {
-  // const privateKey = new HexString(privateKeyStr);
   const isDevnet = true;
   const netConf = isDevnet ? CONFIGS.devnet : CONFIGS.localhost;
   const contractAddress = netConf.contractAddress;
-  const client = new AptosClient(NODE_URL);
-  // const account = new AptosAccount(privateKey.toUint8Array());
-  // console.log(`Using address ${account.address().hex()}`);
-  return { client, contractAddress, netConf };
+  return { contractAddress, netConf };
 };
+
+export async function sendPayloadTx(
+  client: AptosClient,
+  account: AptosAccount,
+  payload: Types.TransactionPayload,
+  max_gas = 1000
+) {
+  const txnRequest = await client.generateTransaction(account.address(), payload, {
+    max_gas_amount: `${max_gas}`
+  });
+  const signedTxn = await client.signTransaction(account, txnRequest);
+  const txnResult = await client.submitTransaction(signedTxn);
+  await client.waitForTransaction(txnResult.hash);
+  const txDetails = (await client.getTransaction(txnResult.hash)) as Types.UserTransaction;
+  console.log(txDetails);
+}

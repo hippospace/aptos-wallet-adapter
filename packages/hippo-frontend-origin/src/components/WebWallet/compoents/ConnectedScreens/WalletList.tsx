@@ -1,7 +1,11 @@
 import { List } from 'components/Antd';
 import useAptosWallet from 'hooks/useAptosWallet';
 
-const WalletList: React.FC = () => {
+interface TProps {
+  onSuccess: () => void;
+}
+
+const WalletList: React.FC<TProps> = ({ onSuccess }) => {
   const { walletList, setActiveAptosWallet } = useAptosWallet();
 
   return (
@@ -12,7 +16,10 @@ const WalletList: React.FC = () => {
         dataSource={walletList}
         renderItem={(wallet) => (
           <List.Item
-            onClick={() => setActiveAptosWallet(wallet.walletName)}
+            onClick={() => {
+              setActiveAptosWallet(wallet.walletName);
+              onSuccess();
+            }}
             className="cursor-pointer">
             <h5>{wallet.walletName}</h5>
           </List.Item>

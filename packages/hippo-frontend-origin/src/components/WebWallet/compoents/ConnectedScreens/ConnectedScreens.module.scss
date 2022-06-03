@@ -1,2 +1,30 @@
-.connectedScreens {
+.menu {
+  &:global {
+    &.ant-menu.ant-menu-dark {
+      @apply bg-secondary rounded-[11px];
+
+      .ant-menu-item {
+        @apply flex-grow flex justify-center items-center h-16;
+
+        svg,
+        path {
+          @apply fill-primary;
+        }
+      }
+    }
+
+    // remove blue background
+    &.ant-menu.ant-menu-dark .ant-menu-item-selected,
+    &.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected,
+    &.ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover {
+      background: transparent;
+      svg,
+      path {
+        @apply fill-primePurple-900;
+      }
+      a {
+        @apply text-grey-900;
+      }
+    }
+  }
 }

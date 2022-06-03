@@ -14,3 +14,6 @@ export { ReactComponent as CoinbaseIcon } from './coinbase.svg';
 export { ReactComponent as WalletConnectIcon } from './walletConnect.svg';
 export { ReactComponent as PhantomIcon } from './phantom.svg';
 export { ReactComponent as PlusIcon } from './plus.svg';
+export { ReactComponent as CopyIcon } from './copy.svg';
+export { ReactComponent as CoinListIcon } from './coinList.svg';
+export { ReactComponent as FaucetIcon } from './faucet.svg';

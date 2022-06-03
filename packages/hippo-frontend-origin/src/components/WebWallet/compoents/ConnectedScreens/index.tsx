@@ -1,28 +1,29 @@
-import { AccountBookOutlined, DollarCircleOutlined, SettingOutlined } from '@ant-design/icons';
+// import { SettingFilled } from '@ant-design/icons';
 import { Menu, MenuProps } from 'components/Antd';
 import { useState } from 'react';
-import cx from 'classnames';
+// import cx from 'classnames';
 import CoinList from './CoinList';
 import Faucet from './Faucet';
 import Settings from './Settings';
 import WalletOverview from './WalletOverview';
 import styles from './ConnectedScreens.module.scss';
+import { CoinListIcon, FaucetIcon, SettingIcon } from 'resources/icons';
 
 const items: MenuProps['items'] = [
   {
-    label: 'Coin list',
+    // label: 'Coin list',
     key: 'coinList',
-    icon: <DollarCircleOutlined />
+    icon: <CoinListIcon className="fill-black" />
   },
   {
-    label: 'Faucet',
+    // label: 'Faucet',
     key: 'faucet',
-    icon: <AccountBookOutlined />
+    icon: <FaucetIcon className="fill-black" />
   },
   {
-    label: 'Settings',
+    // label: 'Settings',
     key: 'settings',
-    icon: <SettingOutlined />
+    icon: <SettingIcon />
   }
 ];
 
@@ -34,6 +35,8 @@ const ConnectedScreens: React.FC = () => {
     setCurrent(e.key);
   };
 
+  const onReset = () => setCurrent('coinList');
+
   const getModalContent = () => {
     switch (current) {
       case 'coinList':
@@ -41,17 +44,26 @@ const ConnectedScreens: React.FC = () => {
       case 'faucet':
         return <Faucet />;
       case 'settings':
-        return <Settings />;
+        return <Settings onReset={onReset} />;
       default:
         return <CoinList />;
     }
   };
 
   return (
-    <div className={cx(styles.connectedScreens, 'flex flex-col gap-4')}>
+    <div className="flex flex-col">
       <WalletOverview />
-      <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-      {getModalContent()}
+      <div className="flex flex-col gap-4 bg-primary px-9 py-6 rounded-[11px]">
+        {getModalContent()}
+      </div>
+      <Menu
+        mode="horizontal"
+        theme="dark"
+        className={styles.menu}
+        onClick={onClick}
+        selectedKeys={[current]}
+        items={items}
+      />
     </div>
   );
 };

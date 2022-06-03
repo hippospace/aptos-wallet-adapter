@@ -1,4 +1,4 @@
-import { AccountBookOutlined, LeftOutlined, SettingOutlined } from '@ant-design/icons';
+import { LeftOutlined } from '@ant-design/icons';
 import { MenuProps, Menu } from 'antd';
 import Button from 'components/Button';
 import useAptosWallet from 'hooks/useAptosWallet';
@@ -8,7 +8,11 @@ import ChangePassword from './ChangePassword';
 import ImportWallet from './ImportWallet';
 import WalletList from './WalletList';
 
-const Settings: React.FC = () => {
+interface TProps {
+  onReset: () => void;
+}
+
+const Settings: React.FC<TProps> = ({ onReset }) => {
   const { disconnect } = useAptosWallet();
   const [screen, setScreen] = useState('');
 
@@ -17,30 +21,22 @@ const Settings: React.FC = () => {
       {
         label: 'Change Password',
         key: 'changePasword',
-        icon: <AccountBookOutlined />,
         onClick: () => setScreen('changePassword')
       },
       {
-        label: 'Manage Wallets',
-        key: 'settings',
-        icon: <SettingOutlined />,
-        children: [
-          {
-            label: 'Existing Wallets',
-            key: 'existing wallets',
-            onClick: () => setScreen('walletList')
-          },
-          {
-            label: 'Create new wallet',
-            key: 'create new wallet',
-            onClick: () => setScreen('createWallet')
-          },
-          {
-            label: 'Import Wallet',
-            key: 'importWallet',
-            onClick: () => setScreen('importWallet')
-          }
-        ]
+        label: 'Existing Wallets',
+        key: 'existing wallets',
+        onClick: () => setScreen('walletList')
+      },
+      {
+        label: 'Create new wallet',
+        key: 'create new wallet',
+        onClick: () => setScreen('createWallet')
+      },
+      {
+        label: 'Import Wallet',
+        key: 'importWallet',
+        onClick: () => setScreen('importWallet')
       }
     ],
     []
@@ -60,7 +56,7 @@ const Settings: React.FC = () => {
       case 'createWallet':
         return <AddNewWallet onSuccess={() => setScreen('walletList')} />;
       case 'walletList':
-        return <WalletList />;
+        return <WalletList onSuccess={onReset} />;
       case 'importWallet':
         return <ImportWallet onSuccess={() => setScreen('walletList')} />;
       default:

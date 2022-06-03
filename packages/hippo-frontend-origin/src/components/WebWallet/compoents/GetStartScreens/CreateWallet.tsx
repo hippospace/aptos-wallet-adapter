@@ -1,7 +1,7 @@
 import { Form } from 'components/Antd';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
-import { faucetClient } from 'config/faucetClient';
+import { faucetClient } from 'config/aptosClient';
 import { useFormik } from 'formik';
 import useAptosWallet from 'hooks/useAptosWallet';
 import { useState } from 'react';
