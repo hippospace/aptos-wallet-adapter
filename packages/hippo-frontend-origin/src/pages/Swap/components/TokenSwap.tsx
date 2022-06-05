@@ -42,7 +42,7 @@ const TokenSwap = () => {
         <SwapIcon />
       </Button>
       <CurrencyInput actionType="currencyTo" />
-      {!!values.currencyTo?.amount && <SwapDetail />}
+      {!!values.currencyFrom?.amount && !!values.currencyTo?.token.symbol && <SwapDetail />}
       <Button className="paragraph bold mt-14">SWAP</Button>
     </div>
   );

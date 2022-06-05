@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import NumberInput from 'components/NumberInput';
 import CoinIcon from 'components/CoinIcon';
 import { Popover } from 'antd';
+import useHippoClient from 'hooks/useHippoClient';
 
 interface TProps {
   actionType: 'currencyTo' | 'currencyFrom';
@@ -16,8 +17,17 @@ interface TProps {
 const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
   const [isVisibile, setIsVisible] = useState(false);
   const { values, setFieldValue } = useFormikContext<ISwapSettings>();
+  const hippoClient = useHippoClient();
 
   const selectedCurrency = values[actionType];
+  const selectedSymbol = selectedCurrency?.token.symbol;
+  let uiBalance = 0;
+  if (selectedSymbol && hippoClient && hippoClient.hippoWallet) {
+    const selectedRawBalance =
+      hippoClient.hippoWallet?.symbolToCoinStore[selectedSymbol].coin.value.toJSNumber();
+    const selectedDecimals = hippoClient.hippoWallet.symbolToTokenInfo[selectedSymbol].decimals;
+    uiBalance = selectedRawBalance! / Math.pow(10, selectedDecimals!) || 0;
+  }
 
   const coinSelectorButton = useMemo(() => {
     return (
@@ -84,10 +94,10 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
           controls={false}
           formatter={(value: unknown) =>
             typeof value !== 'undefined'
-              ? `$${parseFloat((value as string) || '0.00').toFixed(2)}`
+              ? `${parseFloat((value as string) || '0.00').toFixed(4)}`
               : ''
           }
-          value={(selectedCurrency?.balance || '0') as string}
+          value={uiBalance.toString()}
         />
       </div>
     </div>

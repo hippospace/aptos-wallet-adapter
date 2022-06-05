@@ -3,11 +3,12 @@ import { hippoSwapClient, hippoWalletClient } from 'config/hippoWalletClient';
 import { HippoSwapClient, HippoWalletClient, X0x1 } from '@manahippo/hippo-sdk';
 import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790';
 import useAptosWallet from 'hooks/useAptosWallet';
-import { aptosClient } from 'config/aptosClient';
+import { aptosClient, faucetClient } from 'config/aptosClient';
 import { sendPayloadTx } from 'utils/hippoWalletUtil';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
+  hippoSwap?: HippoSwapClient;
   tokenStores?: Record<string, X0x1.Coin.CoinStore>;
   tokenInfos?: Record<string, TokenRegistry.TokenInfo>;
   requestFaucet: (symbol: string, uiAmount: string) => {};
@@ -23,7 +24,7 @@ const HippoClientContext = createContext<HippoClientContextType>({} as HippoClie
 const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const { activeWallet } = useAptosWallet();
   const [hippoWallet, setHippoWallet] = useState<HippoWalletClient>();
-  const [swapClient, setHippoSwapClient] = useState<HippoSwapClient>();
+  const [hippoSwap, setHippoSwapClient] = useState<HippoSwapClient>();
   const [refresh, setRefresh] = useState(false);
   const [tokenStores, setTokenStores] = useState<Record<string, X0x1.Coin.CoinStore>>();
   const [tokenInfos, setTokenInfos] = useState<Record<string, TokenRegistry.TokenInfo>>();
@@ -31,14 +32,18 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const getHippoWalletClient = useCallback(async () => {
     if (activeWallet) {
       const client = await hippoWalletClient(activeWallet.aptosAccount);
-      const sClient = await hippoSwapClient();
       setHippoWallet(client);
-      setHippoSwapClient(sClient);
     }
   }, [activeWallet]);
 
+  const getHippoSwapClient = useCallback(async () => {
+    const sClient = await hippoSwapClient();
+    setHippoSwapClient(sClient);
+  }, []);
+
   useEffect(() => {
     getHippoWalletClient();
+    getHippoSwapClient();
   }, [activeWallet, getHippoWalletClient]);
 
   useEffect(() => {
@@ -52,17 +57,21 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   }, [hippoWallet, refresh]);
 
   const requestFaucet = useCallback(
-    async (symbol: string, uiAmount: string) => {
+    async (symbol: string) => {
       if (!activeWallet || !activeWallet.aptosAccount) throw new Error('Please login first');
-      const uiAmountNum = Number.parseFloat(uiAmount);
-      if (uiAmountNum <= 0) {
-        throw new Error('Input amount needs to be greater than 0');
-      }
-      const payload = await hippoWallet?.makeFaucetMintToPayload(uiAmountNum, symbol);
-      if (payload) {
-        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+      if (symbol === 'APTOS') {
+        let result = await faucetClient.fundAccount(activeWallet.aptosAccount.address(), 100000);
         await hippoWallet?.refreshStores();
         setRefresh(true);
+        console.log(result);
+      } else {
+        const uiAmtUsed = symbol === 'BTC' ? 0.01 : 10;
+        const payload = await hippoWallet?.makeFaucetMintToPayload(uiAmtUsed, symbol);
+        if (payload) {
+          await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+          await hippoWallet?.refreshStores();
+          setRefresh(true);
+        }
       }
     },
     [activeWallet, hippoWallet]
@@ -70,25 +79,26 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
 
   const requestSwap = useCallback(
     async (fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-      if (!activeWallet || !activeWallet.aptosAccount || !swapClient)
+      if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap)
         throw new Error('Please login first');
       const uiAmtInNum = Number.parseFloat(uiAmtIn);
       if (uiAmtInNum <= 0) {
         throw new Error('Input amount needs to be greater than 0');
       }
-      const payload = await swapClient.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
+      const payload = await hippoSwap.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
       if (payload) {
         await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
         setRefresh(true);
       }
     },
-    [swapClient, activeWallet]
+    [hippoSwap, activeWallet]
   );
 
   return (
     <HippoClientContext.Provider
       value={{
         hippoWallet,
+        hippoSwap,
         tokenStores,
         tokenInfos,
         requestFaucet,

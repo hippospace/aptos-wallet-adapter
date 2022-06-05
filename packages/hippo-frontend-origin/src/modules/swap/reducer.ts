@@ -18,7 +18,7 @@ const initState: SwapState = {
   error: null,
   tokenList: [],
   swapSettings: {
-    slipTolerance: 0,
+    slipTolerance: 1,
     trasactionDeadline: 0,
     currencyFrom: {
       token: {} as ITokenInfo,

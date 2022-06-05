@@ -16,28 +16,12 @@ interface TProps {
   dismissiModal: () => void;
 }
 
-const commonCoins = [
-  {
-    chainId: 1,
-    address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    name: 'USD Coin',
-    symbol: 'USDC',
-    decimals: 6,
-    logoURI: 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png?1547042389'
-  },
-  {
-    chainId: 1,
-    name: 'Solana',
-    address: '0xD31a59c85aE9D8edEFeC411D448f90841571b89c',
-    decimals: 9,
-    symbol: 'SOL',
-    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/16116.png'
-  }
-];
-
 const CoinSelector: React.FC<TProps> = ({ dismissiModal, actionType }) => {
   const { values, setFieldValue } = useFormikContext<ISwapSettings>();
   const tokenList = useSelector(getTokenList);
+  const commonCoins = tokenList.filter((token) => {
+    return ['BTC', 'USDT', 'USDC'].includes(token.symbol);
+  });
   const [filter, setFilter] = useState<string>('');
 
   const onSelectToken = useCallback(
