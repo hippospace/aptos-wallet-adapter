@@ -59,8 +59,11 @@ const CreateWallet: React.FC = () => {
   });
 
   return (
-    <form className="flex flex-col items-center gap-6 w-full" onSubmit={formik.handleSubmit}>
-      <h5>Create Password</h5>
+    <form
+      className="flex flex-col items-left gap-6 w-full py-6 px-8"
+      onSubmit={formik.handleSubmit}>
+      <h4 className="text-grey-900 font-bold">Your Master Password</h4>
+      <div className="">Store or remember your master password to unlock your wallet.</div>
       <Form.Item
         {...formItemLayout}
         className="w-full"

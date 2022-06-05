@@ -3,7 +3,7 @@ import Button from 'components/Button';
 import NumberInput from 'components/NumberInput';
 import SlideInput from 'components/SlideInput';
 import { useFormik } from 'formik';
-import { CloseIcon, PlusIcon } from 'resources/icons';
+import { CloseCircleIcon, PlusIcon } from 'resources/icons';
 import { IPool } from 'types/pool';
 import styles from './WithdrawModal.module.scss';
 
@@ -55,7 +55,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       visible={isVisible}
       footer={null}
       maskClosable={false}
-      closeIcon={<CloseIcon />}>
+      closeIcon={<CloseCircleIcon />}>
       <form onSubmit={formik.handleSubmit}>
         <div className="px-10 flex flex-col items-center gap-10">
           <div className="header5 bold">Withdraw Liquidity</div>

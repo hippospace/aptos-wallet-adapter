@@ -1,5 +1,5 @@
 import { Modal } from 'components/Antd';
-import { CloseIcon } from 'resources/icons';
+import { CloseCircleIcon } from 'resources/icons';
 import commonActions from 'modules/common/actions';
 import { useCallback, useMemo } from 'react';
 import { getShowWalletConnector } from 'modules/common/reducer';
@@ -63,7 +63,7 @@ const WalletsModal = () => {
       wrapClassName={styles.walletsModal}
       visible={showWalletConnector}
       footer={null}
-      closeIcon={<CloseIcon />}>
+      closeIcon={<CloseCircleIcon />}>
       <div className="header5 bold text-black">Connect your wallet</div>
       <div className="flex flex-wrap mt-6">{getModalContent}</div>
     </Modal>

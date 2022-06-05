@@ -6,7 +6,7 @@ import TextLink from 'components/TextLink';
 import { useFormik } from 'formik';
 import useToken from 'hooks/useToken';
 import { useCallback } from 'react';
-import { CloseIcon, PlusIcon } from 'resources/icons';
+import { CloseCircleIcon, PlusIcon } from 'resources/icons';
 import { IPool, IPoolToken } from 'types/pool';
 // import * as Yup from 'yup';
 import styles from './DepositModal.module.scss';
@@ -102,7 +102,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       visible={isVisible}
       footer={null}
       maskClosable={false}
-      closeIcon={<CloseIcon />}>
+      closeIcon={<CloseCircleIcon />}>
       <form onSubmit={formik.handleSubmit}>
         <div className="px-10 flex flex-col items-center gap-10">
           <div className="header5 bold">Deposit Liquidity</div>

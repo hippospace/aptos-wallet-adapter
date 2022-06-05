@@ -1,2 +1,24 @@
 .textInput {
+  :global {
+    .ant-input-affix-wrapper,
+    .ant-input-affix-wrapper-readonly {
+      @apply border-[3px] border-grey-900 rounded-xl py-3 px-5 text-grey-900 font-bold;
+    }
+
+    .ant-input {
+      @apply border-[3px] border-grey-900 rounded-xl py-3 px-5 text-grey-900 font-bold;
+    }
+
+    ::placeholder {
+      @apply text-grey-500;
+    }
+    /* Edge */
+    ::-webkit-input-placeholder {
+      @apply text-grey-500;
+    }
+    /* Internet Explorer */
+    :-ms-input-placeholder {
+      @apply text-grey-500;
+    }
+  }
 }

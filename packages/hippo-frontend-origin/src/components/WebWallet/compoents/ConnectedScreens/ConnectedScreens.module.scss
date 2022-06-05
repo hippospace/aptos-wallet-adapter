@@ -3,8 +3,8 @@
     &.ant-menu.ant-menu-dark {
       @apply bg-secondary rounded-[11px];
 
-      .ant-menu-item {
-        @apply flex-grow flex justify-center items-center h-16;
+      .ant-menu-item:not(:last-child) {
+        @apply flex-grow flex justify-center items-center h-16 opacity-100;
 
         svg,
         path {
@@ -25,6 +25,14 @@
       a {
         @apply text-grey-900;
       }
+    }
+  }
+}
+
+.drawer {
+  :global {
+    .ant-drawer-content-wrapper {
+      @apply border-4 border-grey-900 rounded-tl-[11px] rounded-bl-[11px] overflow-hidden border-r-0;
     }
   }
 }

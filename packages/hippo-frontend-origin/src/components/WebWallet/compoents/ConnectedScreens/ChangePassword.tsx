@@ -3,6 +3,7 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { useFormik } from 'formik';
 import useAptosWallet from 'hooks/useAptosWallet';
+import { LockIcon } from 'resources/icons';
 import * as yup from 'yup';
 
 interface TFormProps {
@@ -50,35 +51,49 @@ const ChangePassword: React.FC<TProps> = ({ onSuccess }) => {
   });
 
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <h5>Change Password</h5>
-      <Form.Item
-        {...formItemLayout}
-        className="w-full"
-        label="New Password (8 characters min)"
-        validateStatus={formik.errors.password ? 'error' : ''}
-        help={formik.errors.password}>
-        <TextInput
-          type="password"
-          name="password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-        />
-      </Form.Item>
-      <Form.Item
-        {...formItemLayout}
-        className="w-full"
-        label="Confirm password"
-        validateStatus={formik.errors.confirmPassword ? 'error' : ''}
-        help={formik.errors.confirmPassword}>
-        <TextInput
-          name="confirmPassword"
-          type="password"
-          value={formik.values.confirmPassword}
-          onChange={formik.handleChange}
-        />
-      </Form.Item>
-      <Button type="submit">Confirm</Button>
+    <form className="flex flex-col items-center w-full gap-10" onSubmit={formik.handleSubmit}>
+      <div className="flex flex-col gap-2 items-center">
+        <LockIcon />
+        <h3 className="text-grey-900 font-bold">Change Password</h3>
+      </div>
+      <div className="mt-2 flex flex-col items-center text-center gap-3 w-full">
+        <Form.Item
+          {...formItemLayout}
+          className="w-full"
+          // label="New Password (8 characters min)"
+          validateStatus={formik.errors.password ? 'error' : ''}
+          help={formik.errors.password}>
+          <TextInput
+            type="password"
+            name="password"
+            placeholder="New Password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+          />
+        </Form.Item>
+        <Form.Item
+          {...formItemLayout}
+          className="w-full"
+          // label="Confirm password"
+          validateStatus={formik.errors.confirmPassword ? 'error' : ''}
+          help={formik.errors.confirmPassword}>
+          <TextInput
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirm New Password"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+          />
+        </Form.Item>
+        <div className="flex w-full justify-between mt-20">
+          <Button variant="outlined" className="w-[230px] font-bold" onClick={onSuccess}>
+            Cancel
+          </Button>
+          <Button type="submit" className="w-[230px] font-bold">
+            Update
+          </Button>
+        </div>
+      </div>
     </form>
   );
 };

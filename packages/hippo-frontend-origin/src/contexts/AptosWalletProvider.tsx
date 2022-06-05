@@ -44,24 +44,13 @@ interface StoreWalletStateProp {
 
 const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
   const [open, setOpen] = useState(false);
-  const [initialized] = useState(() => !!getEncryptedLocalState());
+  const [initialized, setInitialized] = useState(() => !!getEncryptedLocalState());
   const [walletList, setWalletList] = useState<AptosWalletObject[]>([]);
   const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet | undefined>(undefined);
   const [aptosNetwork, setAptosNetwork] = useState<AptosNetwork | null>(() =>
     getLocalStorageNetworkState()
   );
   const savedPassword = window.localStorage.getItem(CONNECT_PASSWORD);
-  // const [hippoWallet, setHippoWallet] = useState<HippoWalletClient>();
-  // const getHippoWalletClient = useCallback(async () => {
-  //   if (activeWallet) {
-  //     const client = await hippoWalletClient(activeWallet.aptosAccount);
-  //     setHippoWallet(client);
-  //   }
-  // }, [activeWallet]);
-
-  // useEffect(() => {
-  //   getHippoWalletClient();
-  // }, [activeWallet, getHippoWalletClient]);
 
   useEffect(() => {
     if (walletList && walletList.length) {
@@ -104,6 +93,7 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
         ).toString();
         window.localStorage.setItem(ENCRYPTED_WALLET_LIST, encryptedWallet);
         setWalletList(updatedWalletList);
+        setInitialized(true);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
