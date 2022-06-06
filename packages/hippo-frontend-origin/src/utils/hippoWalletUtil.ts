@@ -1,3 +1,4 @@
+import { getTypeTagFullname, StructTag, TypeTag } from '@manahippo/aptos-tsgen';
 import { CONFIGS } from '@manahippo/hippo-sdk';
 import { AptosAccount, AptosClient, Types } from 'aptos';
 
@@ -23,3 +24,14 @@ export async function sendPayloadTx(
   const txDetails = (await client.getTransaction(txnResult.hash)) as Types.UserTransaction;
   console.log(txDetails);
 }
+
+export const getJointName = (xTag: TypeTag, yTag: TypeTag) => {
+  if (!(xTag instanceof StructTag)) {
+    throw new Error(`Expected xTag to be StructTag but received: ${JSON.stringify(xTag)}`);
+  }
+  if (!(yTag instanceof StructTag)) {
+    throw new Error(`Expected yTag to be StructTag but received: ${JSON.stringify(yTag)}`);
+  }
+  const [xFullname, yFullname] = [xTag, yTag].map(getTypeTagFullname);
+  return `${xFullname}/${yFullname}`;
+};

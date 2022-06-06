@@ -1,9 +1,12 @@
+import { useFormikContext } from 'formik';
 import useHippoClient from 'hooks/useHippoClient';
-import { getSwapSettings } from 'modules/swap/reducer';
-import { useSelector } from 'react-redux';
+// import { getSwapSettings } from 'modules/swap/reducer';
+// import { useSelector } from 'react-redux';
+import { ISwapSettings } from '../types';
 
 const SwapDetail: React.FC = () => {
-  const swapSettings = useSelector(getSwapSettings);
+  // const swapSettings = useSelector(getSwapSettings);
+  const { values: swapSettings } = useFormikContext<ISwapSettings>();
   const hippoClient = useHippoClient();
   let output = '...';
   let minimum = '...';
