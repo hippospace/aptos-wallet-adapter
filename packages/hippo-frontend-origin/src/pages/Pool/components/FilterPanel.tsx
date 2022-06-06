@@ -56,7 +56,7 @@ const FilterPanel: React.FC = () => {
           onChange={(value) => handleOnChange(value, 'sortBy')}
         />
       </div>
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center w-full justify-between">
         <div className="paragraph bold text-grey-900">Show My Liquidity</div>
         <SwitchInput
           checked={filterParams.showSelfLiquidity}

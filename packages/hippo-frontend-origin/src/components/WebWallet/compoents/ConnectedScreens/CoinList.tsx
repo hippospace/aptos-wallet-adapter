@@ -12,7 +12,7 @@ const CoinList: React.FC = () => {
         const tokenInfo = tokenInfos[symbol];
         return (
           <div
-            className="border-2 border-grey-900 py-2 px-6 flex bg-primePurple-100 justify-between"
+            className="border-2 border-grey-900 py-2 px-6 flex bg-primePurple-100 justify-between h-[56px]"
             key={symbol}>
             <div className="flex gap-3 justify-center items-center">
               <CoinIcon logoSrc={tokenInfo.logo_url} />
@@ -29,7 +29,7 @@ const CoinList: React.FC = () => {
 
   return (
     <div className="">
-      <div className="flex flex-col gap-4">{renderTokenList}</div>
+      <div className="flex flex-col gap-4 overflow-y-scroll h-[480px]">{renderTokenList}</div>
     </div>
   );
 };

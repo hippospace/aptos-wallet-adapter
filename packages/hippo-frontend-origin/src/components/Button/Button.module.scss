@@ -15,7 +15,7 @@
   }
 
   &.outlined {
-    @apply border-2 border-grey-900 bg-transparent;
+    @apply border-[3px] border-grey-900 bg-transparent;
 
     &:hover {
       @apply bg-primePurple-100;

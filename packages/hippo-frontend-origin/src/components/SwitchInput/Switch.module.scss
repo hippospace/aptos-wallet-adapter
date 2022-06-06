@@ -11,7 +11,7 @@
       }
 
       &.ant-switch-checked {
-        background-color: darkseagreen;
+        @apply bg-grey-900;
         .ant-switch-handle {
           left: calc(100% - 18px - 3px);
         }

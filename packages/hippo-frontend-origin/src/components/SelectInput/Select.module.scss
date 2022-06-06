@@ -3,7 +3,7 @@
 
   :global {
     .ant-select {
-      @apply w-full;
+      @apply w-full border-[3px] border-grey-900 rounded-xl text-grey-900 font-bold bg-grey-100;
       &:not(.ant-select-customize-input) {
         .ant-select-selector {
           height: 44px !important;

@@ -34,7 +34,7 @@ const PoolList: React.FC<TProps> = ({ filteredPools }) => {
           itemHeight={130}
           itemKey="tokenList">
           {(item) => (
-            <List.Item className="!border-b-0 !px-0" key={item.id}>
+            <List.Item className="!border-b-0 !px-0 !pr-2" key={item.id}>
               <PoolCard
                 pool={item}
                 onDeposit={() => handleOnClickDeposit(item)}

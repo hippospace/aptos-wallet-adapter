@@ -13,7 +13,7 @@ const TokenPair: React.FC<TProps> = ({ token0, token1 }) => {
 
   return (
     <div className="flex items-center gap-4 w-[240px] max-w-[240px]">
-      <div className="flex flex-col gap-2 border-[3px] border-primeBlack20 p-1 rounded-full">
+      <div className="flex flex-col gap-2 border-[5px] border-grey-900 p-1 rounded-full">
         <CoinIcon className="w-8 h-8" logoSrc={token0URI || ''} />
         <CoinIcon className="w-8 h-8" logoSrc={token1URI || ''} />
       </div>

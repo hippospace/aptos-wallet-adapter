@@ -1,9 +1,9 @@
 .input {
   :global {
     .ant-input-affix-wrapper {
-      border: none;
-      border-radius: 5px;
-      @apply bg-primeBlack p-[10px];
+      // border: none;
+      // border-radius: 5px;
+      @apply border-[3px] border-grey-900 rounded-xl py-3 px-5 text-grey-900 font-bold bg-grey-100;
     }
     .ant-input-prefix {
       @apply mr-3;
@@ -11,7 +11,7 @@
 
     .ant-input {
       background-color: transparent;
-      @apply text-sm text-grey-900 font-semibold;
+      @apply border-[3px] border-grey-900 rounded-xl py-3 px-5 text-grey-900 font-bold;
     }
 
     ::placeholder {

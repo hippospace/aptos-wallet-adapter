@@ -4,9 +4,12 @@
   :global {
     // coin seletor modal
     .ant-modal-content {
-      @apply rounded-[20px];
+      @apply rounded-xxl shadow-figma w-[609px];
       .ant-modal-body {
-        @apply px-0;
+        @apply px-20 py-9 rounded-xxl border-4 border-grey-900;
+      }
+      .ant-modal-close {
+        @apply top-5 right-11;
       }
       .ant-modal-close-x svg {
         @apply absolute bottom-2 left-0;

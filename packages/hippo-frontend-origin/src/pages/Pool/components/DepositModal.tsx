@@ -1,12 +1,13 @@
-import { Checkbox, Modal } from 'components/Antd';
+import { Modal } from 'components/Antd';
 import Button from 'components/Button';
+import CheckboxInput from 'components/CheckboxInput';
 import CoinIcon from 'components/CoinIcon';
 import NumberInput from 'components/NumberInput';
 import TextLink from 'components/TextLink';
 import { useFormik } from 'formik';
 import useToken from 'hooks/useToken';
 import { useCallback } from 'react';
-import { CloseCircleIcon, PlusIcon } from 'resources/icons';
+import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool, IPoolToken } from 'types/pool';
 // import * as Yup from 'yup';
 import styles from './DepositModal.module.scss';
@@ -85,9 +86,9 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               onChange={(val) => onHandleInput(inputField, val)}
             />
           </div>
-          <div className="border-[1px] rounded border-[#959595] py-1 px-2 text-[#575757] font-bold">
+          <small className="border-[1px] rounded-[4px] border-grey-500 py-1 px-2 text-grey-700 font-bold">
             Balance: {getWalletTokenBalance(token)}
-          </div>
+          </small>
         </div>
       );
     },
@@ -102,14 +103,14 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       visible={isVisible}
       footer={null}
       maskClosable={false}
-      closeIcon={<CloseCircleIcon />}>
+      closeIcon={<CloseIcon />}>
       <form onSubmit={formik.handleSubmit}>
-        <div className="px-10 flex flex-col items-center gap-10">
-          <div className="header5 bold">Deposit Liquidity</div>
+        <div className="flex flex-col items-center gap-10">
+          <h5 className="font-bold text-grey-900">Deposit Liquidity</h5>
           <div className="w-full">
             <div className="flex flex-col gap-2 w-full">
               {renderTokenInput('token0')}
-              <PlusIcon />
+              <PlusSMIcon />
               {renderTokenInput('token1')}
             </div>
             <hr className="h-[2px] bg-[#D5D5D5] w-full my-4" />
@@ -140,15 +141,15 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               </div>
             </div>
           </div>
-          <Checkbox>
+          <CheckboxInput>
             <div className="helpText text-grey-900">
               I verify that I have read the <TextLink href="">Orca Pools Guide</TextLink> and{' '}
               <TextLink href="">understand the risks of providing liquidity</TextLink>, including
               impermanent loss.
             </div>
-          </Checkbox>
-          <Button className="w-full rounded-[20px] font-bold" type="submit">
-            Deposit
+          </CheckboxInput>
+          <Button className="w-full rounded-[8px] font-bold" type="submit">
+            <h6 className="text-white">Deposit</h6>
           </Button>
         </div>
       </form>

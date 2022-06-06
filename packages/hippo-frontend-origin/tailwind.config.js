@@ -53,6 +53,7 @@ module.exports = {
     borderRadius: {
       lg: '8px',
       xl: '10px',
+      xxl: '20px',
       full: '9999px'
     },
     fontFamily: {

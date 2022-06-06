@@ -4,14 +4,15 @@ import { useSelector } from 'react-redux';
 const SummaryPanel: React.FC = () => {
   const { totalValueLocked, total24Vol } = useSelector(getPoolSummary);
   return (
-    <div className="flex flex-col gap-8 text-center">
+    <div className="flex flex-col gap-5 text-left border-4 border-grey-900 rounded-xxl bg-secondary px-10 py-8">
       <div className="flex flex-col gap-4">
-        <div className="title text-primeBlack20">Total Value Locked</div>
-        <div className="header4 bold text-grey-900">${totalValueLocked.toFixed(2)}</div>
+        <small className="text-grey-700 font-bold">Total Value Locked</small>
+        <h5 className="font-bold text-grey-900">${totalValueLocked.toFixed(2)}</h5>
       </div>
+      <hr className="border-[1px] border-primeBlack20" />
       <div className="flex flex-col gap-4">
-        <div className="title text-primeBlack20">Total 24h Volume</div>
-        <div className="header4 bold text-grey-900">${total24Vol.toFixed(2)}</div>
+        <small className="text-grey-700 font-bold">Total 24h Volume</small>
+        <h5 className="font-bold text-grey-900">${total24Vol.toFixed(2)}</h5>
       </div>
     </div>
   );

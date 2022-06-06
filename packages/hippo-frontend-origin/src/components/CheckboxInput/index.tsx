@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import { Checkbox, CheckboxProps } from 'components/Antd';
-import styles from './Checkbox.module.scss';
+import styles from './CheckboxInput.module.scss';
 
 interface TProps extends CheckboxProps {
   className?: string;

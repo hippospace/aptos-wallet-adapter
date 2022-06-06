@@ -8,7 +8,7 @@ interface TProps {
 }
 
 const WalletOverview: React.FC<TProps> = ({ onShowWalletList }) => {
-  const { activeWallet } = useAptosWallet();
+  const { activeWallet, closeModal } = useAptosWallet();
   const privateKeyObject = activeWallet?.aptosAccount?.toPrivateKeyObject();
   const credentials = useMemo(
     () => [
@@ -59,7 +59,7 @@ const WalletOverview: React.FC<TProps> = ({ onShowWalletList }) => {
           </div>
         ))}
       </div>
-      <CloseIcon />
+      <CloseIcon className="cursor-pointer" onClick={closeModal} />
     </div>
   );
 };

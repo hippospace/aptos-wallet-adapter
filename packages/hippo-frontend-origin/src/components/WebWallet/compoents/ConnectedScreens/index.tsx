@@ -70,6 +70,7 @@ const ConnectedScreens: React.FC = () => {
       <Menu
         mode="horizontal"
         theme="dark"
+        overflowedIndicator={null}
         className={styles.menu}
         onClick={onClick}
         selectedKeys={[current]}

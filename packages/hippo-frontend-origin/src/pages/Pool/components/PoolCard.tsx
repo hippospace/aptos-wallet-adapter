@@ -13,7 +13,7 @@ interface TProps {
 const PoolCard: React.FC<TProps> = ({ pool, onDeposit, onWithdraw }) => {
   if (!pool) return null;
   return (
-    <Card className="w-full py-6 px-9 flex justify-between items-center">
+    <Card className="w-full py-6 px-9 flex justify-between items-center border-4 border-grey-900 shadow-figma">
       <TokenPair token0={pool.token0} token1={pool.token1} />
       <PoolInfo pool={pool} />
       <hr className="w-[2px] h-[62px] bg-primeBlack20 mr-14" />

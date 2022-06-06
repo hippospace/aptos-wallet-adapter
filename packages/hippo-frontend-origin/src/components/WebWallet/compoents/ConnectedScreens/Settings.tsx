@@ -64,7 +64,7 @@ const Settings: React.FC<TProps> = ({ onReset }) => {
               <div
                 key={label}
                 onClick={onClick}
-                className="flex border-2 border-grey-900 py-6 px-9 rounded-[20px] justify-between items-center cursor-pointer">
+                className="flex border-2 border-grey-900 py-6 px-9 rounded-xxl justify-between items-center cursor-pointer">
                 <div className="flex flex-col gap-2">
                   <h5 className="font-bold text-grey-900">{label}</h5>
                   <h6 className="text-grey-700">{helpText}</h6>

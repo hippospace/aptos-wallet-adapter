@@ -3,7 +3,7 @@ import Button from 'components/Button';
 import NumberInput from 'components/NumberInput';
 import SlideInput from 'components/SlideInput';
 import { useFormik } from 'formik';
-import { CloseCircleIcon, PlusIcon } from 'resources/icons';
+import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool } from 'types/pool';
 import styles from './WithdrawModal.module.scss';
 
@@ -55,12 +55,12 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       visible={isVisible}
       footer={null}
       maskClosable={false}
-      closeIcon={<CloseCircleIcon />}>
+      closeIcon={<CloseIcon />}>
       <form onSubmit={formik.handleSubmit}>
-        <div className="px-10 flex flex-col items-center gap-10">
-          <div className="header5 bold">Withdraw Liquidity</div>
-          <div className="flex flex-col w-full gap-2">
-            <label className="paragraph">Amount(estimated)</label>
+        <div className="flex flex-col items-center gap-12">
+          <h5 className="font-bold text-grey-900">Withdraw Liquidity</h5>
+          <div className="flex flex-col w-full gap-3">
+            <div className="text-grey-900 text-base">Amount(estimated)</div>
             <NumberInput
               className="w-full rounded-xl bg-input h-[56px] header5 bold"
               min={0}
@@ -71,35 +71,37 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               value={formik.values.amount}
               onChange={(val) => handleOnChange(val)}
             />
-            <div className="helpText font-bold text-[#575757]">
+            <div className="helpText font-bold text-grey-700">
               <span className="uppercase">
                 ({totalLiquidity} {tokenPair?.token0.symbol} / {tokenPair?.token1.symbol}
               </span>{' '}
               liquidity tokens)
             </div>
-            <SlideInput
-              min={0}
-              max={totalLiquidity}
-              tipFormatter={null}
-              step={totalLiquidity / 100}
-              onChange={(val: number) => handleOnChange(val)}
-              value={paresSlideValue()}
-            />
-            <div className="flex flex-col w-full gap-2 mt-2">
+            <div className="my-4">
+              <SlideInput
+                min={0}
+                max={totalLiquidity}
+                tipFormatter={(value) => <div className="">{value}</div>}
+                step={totalLiquidity / 100}
+                onChange={(val: number) => handleOnChange(val)}
+                value={paresSlideValue()}
+              />
+            </div>
+            <div className="flex flex-col w-full gap-2">
               <div className="paragraph">You will receive:</div>
               <div className="flex w-full justify-between items-center">
                 <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
                   {randomToken0.toFixed(7)} {tokenPair?.token0.symbol}
                 </div>
-                <PlusIcon />
+                <PlusSMIcon />
                 <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
                   {randomToken1.toFixed(7)} {tokenPair?.token1.symbol}
                 </div>
               </div>
             </div>
           </div>
-          <Button className="w-full rounded-[20px] font-bold" type="submit">
-            Withdraw
+          <Button className="w-full rounded-[8px] font-bold" type="submit">
+            <h6 className="text-white">Withdraw</h6>
           </Button>
         </div>
       </form>
