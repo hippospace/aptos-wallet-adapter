@@ -51,7 +51,6 @@ const WalletDetail: React.FC<TProps> = ({ onSuccess }) => {
         return false;
       }
       if (privateKeyObject) {
-        console.log('MEMEME>>>');
         const otherWallets =
           walletList.filter(
             (wallet) =>

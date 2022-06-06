@@ -36,3 +36,19 @@
     }
   }
 }
+
+.tabs {
+  :global {
+    .ant-tabs-nav {
+      @apply mb-6;
+      .ant-tabs-nav-wrap,
+      .ant-tabs-nav-list {
+        @apply w-full;
+
+        .ant-tabs-tab {
+          @apply flex-grow justify-center font-bold;
+        }
+      }
+    }
+  }
+}

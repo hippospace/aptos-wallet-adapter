@@ -8,6 +8,7 @@ import * as yup from 'yup';
 
 interface TFormProps {
   privateKey: string;
+  walletName: string;
 }
 
 const formItemLayout = {
@@ -16,7 +17,8 @@ const formItemLayout = {
 };
 
 const importWalletSchema = yup.object({
-  privateKey: yup.string().required()
+  privateKey: yup.string().required(),
+  walletName: yup.string().required()
 });
 
 interface TProps {
@@ -28,10 +30,9 @@ const ImportWallet: React.FC<TProps> = ({ onSuccess }) => {
 
   const onSubmit = async (values: TFormProps) => {
     try {
-      const { privateKey } = values;
+      const { privateKey, walletName } = values;
       const account = importAccount(privateKey);
       const privateKeyObject = account?.toPrivateKeyObject();
-      const walletName = `wallet${walletList.length + 1}`;
       const updatedWalletList = [{ walletName, aptosAccountObj: privateKeyObject }, ...walletList];
       storeEncryptedWallet({ updatedWalletList });
       onSuccess();
@@ -42,15 +43,28 @@ const ImportWallet: React.FC<TProps> = ({ onSuccess }) => {
 
   const formik = useFormik({
     initialValues: {
-      privateKey: ''
+      privateKey: '',
+      walletName: `Wallet${walletList.length + 1}`
     },
     validationSchema: importWalletSchema,
     onSubmit
   });
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
-      <h5>Import Wallet</h5>
+    <form className="flex flex-col gap-8" onSubmit={formik.handleSubmit}>
+      <h4 className="text-grey-900 font-bold">Import Wallet</h4>
+      <Form.Item
+        {...formItemLayout}
+        className="w-full"
+        label="Wallet Name"
+        validateStatus={formik.errors.walletName ? 'error' : ''}
+        help={formik.errors.walletName}>
+        <TextInput
+          name="walletName"
+          value={formik.values.walletName}
+          onChange={formik.handleChange}
+        />
+      </Form.Item>
       <Form.Item
         {...formItemLayout}
         className="w-full"
@@ -59,11 +73,19 @@ const ImportWallet: React.FC<TProps> = ({ onSuccess }) => {
         help={formik.errors.privateKey}>
         <TextInput
           name="privateKey"
+          placeholder="Private key"
           value={formik.values.privateKey}
           onChange={formik.handleChange}
         />
       </Form.Item>
-      <Button type="submit">Import</Button>
+      <div className="flex w-full justify-between mt-20">
+        <Button variant="outlined" className="w-[230px] font-bold" onClick={onSuccess}>
+          Cancel
+        </Button>
+        <Button type="submit" className="w-[230px] font-bold">
+          Confirm
+        </Button>
+      </div>
     </form>
   );
 };

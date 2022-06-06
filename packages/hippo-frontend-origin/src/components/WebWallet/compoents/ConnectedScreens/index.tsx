@@ -1,13 +1,15 @@
-// import { SettingFilled } from '@ant-design/icons';
-import { Drawer, Menu, MenuProps } from 'components/Antd';
+import { Drawer, Menu, MenuProps, Tabs } from 'components/Antd';
 import { useState } from 'react';
-// import cx from 'classnames';
+import cx from 'classnames';
 import CoinList from './CoinList';
 import Faucet from './Faucet';
 import Settings from './Settings';
 import WalletOverview from './WalletOverview';
 import styles from './ConnectedScreens.module.scss';
 import { CloseIcon, CoinListIcon, FaucetIcon, LogoIcon, SettingIcon } from 'resources/icons';
+import WalletList from './WalletList';
+import AddNewWallet from './AddNewWallet';
+import ImportWallet from './ImportWallet';
 
 const items: MenuProps['items'] = [
   {
@@ -30,6 +32,7 @@ const items: MenuProps['items'] = [
 const ConnectedScreens: React.FC = () => {
   const [current, setCurrent] = useState('coinList');
   const [visible, setVisible] = useState(false);
+  const [addNew, setAddNew] = useState(false);
 
   const showDrawer = () => {
     setVisible(true);
@@ -40,7 +43,6 @@ const ConnectedScreens: React.FC = () => {
   };
 
   const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
     setCurrent(e.key);
   };
 
@@ -62,7 +64,7 @@ const ConnectedScreens: React.FC = () => {
   return (
     <div className="flex flex-col">
       <WalletOverview onShowWalletList={showDrawer} />
-      <div className="flex flex-col gap-4 bg-primary px-9 py-6 rounded-[11px]">
+      <div className="flex flex-col gap-4 bg-primary px-9 py-6 rounded-[11px] h-[520px]">
         {getModalContent()}
       </div>
       <Menu
@@ -83,14 +85,26 @@ const ConnectedScreens: React.FC = () => {
         placement="left"
         className={styles.drawer}
         closable={false}
-        // onClose={onClose}
         visible={visible}
         getContainer={false}
         style={{ position: 'absolute' }}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <WalletList onSelect={onClose} onAddNew={() => setAddNew(true)} />
       </Drawer>
+      {addNew && (
+        <div className="absolute inset-0 bg-secondary z-[9999] py-16 px-8 border-4 border-grey-900 rounded-[11px]">
+          <div onClick={() => setAddNew(false)} className="absolute right-12 top-9 cursor-pointer">
+            <CloseIcon />
+          </div>
+          <Tabs defaultActiveKey="1" className={cx(styles.tabs)}>
+            <Tabs.TabPane tab="Add Wallet" key="1">
+              <AddNewWallet onSuccess={() => setAddNew(false)} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Import Wallet" key="2">
+              <ImportWallet onSuccess={() => setAddNew(false)} />
+            </Tabs.TabPane>
+          </Tabs>
+        </div>
+      )}
     </div>
   );
 };

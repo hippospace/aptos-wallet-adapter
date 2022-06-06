@@ -6,7 +6,6 @@ import AddNewWallet from './AddNewWallet';
 import ChangePassword from './ChangePassword';
 import ImportWallet from './ImportWallet';
 import WalletDetail from './WalletDetail';
-import WalletList from './WalletList';
 
 interface TProps {
   onReset: () => void;
@@ -41,8 +40,6 @@ const Settings: React.FC<TProps> = ({ onReset }) => {
         return <ChangePassword onSuccess={onBackToSetting} />;
       case 'createWallet':
         return <AddNewWallet onSuccess={() => setScreen('walletList')} />;
-      case 'walletList':
-        return <WalletList onSuccess={onReset} />;
       case 'importWallet':
         return <ImportWallet onSuccess={() => setScreen('walletList')} />;
       default:
