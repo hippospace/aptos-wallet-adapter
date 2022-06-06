@@ -7,7 +7,7 @@ import NumberInput from 'components/NumberInput';
 import { useFormik } from 'formik';
 import useHippoClient from 'hooks/useHippoClient';
 import useToken from 'hooks/useToken';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool, IPoolToken } from 'types/pool';
 // import * as Yup from 'yup';
@@ -33,17 +33,20 @@ interface TProps {
 
 const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const isVisible = !!tokenPair;
+  const [loading, setLoading] = useState(false);
   const { retreiveTokenImg } = useToken();
   const hippoClient = useHippoClient();
 
   const onSubmitDeposit = async (values: TDepositForm) => {
     console.log('on submit', values);
+    setLoading(true);
     const xSymbol = tokenPair!.token0.symbol;
     const ySymbol = tokenPair!.token1.symbol;
     if (xSymbol && ySymbol && hippoClient && hippoClient.hippoSwap) {
       await hippoClient.requestDeposit(xSymbol, ySymbol, values.token0Amount, values.token1Amount);
       onDismissModal();
     }
+    setLoading(false);
   };
 
   const formik = useFormik({
@@ -190,7 +193,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               </div>
             </CheckboxInput>
           </div>*/}
-          <Button className="w-full rounded-[8px] font-bold" type="submit">
+          <Button className="w-full rounded-[8px] font-bold" type="submit" isLoading={loading}>
             <h6 className="text-inherit">Deposit</h6>
           </Button>
         </div>

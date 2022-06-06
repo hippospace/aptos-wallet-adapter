@@ -4,6 +4,7 @@ import NumberInput from 'components/NumberInput';
 import SlideInput from 'components/SlideInput';
 import { useFormik } from 'formik';
 import useHippoClient from 'hooks/useHippoClient';
+import { useState } from 'react';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool } from 'types/pool';
 import styles from './WithdrawModal.module.scss';
@@ -21,10 +22,12 @@ interface TProps {
 
 const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const isVisible = !!tokenPair;
+  const [loading, setLoading] = useState(false);
   const { hippoSwap, tokenStores } = useHippoClient();
 
   const onSubmitWithdraw = async (values: TWithdrawForm) => {
     console.log('on submit', values, tokenPair);
+    setLoading(true);
     const lhsSymbol = tokenPair?.token0.symbol || '';
     const rhsSymbol = tokenPair?.token1.symbol || '';
     const lpTokenResult = await hippoSwap?.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
@@ -43,6 +46,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     //   0,
     //   0
     // );
+    setLoading(false);
     onDismissModal();
   };
 
@@ -138,7 +142,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               </div>
             </div>
           </div>
-          <Button className="w-full rounded-[8px] font-bold" type="submit">
+          <Button className="w-full rounded-[8px] font-bold" type="submit" isLoading={loading}>
             <h6 className="text-inherit">Withdraw</h6>
           </Button>
         </div>
