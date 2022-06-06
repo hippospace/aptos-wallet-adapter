@@ -9,7 +9,6 @@ import SummaryPanel from './components/SummaryPanel';
 import FilterPanel from './components/FilterPanel';
 import useHippoClient from 'hooks/useHippoClient';
 import { StructTag } from '@manahippo/aptos-tsgen';
-import { getJointName } from 'utils/hippoWalletUtil';
 
 const Pool: React.FC = () => {
   const dispatch = useDispatch();
@@ -31,8 +30,9 @@ const Pool: React.FC = () => {
           );
         }
         const [xTag, yTag] = cpMeta.typeTag.typeParams;
-        const jointName = getJointName(xTag, yTag);
-        console.log('Pool joint name>>>', jointName);
+        const jointName = hippoSwap.getJointName(xTag, yTag);
+        const priceInfo = hippoSwap.getCpPrice(cpMeta);
+        console.log('Pool joint name>>>', jointName, priceInfo);
       }
     }
     dispatch(poolAction.SET_POOL_LIST(data.pools));
