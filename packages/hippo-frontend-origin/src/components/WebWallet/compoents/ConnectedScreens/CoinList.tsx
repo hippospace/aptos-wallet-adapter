@@ -16,7 +16,10 @@ const CoinList: React.FC = () => {
             key={symbol}>
             <div className="flex gap-3 justify-center items-center">
               <CoinIcon logoSrc={tokenInfo.logo_url} />
-              <h5 className="font-bold text-grey-900">{tokenInfo.symbol}</h5>
+              <div className="flex flex-col">
+                <div className="font-bold text-grey-900">{tokenInfo.name}</div>
+                <small className="font-bold text-grey-500">{tokenInfo.symbol}</small>
+              </div>
             </div>
             <h5 className="font-bold text-grey-900">
               {store.coin.value.toJSNumber() / Math.pow(10, tokenInfo.decimals)}

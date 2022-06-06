@@ -6,10 +6,12 @@ import { ISwapSettings } from '../types';
 import CurrencyInput from './CurrencyInput';
 import SwapDetail from './SwapDetail';
 import useHippoClient from 'hooks/useHippoClient';
+import useAptosWallet from 'hooks/useAptosWallet';
 
 const TokenSwap = () => {
   const { values, setFieldValue, resetForm } = useFormikContext<ISwapSettings>();
   const [isSwapping, setIsSwapping] = useState(false);
+  const { activeWallet, openModal } = useAptosWallet();
   const hippoClient = useHippoClient();
   const fromSymbol = values.currencyFrom?.token.symbol;
   const toSymbol = values.currencyTo?.token.symbol;
@@ -66,8 +68,11 @@ const TokenSwap = () => {
       </Button>
       <CurrencyInput actionType="currencyTo" />
       {!!values.currencyFrom?.amount && !!values.currencyTo?.token.symbol && <SwapDetail />}
-      <Button isLoading={isSwapping} className="paragraph bold mt-14" onClick={onClickSwap}>
-        SWAP
+      <Button
+        isLoading={isSwapping}
+        className="paragraph bold mt-14"
+        onClick={!activeWallet ? openModal : onClickSwap}>
+        {!activeWallet ? 'Connect to Wallet' : 'SWAP'}
       </Button>
     </div>
   );

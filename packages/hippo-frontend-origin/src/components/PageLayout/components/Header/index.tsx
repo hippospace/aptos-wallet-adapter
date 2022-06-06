@@ -58,7 +58,7 @@ const PageHeader: React.FC = () => {
           <Antd.Menu
             mode="horizontal"
             theme="dark"
-            className={cx(styles.menu, 'h-full')}
+            className={cx(styles.menu, 'h-full min-w-[200px]')}
             selectedKeys={[selectedKey]}>
             {renderNavItems()}
           </Antd.Menu>

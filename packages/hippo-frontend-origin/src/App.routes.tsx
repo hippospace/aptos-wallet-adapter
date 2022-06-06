@@ -19,26 +19,26 @@ export const routes: TRoute[] = [
     name: 'Pools',
     element: <Pool />
   },
-  {
-    path: 'stake',
-    name: 'Stake',
-    element: <Swap />
-  },
-  {
-    path: 'vote',
-    name: 'Vote',
-    element: <Swap />
-  },
-  {
-    path: 'launchpad',
-    name: 'Launchpad',
-    element: <Swap />
-  },
-  {
-    path: 'stats',
-    name: 'Stats',
-    element: <Swap />
-  },
+  // {
+  //   path: 'stake',
+  //   name: 'Stake',
+  //   element: <Swap />
+  // },
+  // {
+  //   path: 'vote',
+  //   name: 'Vote',
+  //   element: <Swap />
+  // },
+  // {
+  //   path: 'launchpad',
+  //   name: 'Launchpad',
+  //   element: <Swap />
+  // },
+  // {
+  //   path: 'stats',
+  //   name: 'Stats',
+  //   element: <Swap />
+  // },
   {
     path: '*',
     name: '404',
