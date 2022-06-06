@@ -14,6 +14,7 @@ interface HippoClientContextType {
   tokenInfos?: Record<string, TokenRegistry.TokenInfo>;
   requestFaucet: (symbol: string, uiAmount: string) => {};
   requestSwap: (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {};
+  requestDeposit: (lhsSymbol: string, rhsSymbol: string, lhsUiAmt: number, rhsUiAmt: number) => {};
 }
 
 interface TProviderProps {
@@ -108,6 +109,32 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
     [hippoSwap, activeWallet, hippoWallet]
   );
 
+  const requestDeposit = useCallback(
+    async (lhsSymbol: string, rhsSymbol: string, lhsUiAmt: number, rhsUiAmt: number) => {
+      try {
+        if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap) {
+          throw new Error('Please login first');
+        }
+        const payload = await hippoSwap.makeCPAddLiquidityPayload(
+          lhsSymbol,
+          rhsSymbol,
+          lhsUiAmt,
+          rhsUiAmt
+        );
+        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+        await hippoWallet?.refreshStores();
+        setRefresh(true);
+        message.success('Deposit success');
+      } catch (error) {
+        console.log('request deposit error:', error);
+        if (error instanceof Error) {
+          message.error(error?.message);
+        }
+      }
+    },
+    [hippoSwap, activeWallet, hippoWallet]
+  );
+
   return (
     <HippoClientContext.Provider
       value={{
@@ -116,7 +143,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         tokenStores,
         tokenInfos,
         requestFaucet,
-        requestSwap
+        requestSwap,
+        requestDeposit
       }}>
       {children}
     </HippoClientContext.Provider>

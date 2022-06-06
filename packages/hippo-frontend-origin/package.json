@@ -7,7 +7,7 @@
     "@craco/craco": "^6.4.3",
     "@ethersproject/providers": "^5.6.6",
     "@manahippo/aptos-tsgen": "^0.0.37",
-    "@manahippo/hippo-sdk": "^0.0.11",
+    "@manahippo/hippo-sdk": "^0.0.12",
     "@reduxjs/toolkit": "^1.8.1",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",

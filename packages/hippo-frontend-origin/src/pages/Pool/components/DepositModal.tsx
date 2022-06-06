@@ -1,10 +1,11 @@
 import { Modal } from 'components/Antd';
 import Button from 'components/Button';
-import CheckboxInput from 'components/CheckboxInput';
+//import CheckboxInput from 'components/CheckboxInput';
 import CoinIcon from 'components/CoinIcon';
 import NumberInput from 'components/NumberInput';
-import TextLink from 'components/TextLink';
+//import TextLink from 'components/TextLink';
 import { useFormik } from 'formik';
+import useHippoClient from 'hooks/useHippoClient';
 import useToken from 'hooks/useToken';
 import { useCallback } from 'react';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
@@ -13,9 +14,9 @@ import { IPool, IPoolToken } from 'types/pool';
 import styles from './DepositModal.module.scss';
 
 interface TDepositForm {
-  token0Amount: Number;
-  token1Amount: Number;
-  total: Number;
+  token0Amount: number;
+  token1Amount: number;
+  total: number;
   agreed: boolean;
 }
 
@@ -33,9 +34,16 @@ interface TProps {
 const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const isVisible = !!tokenPair;
   const { retreiveTokenImg } = useToken();
-  const onSubmitDeposit = (values: TDepositForm) => {
+  const hippoClient = useHippoClient();
+
+  const onSubmitDeposit = async (values: TDepositForm) => {
     console.log('on submit', values);
-    onDismissModal();
+    const xSymbol = tokenPair!.token0.symbol;
+    const ySymbol = tokenPair!.token1.symbol;
+    if (xSymbol && ySymbol && hippoClient && hippoClient.hippoSwap) {
+      await hippoClient.requestDeposit(xSymbol, ySymbol, values.token0Amount, values.token1Amount);
+      onDismissModal();
+    }
   };
 
   const formik = useFormik({
@@ -50,13 +58,42 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   });
 
   const getWalletTokenBalance = (token: IPoolToken) => {
+    if (hippoClient.hippoWallet) {
+      const store = hippoClient.hippoWallet.symbolToCoinStore[token.symbol];
+      const ti = hippoClient.hippoWallet.symbolToTokenInfo[token.symbol];
+      const uiBalance = store.coin.value.toJSNumber() / Math.pow(10, ti.decimals);
+      return uiBalance.toFixed(4);
+    }
     console.log('getWalletTokenBalance>>>', token);
     return Number(0).toFixed(4);
   };
 
   const onHandleInput = useCallback(
-    (field: string, value: any) => {
+    (field: 'token0Amount' | 'token1Amount', value: any) => {
       formik.setFieldValue(field, value);
+      // when user enters one amount, automatically compute the required amount of the other
+      const xSymbol = tokenPair!.token0.symbol;
+      const ySymbol = tokenPair!.token1.symbol;
+      if (hippoClient.hippoSwap) {
+        const lpInfo = hippoClient.hippoSwap.getCpLpTokenInfo(xSymbol, ySymbol);
+        const xTokenInfo = hippoClient.hippoSwap.symbolToTokenInfo[xSymbol];
+        const yTokenInfo = hippoClient.hippoSwap.symbolToTokenInfo[ySymbol];
+        if (lpInfo) {
+          const cpMeta = hippoClient.hippoSwap.xyFullnameToCPMeta[lpInfo.jointName];
+          const xPoolUiBalance =
+            cpMeta.balance_x.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+          const yPoolUiBalance =
+            cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals);
+          const xToY = xPoolUiBalance / yPoolUiBalance;
+          if (field === 'token0Amount') {
+            const desiredYUiAmt = Number(value) / xToY;
+            formik.setFieldValue('token1Amount', desiredYUiAmt);
+          } else {
+            const desiredXUiAmt = Number(value) * xToY;
+            formik.setFieldValue('token0Amount', desiredXUiAmt);
+          }
+        }
+      }
       // TODO: Calculate and update total field
       formik.setFieldValue('total', formik.values.token0Amount + formik.values.token1Amount);
     },
@@ -113,6 +150,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               <PlusSMIcon />
               {renderTokenInput('token1')}
             </div>
+            {/*
             <hr className="h-[2px] bg-[#D5D5D5] w-full my-4" />
             <div className="flex items-center justify-end w-full gap-6">
               <div className="header5 bold text-grey-900">Total</div>
@@ -125,29 +163,33 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
                 value={formik.values.total}
               />
             </div>
+            */}
           </div>
-          <div className="flex flex-col">
-            <div className="text-prime paragraph bold">
-              Estimated earnings from fees(7d) + Aquafarm rewards
-            </div>
-            <div className="flex justify-between pt-12">
-              <div className="flex gap-4 items-center">
-                <div className="header5 bold text-grey-900">$1.23</div>
-                <div className="paragraph text-grey-900">/ month</div>
+          {/*
+          <div>
+            <div className="flex flex-col">
+              <div className="text-prime paragraph bold">
+                Estimated earnings from fees(7d) + Aquafarm rewards
               </div>
-              <div className="flex gap-4 items-center">
-                <div className="header5 bold text-grey-900">100%</div>
-                <div className="paragraph text-grey-900">APR</div>
+              <div className="flex justify-between pt-12">
+                <div className="flex gap-4 items-center">
+                  <div className="header5 bold text-grey-900">$1.23</div>
+                  <div className="paragraph text-grey-900">/ month</div>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <div className="header5 bold text-grey-900">100%</div>
+                  <div className="paragraph text-grey-900">APR</div>
+                </div>
               </div>
             </div>
-          </div>
-          <CheckboxInput>
-            <div className="helpText text-grey-900">
-              I verify that I have read the <TextLink href="">Orca Pools Guide</TextLink> and{' '}
-              <TextLink href="">understand the risks of providing liquidity</TextLink>, including
-              impermanent loss.
-            </div>
-          </CheckboxInput>
+            <CheckboxInput>
+              <div className="helpText text-grey-900">
+                I verify that I have read the <TextLink href="">Orca Pools Guide</TextLink> and{' '}
+                <TextLink href="">understand the risks of providing liquidity</TextLink>, including
+                impermanent loss.
+              </div>
+            </CheckboxInput>
+          </div>*/}
           <Button className="w-full rounded-[8px] font-bold" type="submit">
             <h6 className="text-white">Deposit</h6>
           </Button>
