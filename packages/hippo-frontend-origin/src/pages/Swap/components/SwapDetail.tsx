@@ -6,27 +6,27 @@ import { ISwapSettings } from '../types';
 
 const SwapDetail: React.FC = () => {
   // const swapSettings = useSelector(getSwapSettings);
-  const { values: swapSettings } = useFormikContext<ISwapSettings>();
   const hippoClient = useHippoClient();
+  const { values: swapSettings } = useFormikContext<ISwapSettings>();
   let output = '...';
   let minimum = '...';
   let priceImpact = '...';
-
-  // FIXME: why swapSettings never gets updated??
-  console.log(swapSettings);
 
   if (hippoClient.hippoSwap && swapSettings.currencyFrom?.amount && swapSettings.currencyTo) {
     const fromSymbol = swapSettings.currencyFrom.token.symbol;
     const toSymbol = swapSettings.currencyTo.token.symbol;
 
     const hasRoute = hippoClient.hippoSwap.hasCpPoolFor(fromSymbol, toSymbol);
-    const priceInfo = hippoClient.hippoSwap.getCpPriceBySymbols(fromSymbol, toSymbol);
-    if (hasRoute && typeof priceInfo === 'object') {
-      const yToX = priceInfo.yToX;
-      const outputUiAmt = swapSettings.currencyFrom.amount * yToX;
+    const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(
+      fromSymbol,
+      toSymbol,
+      swapSettings.currencyFrom.amount
+    );
+    if (hasRoute && typeof quote === 'object') {
+      const outputUiAmt = quote.outputUiAmt;
       output = `${outputUiAmt.toFixed(4)} ${toSymbol}`;
-      minimum = `${(outputUiAmt * (1 - swapSettings.slipTolerance)).toFixed(4)} ${toSymbol}`;
-      priceImpact = '0.01%';
+      minimum = `${(outputUiAmt * (1 - swapSettings.slipTolerance / 100)).toFixed(4)} ${toSymbol}`;
+      priceImpact = `${(quote.priceImpact * 100).toFixed(2)}%`;
     } else {
       output = 'route unavailable';
       minimum = 'route unavailable';

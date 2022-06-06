@@ -2,25 +2,29 @@ import Button from 'components/Button';
 import { useFormikContext } from 'formik';
 import { useCallback, useEffect } from 'react';
 import { SwapIcon } from 'resources/icons';
-import random from 'lodash/random';
 import { ISwapSettings } from '../types';
 import CurrencyInput from './CurrencyInput';
 import SwapDetail from './SwapDetail';
+import useHippoClient from 'hooks/useHippoClient';
 
 const TokenSwap = () => {
   const { values, setFieldValue } = useFormikContext<ISwapSettings>();
+  const hippoClient = useHippoClient();
+  const fromSymbol = values.currencyFrom?.token.symbol;
+  const toSymbol = values.currencyTo?.token.symbol;
+  const fromUiAmt = values.currencyFrom?.amount;
+  const hippoWallet = hippoClient.hippoWallet;
 
   const fetchSwapPrice = useCallback(() => {
-    if (
-      values.currencyFrom?.amount &&
-      values.currencyFrom?.token.address &&
-      values.currencyTo?.token.address
-    ) {
-      // TO UPDATE: IMPLEMENT FETCH BEST PRICE
-      setFieldValue('currencyTo', {
-        ...values.currencyTo,
-        amount: values.currencyFrom.amount * random(0.1, 2.1)
-      });
+    if (hippoClient.hippoSwap && fromSymbol && toSymbol && fromUiAmt) {
+      const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
+      if (typeof quote === 'object') {
+        // TO UPDATE: IMPLEMENT FETCH BEST PRICE
+        setFieldValue('currencyTo', {
+          ...values.currencyTo,
+          amount: quote.outputUiAmt
+        });
+      }
     }
   }, [values, setFieldValue]);
 
@@ -35,6 +39,21 @@ const TokenSwap = () => {
     setFieldValue('currencyTo', tokenFrom);
   }, [values, setFieldValue]);
 
+  const onClickSwap = useCallback(async () => {
+    if (hippoClient.hippoSwap && hippoWallet && fromSymbol && toSymbol && fromUiAmt) {
+      const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
+      if (typeof quote === 'object') {
+        const minOut = quote.outputUiAmt * (1 - values.slipTolerance / 100);
+        await hippoClient.requestSwap(fromSymbol, toSymbol, fromUiAmt, minOut);
+        await hippoWallet.refreshStores();
+        // TODO: refresh the UI numbers
+        // setRefresh(true);
+      } else {
+        // TODO: info bubble "route note available"
+      }
+    }
+  }, [hippoClient.hippoSwap, fromSymbol, toSymbol, fromUiAmt]);
+
   return (
     <div className="w-full flex flex-col px-8 gap-1">
       <CurrencyInput actionType="currencyFrom" />
@@ -43,7 +62,9 @@ const TokenSwap = () => {
       </Button>
       <CurrencyInput actionType="currencyTo" />
       {!!values.currencyFrom?.amount && !!values.currencyTo?.token.symbol && <SwapDetail />}
-      <Button className="paragraph bold mt-14">SWAP</Button>
+      <Button className="paragraph bold mt-14" onClick={onClickSwap}>
+        SWAP
+      </Button>
     </div>
   );
 };

@@ -12,7 +12,7 @@ interface HippoClientContextType {
   tokenStores?: Record<string, X0x1.Coin.CoinStore>;
   tokenInfos?: Record<string, TokenRegistry.TokenInfo>;
   requestFaucet: (symbol: string, uiAmount: string) => {};
-  requestSwap: (fromSymbol: string, toSymbol: string, uiAmtIn: string) => {};
+  requestSwap: (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {};
 }
 
 interface TProviderProps {
@@ -78,14 +78,13 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   );
 
   const requestSwap = useCallback(
-    async (fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
+    async (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {
       if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap)
         throw new Error('Please login first');
-      const uiAmtInNum = Number.parseFloat(uiAmtIn);
-      if (uiAmtInNum <= 0) {
+      if (uiAmtIn <= 0) {
         throw new Error('Input amount needs to be greater than 0');
       }
-      const payload = await hippoSwap.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
+      const payload = await hippoSwap.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtIn, uiAmtOutMin);
       if (payload) {
         await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
         setRefresh(true);
