@@ -91,7 +91,7 @@ const CreateWallet: React.FC = () => {
         />
       </Form.Item>
       <Button isLoading={isAccountBeingCreated} type="submit" className="font-bold">
-        <h6 className="text-white">Create Account</h6>
+        <h6 className="text-inherit">Create Account</h6>
       </Button>
     </form>
   );

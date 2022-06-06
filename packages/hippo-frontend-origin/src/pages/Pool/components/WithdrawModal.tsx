@@ -3,6 +3,7 @@ import Button from 'components/Button';
 import NumberInput from 'components/NumberInput';
 import SlideInput from 'components/SlideInput';
 import { useFormik } from 'formik';
+import useHippoClient from 'hooks/useHippoClient';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool } from 'types/pool';
 import styles from './WithdrawModal.module.scss';
@@ -16,13 +17,32 @@ interface TProps {
   onDismissModal: () => void;
 }
 
-const totalLiquidity = 0.99999;
+// const totalLiquidity = 0.99999;
 
 const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const isVisible = !!tokenPair;
+  const { hippoSwap, tokenStores } = useHippoClient();
 
-  const onSubmitDeposit = (values: TWithdrawForm) => {
-    console.log('on submit', values);
+  const onSubmitWithdraw = async (values: TWithdrawForm) => {
+    console.log('on submit', values, tokenPair);
+    const lhsSymbol = tokenPair?.token0.symbol || '';
+    const rhsSymbol = tokenPair?.token1.symbol || '';
+    const lpTokenResult = await hippoSwap?.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
+    if (!lpTokenResult) {
+      throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
+    }
+    const { jointName } = lpTokenResult;
+    if (tokenStores && tokenStores[jointName]) {
+    }
+    // const lpTokenTag = typeInfoToTypeTag(lpToken.token_type);
+    console.log('>>>>');
+    // await requestWithdraw(
+    //   tokenPair?.token0.symbol || '',
+    //   tokenPair?.token1.symbol || '',
+    //   values.amount,
+    //   0,
+    //   0
+    // );
     onDismissModal();
   };
 
@@ -31,11 +51,32 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       amount: 0
     },
     // validationSchema: DepositSchema,
-    onSubmit: onSubmitDeposit
+    onSubmit: onSubmitWithdraw
   });
+
+  const onRequestAmountToWithdraw = async (amount: number) => {
+    //TODO: this will update the amount of each token to withdraw when user amount change
+    const lhsSymbol = tokenPair?.token0.symbol || '';
+    const rhsSymbol = tokenPair?.token1.symbol || '';
+    const lpTokenResult = await hippoSwap?.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
+    if (!lpTokenResult) {
+      throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
+    }
+    const { jointName } = lpTokenResult;
+    if (tokenStores && tokenStores[jointName]) {
+      const lhsAmountCir = hippoSwap?.getTokenTotalSupplyBySymbol(lhsSymbol);
+      const rhsAmountCir = hippoSwap?.getTokenTotalSupplyBySymbol(rhsSymbol);
+      console.log('>>>on Request amount to withdraw', amount, lhsAmountCir, rhsAmountCir);
+    }
+  };
+
+  const randomToken0 = formik.values.amount * Math.random();
+  const randomToken1 = formik.values.amount - randomToken0;
+  const totalLiquidity = tokenPair?.totalValueLockedUSD;
 
   const handleOnChange = (val: any) => {
     formik.setFieldValue('amount', val);
+    onRequestAmountToWithdraw(val);
   };
 
   const paresSlideValue = () => {
@@ -43,9 +84,6 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     if (typeof formik.values.amount === 'string') return parseInt(formik.values.amount);
     return 0;
   };
-
-  const randomToken0 = formik.values.amount * Math.random();
-  const randomToken1 = formik.values.amount - randomToken0;
 
   return (
     <Modal
@@ -80,9 +118,9 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             <div className="my-4">
               <SlideInput
                 min={0}
-                max={totalLiquidity}
+                max={parseFloat(tokenPair?.totalValueLockedUSD || '')}
                 tipFormatter={(value) => <div className="">{value}</div>}
-                step={totalLiquidity / 100}
+                step={parseFloat(tokenPair?.totalValueLockedUSD || '') / 100}
                 onChange={(val: number) => handleOnChange(val)}
                 value={paresSlideValue()}
               />
@@ -101,7 +139,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             </div>
           </div>
           <Button className="w-full rounded-[8px] font-bold" type="submit">
-            <h6 className="text-white">Withdraw</h6>
+            <h6 className="text-inherit">Withdraw</h6>
           </Button>
         </div>
       </form>

@@ -66,7 +66,7 @@ const WalletLogin: React.FC<TProps> = ({ onCreateNew }) => {
         </Form.Item>
         <div className="w-full px-8">
           <Button type="submit" className="w-full font-bold">
-            Unlock
+            <h6 className="text-inherit">Unlock</h6>
           </Button>
         </div>
         {/* <hr className="h-[2px] bg-[#D5D5D5] w-full my-4" /> */}

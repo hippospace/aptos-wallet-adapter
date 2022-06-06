@@ -191,7 +191,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             </CheckboxInput>
           </div>*/}
           <Button className="w-full rounded-[8px] font-bold" type="submit">
-            <h6 className="text-white">Deposit</h6>
+            <h6 className="text-inherit">Deposit</h6>
           </Button>
         </div>
       </form>

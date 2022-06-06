@@ -1,6 +1,6 @@
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { hippoSwapClient, hippoWalletClient } from 'config/hippoWalletClient';
-import { HippoSwapClient, HippoWalletClient, X0x1 } from '@manahippo/hippo-sdk';
+import { HippoSwapClient, HippoWalletClient, UITokenAmount, X0x1 } from '@manahippo/hippo-sdk';
 import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790';
 import useAptosWallet from 'hooks/useAptosWallet';
 import { aptosClient, faucetClient } from 'config/aptosClient';
@@ -15,6 +15,13 @@ interface HippoClientContextType {
   requestFaucet: (symbol: string, uiAmount: string) => {};
   requestSwap: (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {};
   requestDeposit: (lhsSymbol: string, rhsSymbol: string, lhsUiAmt: number, rhsUiAmt: number) => {};
+  requestWithdraw: (
+    lhsSymbol: string,
+    rhsSymbol: string,
+    liqiudityAmt: UITokenAmount,
+    lhsMinAmt: UITokenAmount,
+    rhsMinAmt: UITokenAmount
+  ) => {};
 }
 
 interface TProviderProps {
@@ -31,6 +38,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const [tokenStores, setTokenStores] = useState<Record<string, X0x1.Coin.CoinStore>>();
   const [tokenInfos, setTokenInfos] = useState<Record<string, TokenRegistry.TokenInfo>>();
 
+  console.log('>>>my toekn store', tokenStores);
   const getHippoWalletClient = useCallback(async () => {
     if (activeWallet) {
       const client = await hippoWalletClient(activeWallet.aptosAccount);
@@ -135,6 +143,25 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
     [hippoSwap, activeWallet, hippoWallet]
   );
 
+  const requestWithdraw = useCallback(
+    async (
+      lhsSymbol: string,
+      rhsSymbol: string,
+      liqiudityAmt: UITokenAmount,
+      lhsMinAmt: UITokenAmount,
+      rhsMinAmt: UITokenAmount
+    ) => {
+      await hippoSwap?.makeCPRemoveLiquidityPayload(
+        lhsSymbol,
+        rhsSymbol,
+        liqiudityAmt,
+        lhsMinAmt,
+        rhsMinAmt
+      );
+    },
+    [hippoSwap]
+  );
+
   return (
     <HippoClientContext.Provider
       value={{
@@ -144,7 +171,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         tokenInfos,
         requestFaucet,
         requestSwap,
-        requestDeposit
+        requestDeposit,
+        requestWithdraw
       }}>
       {children}
     </HippoClientContext.Provider>
