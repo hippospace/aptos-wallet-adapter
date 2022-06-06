@@ -12,11 +12,11 @@ const PoolInfo: React.FC<TProps> = ({ pool }) => {
     },
     {
       label: '24h Volume',
-      value: `$ ${parseFloat(pool.volumeUSD).toFixed(2)}`
+      value: `$ ${pool.volumeUSD ? parseFloat(pool.volumeUSD).toFixed(2) : '-'}`
     },
     {
       label: 'APR',
-      value: '63.3 %'
+      value: '-'
     }
   ];
   return (
