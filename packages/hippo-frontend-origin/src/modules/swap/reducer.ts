@@ -46,6 +46,9 @@ export default createReducer(initState, (builder) => {
     })
     .addCase(actions.SET_SWAP_SETTING, (state, { payload }) => {
       state.swapSettings = payload;
+    })
+    .addCase(actions.RESET, (state) => {
+      state.swapSettings = initState.swapSettings;
     });
 });
 

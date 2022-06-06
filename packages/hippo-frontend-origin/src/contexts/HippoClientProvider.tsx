@@ -5,6 +5,7 @@ import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0x49c5e3ec50
 import useAptosWallet from 'hooks/useAptosWallet';
 import { aptosClient, faucetClient } from 'config/aptosClient';
 import { sendPayloadTx } from 'utils/hippoWalletUtil';
+import { message } from 'components/Antd';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
@@ -79,18 +80,32 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
 
   const requestSwap = useCallback(
     async (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {
-      if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap)
-        throw new Error('Please login first');
-      if (uiAmtIn <= 0) {
-        throw new Error('Input amount needs to be greater than 0');
-      }
-      const payload = await hippoSwap.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtIn, uiAmtOutMin);
-      if (payload) {
-        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
-        setRefresh(true);
+      try {
+        if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap)
+          throw new Error('Please login first');
+        if (uiAmtIn <= 0) {
+          throw new Error('Input amount needs to be greater than 0');
+        }
+        const payload = await hippoSwap.makeCPSwapPayload(
+          fromSymbol,
+          toSymbol,
+          uiAmtIn,
+          uiAmtOutMin
+        );
+        if (payload) {
+          await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+          await hippoWallet?.refreshStores();
+          setRefresh(true);
+          message.success('Swap successfully');
+        }
+      } catch (error) {
+        console.log('request swap error:', error);
+        if (error instanceof Error) {
+          message.error(error?.message);
+        }
       }
     },
-    [hippoSwap, activeWallet]
+    [hippoSwap, activeWallet, hippoWallet]
   );
 
   return (

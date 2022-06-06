@@ -1,6 +1,6 @@
 import Button from 'components/Button';
 import { useFormikContext } from 'formik';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SwapIcon } from 'resources/icons';
 import { ISwapSettings } from '../types';
 import CurrencyInput from './CurrencyInput';
@@ -8,7 +8,8 @@ import SwapDetail from './SwapDetail';
 import useHippoClient from 'hooks/useHippoClient';
 
 const TokenSwap = () => {
-  const { values, setFieldValue } = useFormikContext<ISwapSettings>();
+  const { values, setFieldValue, resetForm } = useFormikContext<ISwapSettings>();
+  const [isSwapping, setIsSwapping] = useState(false);
   const hippoClient = useHippoClient();
   const fromSymbol = values.currencyFrom?.token.symbol;
   const toSymbol = values.currencyTo?.token.symbol;
@@ -40,6 +41,7 @@ const TokenSwap = () => {
   }, [values, setFieldValue]);
 
   const onClickSwap = useCallback(async () => {
+    setIsSwapping(true);
     if (hippoClient.hippoSwap && hippoWallet && fromSymbol && toSymbol && fromUiAmt) {
       const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
       if (typeof quote === 'object') {
@@ -48,11 +50,13 @@ const TokenSwap = () => {
         await hippoWallet.refreshStores();
         // TODO: refresh the UI numbers
         // setRefresh(true);
+        resetForm();
       } else {
         // TODO: info bubble "route note available"
       }
     }
-  }, [hippoClient.hippoSwap, fromSymbol, toSymbol, fromUiAmt]);
+    setIsSwapping(false);
+  }, [fromSymbol, toSymbol, fromUiAmt, hippoClient, hippoWallet, values.slipTolerance, resetForm]);
 
   return (
     <div className="w-full flex flex-col px-8 gap-1">
@@ -62,7 +66,7 @@ const TokenSwap = () => {
       </Button>
       <CurrencyInput actionType="currencyTo" />
       {!!values.currencyFrom?.amount && !!values.currencyTo?.token.symbol && <SwapDetail />}
-      <Button className="paragraph bold mt-14" onClick={onClickSwap}>
+      <Button isLoading={isSwapping} className="paragraph bold mt-14" onClick={onClickSwap}>
         SWAP
       </Button>
     </div>
