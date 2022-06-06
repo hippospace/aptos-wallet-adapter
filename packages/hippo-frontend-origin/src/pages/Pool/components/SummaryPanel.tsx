@@ -12,7 +12,7 @@ const SummaryPanel: React.FC = () => {
       <hr className="border-[1px] border-primeBlack20" />
       <div className="flex flex-col gap-4">
         <small className="text-grey-700 font-bold">Total 24h Volume</small>
-        <h5 className="font-bold text-grey-900">${total24Vol.toFixed(2)}</h5>
+        <h5 className="font-bold text-grey-900">${total24Vol ? total24Vol.toFixed(2) : '-'}</h5>
       </div>
     </div>
   );

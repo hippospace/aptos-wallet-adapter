@@ -132,7 +132,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
         await hippoWallet?.refreshStores();
         setRefresh(true);
-        message.success('Deposit success');
+        message.success('Deposit successful');
       } catch (error) {
         console.log('request deposit error:', error);
         if (error instanceof Error) {
@@ -151,15 +151,29 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
       lhsMinAmt: UITokenAmount,
       rhsMinAmt: UITokenAmount
     ) => {
-      await hippoSwap?.makeCPRemoveLiquidityPayload(
-        lhsSymbol,
-        rhsSymbol,
-        liqiudityAmt,
-        lhsMinAmt,
-        rhsMinAmt
-      );
+      try {
+        if (!activeWallet || !activeWallet.aptosAccount || !hippoSwap) {
+          throw new Error('Please login first');
+        }
+        const payload = await hippoSwap?.makeCPRemoveLiquidityPayload(
+          lhsSymbol,
+          rhsSymbol,
+          liqiudityAmt,
+          lhsMinAmt,
+          rhsMinAmt
+        );
+        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+        await hippoWallet?.refreshStores();
+        setRefresh(true);
+        message.success('Withdrawal successful');
+      } catch (error) {
+        console.log('request withdraw error:', error);
+        if (error instanceof Error) {
+          message.error(error?.message);
+        }
+      }
     },
-    [hippoSwap]
+    [hippoSwap, activeWallet, hippoWallet]
   );
 
   return (

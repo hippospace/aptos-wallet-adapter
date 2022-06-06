@@ -4,10 +4,12 @@ import NumberInput from 'components/NumberInput';
 import SlideInput from 'components/SlideInput';
 import { useFormik } from 'formik';
 import useHippoClient from 'hooks/useHippoClient';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
 import { IPool } from 'types/pool';
 import styles from './WithdrawModal.module.scss';
+import { message } from 'components/Antd';
 
 interface TWithdrawForm {
   amount: number;
@@ -18,12 +20,35 @@ interface TProps {
   onDismissModal: () => void;
 }
 
-// const totalLiquidity = 0.99999;
-
 const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const isVisible = !!tokenPair;
   const [loading, setLoading] = useState(false);
-  const { hippoSwap, tokenStores } = useHippoClient();
+  const { hippoSwap, tokenStores, requestWithdraw } = useHippoClient();
+  const [totalUserLpUiAmt, setTotalUserLpUiAmt] = useState(0);
+
+  useEffect(() => {
+    const loadUserLpAmt = async () => {
+      const lhsSymbol = tokenPair?.token0.symbol || '';
+      const rhsSymbol = tokenPair?.token1.symbol || '';
+      if (lhsSymbol && rhsSymbol && tokenStores && hippoSwap) {
+        const lpTokenResult = await hippoSwap?.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
+        if (!lpTokenResult) {
+          throw new Error(`CP Pool for ${lhsSymbol} and ${rhsSymbol} does not exist!`);
+        }
+        const lpSymbol = lpTokenResult.lpToken.symbol;
+        if (lpSymbol in tokenStores) {
+          const uiAmt =
+            tokenStores[lpSymbol].coin.value.toJSNumber() /
+            Math.pow(10, lpTokenResult.lpToken.decimals);
+          setTotalUserLpUiAmt(uiAmt);
+        } else {
+          setTotalUserLpUiAmt(0);
+        }
+      }
+    };
+
+    loadUserLpAmt();
+  }, [hippoSwap, tokenStores, tokenPair]);
 
   const onSubmitWithdraw = async (values: TWithdrawForm) => {
     console.log('on submit', values, tokenPair);
@@ -34,18 +59,13 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     if (!lpTokenResult) {
       throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
-    const { jointName } = lpTokenResult;
-    if (tokenStores && tokenStores[jointName]) {
+    const { lpToken } = lpTokenResult;
+    if (tokenStores && tokenStores[lpToken.symbol]) {
+      await requestWithdraw(lhsSymbol, rhsSymbol, values.amount, 0, 0);
+    } else {
+      // user does not have this LP
+      message.error('You do not have this LP token');
     }
-    // const lpTokenTag = typeInfoToTypeTag(lpToken.token_type);
-    console.log('>>>>');
-    // await requestWithdraw(
-    //   tokenPair?.token0.symbol || '',
-    //   tokenPair?.token1.symbol || '',
-    //   values.amount,
-    //   0,
-    //   0
-    // );
     setLoading(false);
     onDismissModal();
   };
@@ -58,25 +78,39 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     onSubmit: onSubmitWithdraw
   });
 
+  const [receivedTokenXUiAmt, setReceivedX] = useState(0);
+  const [receivedTokenYUiAmt, setReceivedY] = useState(0);
+
   const onRequestAmountToWithdraw = async (amount: number) => {
     //TODO: this will update the amount of each token to withdraw when user amount change
     const lhsSymbol = tokenPair?.token0.symbol || '';
     const rhsSymbol = tokenPair?.token1.symbol || '';
-    const lpTokenResult = await hippoSwap?.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
+    if (!hippoSwap || !lhsSymbol || !rhsSymbol) {
+      return;
+    }
+    const lpTokenResult = await hippoSwap.getCpLpTokenInfo(lhsSymbol, rhsSymbol);
     if (!lpTokenResult) {
       throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
-    const { jointName } = lpTokenResult;
-    if (tokenStores && tokenStores[jointName]) {
-      const lhsAmountCir = hippoSwap?.getTokenTotalSupplyBySymbol(lhsSymbol);
-      const rhsAmountCir = hippoSwap?.getTokenTotalSupplyBySymbol(rhsSymbol);
-      console.log('>>>on Request amount to withdraw', amount, lhsAmountCir, rhsAmountCir);
+    const lpSupplyRawAmt = await hippoSwap.getTokenTotalSupplyBySymbol(
+      lpTokenResult.lpToken.symbol
+    );
+    if (!lpSupplyRawAmt) {
+      throw new Error('Unable to obtain LP token total supply');
     }
+    const lpSupplyUiAmt =
+      lpSupplyRawAmt.toJSNumber() / Math.pow(10, lpTokenResult.lpToken.decimals);
+    const fraction = amount / lpSupplyUiAmt;
+    const cpMeta = hippoSwap.xyFullnameToCPMeta[lpTokenResult.jointName];
+    const xTokenInfo = hippoSwap.symbolToTokenInfo[lhsSymbol];
+    const yTokenInfo = hippoSwap.symbolToTokenInfo[rhsSymbol];
+    const xToReceive =
+      (cpMeta.balance_x.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals)) * fraction;
+    const yToReceive =
+      (cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals)) * fraction;
+    setReceivedX(xToReceive);
+    setReceivedY(yToReceive);
   };
-
-  const randomToken0 = formik.values.amount * Math.random();
-  const randomToken1 = formik.values.amount - randomToken0;
-  const totalLiquidity = tokenPair?.totalValueLockedUSD;
 
   const handleOnChange = (val: any) => {
     formik.setFieldValue('amount', val);
@@ -106,7 +140,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             <NumberInput
               className="w-full rounded-xl bg-input h-[56px] header5 bold"
               min={0}
-              max={totalLiquidity}
+              max={totalUserLpUiAmt}
               placeholder="0.00"
               // onFocus={() => handleOnChange(null)}
               controls={false}
@@ -115,16 +149,16 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             />
             <div className="helpText font-bold text-grey-700">
               <span className="uppercase">
-                ({totalLiquidity} {tokenPair?.token0.symbol} / {tokenPair?.token1.symbol}
+                ({totalUserLpUiAmt} {tokenPair?.token0.symbol} / {tokenPair?.token1.symbol}
               </span>{' '}
               liquidity tokens)
             </div>
             <div className="my-4">
               <SlideInput
                 min={0}
-                max={parseFloat(tokenPair?.totalValueLockedUSD || '')}
+                max={totalUserLpUiAmt}
                 tipFormatter={(value) => <div className="">{value}</div>}
-                step={parseFloat(tokenPair?.totalValueLockedUSD || '') / 100}
+                step={totalUserLpUiAmt / 10}
                 onChange={(val: number) => handleOnChange(val)}
                 value={paresSlideValue()}
               />
@@ -133,11 +167,11 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
               <div className="paragraph">You will receive:</div>
               <div className="flex w-full justify-between items-center">
                 <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
-                  {randomToken0.toFixed(7)} {tokenPair?.token0.symbol}
+                  {receivedTokenXUiAmt.toFixed(7)} {tokenPair?.token0.symbol}
                 </div>
                 <PlusSMIcon />
                 <div className="header5 bold text-grey-900 py-2 px-4 uppercase">
-                  {randomToken1.toFixed(7)} {tokenPair?.token1.symbol}
+                  {receivedTokenYUiAmt.toFixed(7)} {tokenPair?.token1.symbol}
                 </div>
               </div>
             </div>
