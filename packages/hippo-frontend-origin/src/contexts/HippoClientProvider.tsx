@@ -38,7 +38,6 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const [tokenStores, setTokenStores] = useState<Record<string, X0x1.Coin.CoinStore>>();
   const [tokenInfos, setTokenInfos] = useState<Record<string, TokenRegistry.TokenInfo>>();
 
-  console.log('>>>my toekn store', tokenStores);
   const getHippoWalletClient = useCallback(async () => {
     if (activeWallet) {
       const client = await hippoWalletClient(activeWallet.aptosAccount);

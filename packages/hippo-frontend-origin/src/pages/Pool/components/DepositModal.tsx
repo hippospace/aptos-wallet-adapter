@@ -38,7 +38,6 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const hippoClient = useHippoClient();
 
   const onSubmitDeposit = async (values: TDepositForm) => {
-    console.log('on submit', values);
     setLoading(true);
     const xSymbol = tokenPair!.token0.symbol;
     const ySymbol = tokenPair!.token1.symbol;
@@ -67,7 +66,6 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       const uiBalance = store.coin.value.toJSNumber() / Math.pow(10, ti.decimals);
       return uiBalance.toFixed(4);
     }
-    console.log('getWalletTokenBalance>>>', token);
     return Number(0).toFixed(4);
   };
 

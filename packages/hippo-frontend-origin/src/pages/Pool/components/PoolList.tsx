@@ -17,12 +17,10 @@ const PoolList: React.FC<TProps> = ({ filteredPools }) => {
   const [withdrawPair, setWithdrawPair] = useState<IPool>();
 
   const handleOnClickDeposit = (item: IPool) => {
-    console.log('deposit>>>', item);
     setDepositPair(item);
   };
 
   const handleOnClickWithdraw = (item: IPool) => {
-    console.log('withdraw>>>', item);
     setWithdrawPair(item);
   };
   return (

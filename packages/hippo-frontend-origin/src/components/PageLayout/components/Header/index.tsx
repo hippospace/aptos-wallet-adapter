@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Antd, WalletConnector } from 'components';
 import { Link, useLocation } from 'react-router-dom';
 import { routes } from 'App.routes';
-import { LogoIcon } from 'resources/icons';
+import LogoIcon from 'components/LogoIcon';
 import cx from 'classnames';
 import styles from './Header.module.scss';
 

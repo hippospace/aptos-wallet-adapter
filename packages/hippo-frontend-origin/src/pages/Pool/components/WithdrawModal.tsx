@@ -51,7 +51,6 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   }, [hippoSwap, tokenStores, tokenPair]);
 
   const onSubmitWithdraw = async (values: TWithdrawForm) => {
-    console.log('on submit', values, tokenPair);
     setLoading(true);
     const lhsSymbol = tokenPair?.token0.symbol || '';
     const rhsSymbol = tokenPair?.token1.symbol || '';

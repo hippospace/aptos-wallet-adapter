@@ -1,4 +1,3 @@
-export { ReactComponent as LogoIcon } from './logo.svg';
 export { ReactComponent as TwitterIcon } from './twitter.svg';
 export { ReactComponent as MediumIcon } from './medium.svg';
 export { ReactComponent as DiscordIcon } from './discord.svg';

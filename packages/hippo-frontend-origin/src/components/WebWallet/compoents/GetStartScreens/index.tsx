@@ -1,7 +1,7 @@
 import Button from 'components/Button';
 import useAptosWallet from 'hooks/useAptosWallet';
 import { useState } from 'react';
-import { LogoIcon } from 'resources/icons';
+import LogoIcon from 'components/LogoIcon';
 import CreateWallet from './CreateWallet';
 import WalletLogin from './WalletLogin';
 
@@ -17,7 +17,7 @@ const GetStartScreens: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center px-2 py-10">
-      <LogoIcon className="mt-8" />
+      <LogoIcon className="mt-8 w-[120px] h-[120px]" />
       <div className="mt-20 flex flex-col items-center text-center gap-4">
         <h4 className="text-grey-900 font-bold">Web Wallet at Hippo</h4>
         <div className="text-grey-900">

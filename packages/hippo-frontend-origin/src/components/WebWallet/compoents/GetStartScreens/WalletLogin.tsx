@@ -3,7 +3,7 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { useFormik } from 'formik';
 import useAptosWallet from 'hooks/useAptosWallet';
-import { LogoIcon } from 'resources/icons';
+import LogoIcon from 'components/LogoIcon';
 import * as yup from 'yup';
 
 interface TFormProps {
@@ -47,7 +47,7 @@ const WalletLogin: React.FC<TProps> = ({ onCreateNew }) => {
 
   return (
     <form className="flex flex-col items-center px-9 py-10" onSubmit={formik.handleSubmit}>
-      <LogoIcon className="mt-8 w-[120px] h-[120px]" width={120} height={120} />
+      <LogoIcon className="mt-8 w-[120px] h-[120px]" />
       <div className="mt-10 flex flex-col items-center text-center gap-8 w-full">
         <h4 className="text-grey-900 font-bold">Enter Your Password</h4>
         <Form.Item
