@@ -6,6 +6,7 @@ import useAptosWallet from 'hooks/useAptosWallet';
 import { aptosClient, faucetClient } from 'config/aptosClient';
 import { sendPayloadTx } from 'utils/hippoWalletUtil';
 import { message } from 'components/Antd';
+import { TTransaction } from 'types/hippo';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
@@ -22,6 +23,8 @@ interface HippoClientContextType {
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
   ) => {};
+  transaction?: TTransaction;
+  setTransaction: (trans: TTransaction) => void;
 }
 
 interface TProviderProps {
@@ -35,6 +38,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const [hippoWallet, setHippoWallet] = useState<HippoWalletClient>();
   const [hippoSwap, setHippoSwapClient] = useState<HippoSwapClient>();
   const [refresh, setRefresh] = useState(false);
+  const [transaction, setTransaction] = useState<TTransaction>();
   const [tokenStores, setTokenStores] = useState<Record<string, X0x1.Coin.CoinStore>>();
   const [tokenInfos, setTokenInfos] = useState<Record<string, TokenRegistry.TokenInfo>>();
 
@@ -86,6 +90,22 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
     [activeWallet, hippoWallet]
   );
 
+  const requestTransaction = useCallback(
+    async (action: TTransaction) => {
+      try {
+        if (!activeWallet || !activeWallet.aptosAccount) throw new Error('Please login first');
+        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, action.payload);
+        await hippoWallet?.refreshStores();
+        setRefresh(true);
+        message.success(`${action.type} successfully`);
+        setTransaction({} as TTransaction);
+      } catch (error) {
+        throw error;
+      }
+    },
+    [activeWallet, hippoWallet]
+  );
+
   const requestSwap = useCallback(
     async (fromSymbol: string, toSymbol: string, uiAmtIn: number, uiAmtOutMin: number) => {
       try {
@@ -100,11 +120,13 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           uiAmtIn,
           uiAmtOutMin
         );
+        const transactionInfo = { [fromSymbol]: uiAmtIn, [toSymbol]: uiAmtOutMin };
         if (payload) {
-          await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
-          await hippoWallet?.refreshStores();
-          setRefresh(true);
-          message.success('Swap successfully');
+          setTransaction({ type: 'swap', payload, transactionInfo, callback: requestTransaction });
+          // await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
+          // await hippoWallet?.refreshStores();
+          // setRefresh(true);
+          // message.success('Swap successfully');
         }
       } catch (error) {
         console.log('request swap error:', error);
@@ -113,7 +135,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet, hippoWallet]
+    [hippoSwap, activeWallet, requestTransaction]
   );
 
   const requestDeposit = useCallback(
@@ -128,10 +150,15 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           lhsUiAmt,
           rhsUiAmt
         );
-        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
-        await hippoWallet?.refreshStores();
-        setRefresh(true);
-        message.success('Deposit successful');
+        const transactionInfo = { [lhsSymbol]: lhsUiAmt, [rhsSymbol]: rhsUiAmt };
+        if (payload) {
+          setTransaction({
+            type: 'deposit',
+            payload,
+            transactionInfo,
+            callback: requestTransaction
+          });
+        }
       } catch (error) {
         console.log('request deposit error:', error);
         if (error instanceof Error) {
@@ -139,7 +166,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet, hippoWallet]
+    [hippoSwap, activeWallet, requestTransaction]
   );
 
   const requestWithdraw = useCallback(
@@ -161,10 +188,19 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           lhsMinAmt,
           rhsMinAmt
         );
-        await sendPayloadTx(aptosClient, activeWallet.aptosAccount, payload);
-        await hippoWallet?.refreshStores();
-        setRefresh(true);
-        message.success('Withdrawal successful');
+        const transactionInfo = {
+          [lhsSymbol]: lhsMinAmt,
+          [rhsSymbol]: rhsMinAmt,
+          'liquidity amount': liqiudityAmt
+        };
+        if (payload) {
+          setTransaction({
+            type: 'withdraw',
+            payload,
+            transactionInfo,
+            callback: requestTransaction
+          });
+        }
       } catch (error) {
         console.log('request withdraw error:', error);
         if (error instanceof Error) {
@@ -172,7 +208,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet, hippoWallet]
+    [hippoSwap, activeWallet, requestTransaction]
   );
 
   return (
@@ -185,7 +221,9 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         requestFaucet,
         requestSwap,
         requestDeposit,
-        requestWithdraw
+        requestWithdraw,
+        transaction,
+        setTransaction
       }}>
       {children}
     </HippoClientContext.Provider>

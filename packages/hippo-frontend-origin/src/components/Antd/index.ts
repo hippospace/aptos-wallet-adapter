@@ -24,6 +24,7 @@ export type { InputProps } from 'antd/lib/input';
 export type { SwitchProps } from 'antd/lib/switch';
 export type { CheckboxProps } from 'antd/lib/checkbox';
 export type { FormProps } from 'antd/lib/form';
+export type { ModalProps } from 'antd/lib/modal';
 export type { SliderSingleProps } from 'antd/lib/slider';
 export type { SelectProps, OptionProps } from 'antd/lib/select';
 
