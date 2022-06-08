@@ -45,7 +45,7 @@ const PageHeader: React.FC = () => {
   }, [getNavSelected]);
 
   return (
-    <Header className="fixed z-20 w-full px-16 pt-12 bg-transparent h-auto">
+    <Header className="fixed z-20 w-full px-16 pt-12 pb-8 bg-primary h-auto">
       <div className="mx-auto h-[72px] top-0 left-0 flex items-center">
         <div className="grow h-full">
           <Link
