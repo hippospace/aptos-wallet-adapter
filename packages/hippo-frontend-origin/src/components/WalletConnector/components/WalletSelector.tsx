@@ -52,7 +52,7 @@ const WalletSelector: React.FC = () => {
     <div className="">
       <h6 className="font-bold text-black">
         {activeWallet
-          ? walletAddressEllipsis(activeWallet?.aptosAccount?.address?.toString() || '')
+          ? walletAddressEllipsis(activeWallet.toString() || '')
           : 'Connect your wallet'}
       </h6>
       <div className="flex flex-wrap gap-2">{renderButtonGroup}</div>

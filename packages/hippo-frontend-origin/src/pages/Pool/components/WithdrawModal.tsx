@@ -60,13 +60,15 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     }
     const { lpToken } = lpTokenResult;
     if (tokenStores && tokenStores[lpToken.symbol]) {
-      await requestWithdraw(lhsSymbol, rhsSymbol, values.amount, 0, 0);
+      await requestWithdraw(lhsSymbol, rhsSymbol, values.amount, 0, 0, () => {
+        setLoading(false);
+        onDismissModal();
+      });
     } else {
       // user does not have this LP
       message.error('You do not have this LP token');
+      setLoading(false);
     }
-    setLoading(false);
-    onDismissModal();
   };
 
   const formik = useFormik({

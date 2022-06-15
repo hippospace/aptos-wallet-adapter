@@ -10,7 +10,7 @@
       .ant-popover-inner {
         @apply border-4 border-grey-900 rounded-[11px];
         .ant-popover-inner-content {
-          @apply p-0;
+          @apply p-0 overflow-x-hidden rounded-[6px];
         }
       }
 

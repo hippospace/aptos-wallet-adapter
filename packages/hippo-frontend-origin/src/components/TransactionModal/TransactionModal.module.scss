@@ -1,7 +1,9 @@
-.collapse {
+.modal {
   :global {
-    .ant-collapse-header {
-      padding: 0 !important;
+    .ant-modal-content {
+      .ant-modal-body {
+        @apply rounded-xxl overflow-hidden;
+      }
     }
   }
 }

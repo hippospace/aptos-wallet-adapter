@@ -4,7 +4,6 @@ import {
   ENCRYPTED_WALLET_LIST,
   WALLET_STATE_NETWORK_LOCAL_STORAGE_KEY
 } from 'config/aptosConstants';
-import { ActiveAptosWallet, AptosWalletObject } from 'types/aptos';
 
 export function createNewAccount(): AptosAccount {
   const account = new AptosAccount();
@@ -26,17 +25,6 @@ export function importAccount(key: string): AptosAccount {
 export function getEncryptedLocalState(): string | null {
   const item = window.localStorage.getItem(ENCRYPTED_WALLET_LIST);
   return item;
-}
-
-export function getAptosAccountState(
-  activeWalletObj: AptosWalletObject
-): ActiveAptosWallet | undefined {
-  return activeWalletObj
-    ? {
-        ...activeWalletObj,
-        aptosAccount: AptosAccount.fromAptosAccountObject(activeWalletObj.aptosAccountObj)
-      }
-    : undefined;
 }
 
 export type AptosNetwork = 'http://0.0.0.0:8080' | 'https://fullnode.devnet.aptoslabs.com';

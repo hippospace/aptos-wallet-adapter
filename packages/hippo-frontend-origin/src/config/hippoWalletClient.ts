@@ -1,10 +1,10 @@
 import { HippoSwapClient, HippoWalletClient } from '@manahippo/hippo-sdk';
 import { getParserRepo } from '@manahippo/hippo-sdk/';
-import { AptosAccountState } from 'types/aptos';
+import { ActiveAptosWallet } from 'types/aptos';
 import { readConfig } from 'utils/hippoWalletUtil';
 import { aptosClient } from './aptosClient';
 
-export const hippoWalletClient = async (account: AptosAccountState) => {
+export const hippoWalletClient = async (account: ActiveAptosWallet) => {
   if (!account) return undefined;
   const { netConf } = readConfig();
   const repo = getParserRepo();
@@ -12,7 +12,7 @@ export const hippoWalletClient = async (account: AptosAccountState) => {
     netConf,
     aptosClient,
     repo,
-    account.address()
+    account
   );
 
   return walletClient;

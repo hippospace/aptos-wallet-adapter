@@ -7,9 +7,9 @@ import NumberInput from 'components/NumberInput';
 import { useFormik } from 'formik';
 import useHippoClient from 'hooks/useHippoClient';
 import useToken from 'hooks/useToken';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CloseIcon, PlusSMIcon } from 'resources/icons';
-import { IPool, IPoolToken } from 'types/pool';
+import { IPool } from 'types/pool';
 // import * as Yup from 'yup';
 import styles from './DepositModal.module.scss';
 
@@ -36,16 +36,52 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
   const [loading, setLoading] = useState(false);
   const { retreiveTokenImg } = useToken();
   const hippoClient = useHippoClient();
+  const [tokenBalance, setTokenBalance] = useState({
+    token0: Number(0).toFixed(4),
+    token1: Number(0).toFixed(4)
+  });
+
+  const getWalletTokenBalance = useCallback(async () => {
+    let balance = Number(0).toFixed(4);
+    if (hippoClient.hippoWallet) {
+      await hippoClient.hippoWallet.refreshStores();
+      const results = [tokenPair?.token0, tokenPair?.token1].map((token) => {
+        const store = hippoClient.hippoWallet?.symbolToCoinStore[token?.symbol || ''];
+        const ti = hippoClient.hippoWallet?.symbolToTokenInfo[token?.symbol || ''];
+        const uiBalance = (store?.coin?.value.toJSNumber() || 0) / Math.pow(10, ti?.decimals || 1);
+        balance = uiBalance.toFixed(4);
+        return balance;
+      });
+      setTokenBalance({
+        token0: results[0],
+        token1: results[1]
+      });
+    }
+    return balance;
+  }, [hippoClient.hippoWallet, tokenPair]);
+
+  useEffect(() => {
+    getWalletTokenBalance();
+  }, [getWalletTokenBalance]);
 
   const onSubmitDeposit = async (values: TDepositForm) => {
     setLoading(true);
     const xSymbol = tokenPair!.token0.symbol;
     const ySymbol = tokenPair!.token1.symbol;
     if (xSymbol && ySymbol && hippoClient && hippoClient.hippoSwap) {
-      await hippoClient.requestDeposit(xSymbol, ySymbol, values.token0Amount, values.token1Amount);
-      onDismissModal();
+      await hippoClient.requestDeposit(
+        xSymbol,
+        ySymbol,
+        values.token0Amount,
+        values.token1Amount,
+        () => {
+          onDismissModal();
+          setLoading(false);
+        }
+      );
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const formik = useFormik({
@@ -58,16 +94,6 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
     // validationSchema: DepositSchema,
     onSubmit: onSubmitDeposit
   });
-
-  const getWalletTokenBalance = (token: IPoolToken) => {
-    if (hippoClient.hippoWallet) {
-      const store = hippoClient.hippoWallet.symbolToCoinStore[token.symbol];
-      const ti = hippoClient.hippoWallet.symbolToTokenInfo[token.symbol];
-      const uiBalance = store.coin.value.toJSNumber() / Math.pow(10, ti.decimals);
-      return uiBalance.toFixed(4);
-    }
-    return Number(0).toFixed(4);
-  };
 
   const onHandleInput = useCallback(
     (field: 'token0Amount' | 'token1Amount', value: any) => {
@@ -125,7 +151,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
             />
           </div>
           <small className="border-[1px] rounded-[4px] border-grey-500 py-1 px-2 text-grey-700 font-bold">
-            Balance: {getWalletTokenBalance(token)}
+            Balance: {tokenBalance[type]}
           </small>
         </div>
       );

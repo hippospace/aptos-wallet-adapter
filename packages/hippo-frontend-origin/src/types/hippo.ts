@@ -1,8 +1,8 @@
-import { TransactionPayload } from 'aptos/dist/api/data-contracts';
+import { UserTransactionRequest } from 'aptos/dist/api/data-contracts';
 
 export type TTransaction = {
-  type: 'swap' | 'deposit' | 'withdraw';
-  payload: TransactionPayload;
-  callback: (trans: TTransaction) => void;
-  transactionInfo: Record<string, string | number>;
+  // type: 'swap' | 'deposit' | 'withdraw';
+  transaction: UserTransactionRequest;
+  callback: () => void;
+  // transactionInfo: Record<string, string | number>;
 };

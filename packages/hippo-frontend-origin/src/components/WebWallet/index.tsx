@@ -1,14 +1,16 @@
-import useAptosWallet from 'hooks/useAptosWallet';
-import ConnectedScreens from './compoents/ConnectedScreens';
-import GetStartScreens from './compoents/GetStartScreens';
+import { WEBWALLET_URL } from 'config/aptosConstants';
 
 const WebWallet: React.FC = () => {
-  const { activeWallet } = useAptosWallet();
-
-  if (!activeWallet) {
-    return <GetStartScreens />;
-  }
-  return <ConnectedScreens />;
+  return (
+    <iframe
+      loading="lazy"
+      id="receiver"
+      className="rounded-[11px]"
+      src={WEBWALLET_URL}
+      width="600"
+      height="700"
+    />
+  );
 };
 
 export default WebWallet;

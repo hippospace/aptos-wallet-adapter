@@ -1,11 +1,8 @@
-import { AptosAccount, AptosAccountObject } from 'aptos';
+import { AptosAccount, AptosAccountObject, HexString } from 'aptos';
 
 export type AptosAccountState = AptosAccount | undefined;
 
-export interface ActiveAptosWallet {
-  walletName: string;
-  aptosAccount: AptosAccountState;
-}
+export type ActiveAptosWallet = HexString | undefined;
 
 export type AptosWalletObject = {
   walletName: string;
