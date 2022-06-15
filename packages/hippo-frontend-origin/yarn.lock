@@ -1785,23 +1785,23 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@manahippo/aptos-tsgen@^0.0.38":
-  version "0.0.38"
-  resolved "https://registry.yarnpkg.com/@manahippo/aptos-tsgen/-/aptos-tsgen-0.0.38.tgz#bbd2e93e98e068961bc4a8bb85f613fa9806f007"
-  integrity sha512-30a8Xh5L4+92Kkws1Jmdj2lnyxxcMjqGdDlg0/Vhc0BXCDMnfJ45C9FU95M88M5Fgteh1d1lFyj/WOKPj9hIWw==
+"@manahippo/aptos-tsgen@^0.0.40":
+  version "0.0.40"
+  resolved "https://registry.yarnpkg.com/@manahippo/aptos-tsgen/-/aptos-tsgen-0.0.40.tgz#9f488785b6e306b35bd66b04b1d56beb3cc2ade0"
+  integrity sha512-BpW6KEBe2AybDVENvPcCqSvGHBwesUq30tDSlkBHZgTeXkSqN8WA6ojGTN25ND3HzDfAKWcLJfTMV4gEKnE8ug==
   dependencies:
     aptos "^0.0.20"
     big-integer "^1.6.51"
     decimal.js "^10.3.1"
     path "^0.12.7"
 
-"@manahippo/hippo-sdk@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.14.tgz#05bb9e97c6eb3ba0bb7105170e23245446beacbf"
-  integrity sha512-hTs6uORjYx2LHobEDggEoQTLLHXdr26Fy/BAfnXJlCU8CM5YftAMWU33K3KOYtygj6MyBIrLpvZrDGjjubM5iA==
+"@manahippo/hippo-sdk@^0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.18.tgz#360ffd875b9203fcbd09fb35a1f1d409093d878d"
+  integrity sha512-RMPuf6YxrdmNs2sEtq101ENm7Lipjxu7g1N98IQgm2CrpHzUO1g9EWbzQ3c5tTKKZdRnezRvsk8tr8f83WSeYg==
   dependencies:
-    "@manahippo/aptos-tsgen" "^0.0.38"
-    aptos "^0.0.20"
+    "@manahippo/aptos-tsgen" "^0.0.40"
+    aptos "0.0.20"
     commander "^9.3.0"
     yaml "^2.1.1"
 
@@ -3070,7 +3070,7 @@ anymatch@^3.0.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-aptos@^0.0.20:
+aptos@0.0.20, aptos@^0.0.20:
   version "0.0.20"
   resolved "https://registry.yarnpkg.com/aptos/-/aptos-0.0.20.tgz#51ac6adcb702d808a79b3f1db65bca8c0a854ffc"
   integrity sha512-f0nBkYiZvfsngctZtXXVjrbtVljRtAC1EXF0BgNew8troMTI014nEoNCTcu9aWEeST2/qCVsD8XbWJHjt8oKnQ==

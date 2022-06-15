@@ -72,6 +72,7 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       await hippoClient.requestDeposit(
         xSymbol,
         ySymbol,
+        tokenPair!.poolType,
         values.token0Amount,
         values.token1Amount,
         () => {
@@ -102,23 +103,19 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       const xSymbol = tokenPair!.token0.symbol;
       const ySymbol = tokenPair!.token1.symbol;
       if (hippoClient.hippoSwap) {
-        const lpInfo = hippoClient.hippoSwap.getCpLpTokenInfo(xSymbol, ySymbol);
-        const xTokenInfo = hippoClient.hippoSwap.symbolToTokenInfo[xSymbol];
-        const yTokenInfo = hippoClient.hippoSwap.symbolToTokenInfo[ySymbol];
-        if (lpInfo) {
-          const cpMeta = hippoClient.hippoSwap.xyFullnameToCPMeta[lpInfo.jointName];
-          const xPoolUiBalance =
-            cpMeta.balance_x.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
-          const yPoolUiBalance =
-            cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals);
-          const xToY = xPoolUiBalance / yPoolUiBalance;
-          if (field === 'token0Amount') {
-            const desiredYUiAmt = Number(value) / xToY;
-            formik.setFieldValue('token1Amount', desiredYUiAmt);
-          } else {
-            const desiredXUiAmt = Number(value) * xToY;
-            formik.setFieldValue('token0Amount', desiredXUiAmt);
-          }
+        const pools = hippoClient.hippoSwap.getDirectPoolsBySymbolsAndPoolType(
+          xSymbol,
+          ySymbol,
+          tokenPair!.poolType
+        );
+        if (pools.length === 0) {
+          throw new Error('Specified pool does not exist');
+        }
+        const pool = pools[0];
+        if (field === 'token0Amount') {
+          formik.setFieldValue('token1Amount', pool.estimateNeededYFromXDeposit(value));
+        } else {
+          formik.setFieldValue('token0Amount', pool.estimateNeededXFromYDeposit(value));
         }
       }
       // TODO: Calculate and update total field

@@ -1,3 +1,5 @@
+import { PoolType } from '@manahippo/hippo-sdk';
+
 export interface IPoolToken {
   id: string;
   symbol: string;
@@ -14,6 +16,7 @@ export interface IPool {
   tick: string;
   token0: IPoolToken;
   token1: IPoolToken;
+  poolType: PoolType;
   token0Price: string;
   token1Price: string;
   volumeUSD: string;

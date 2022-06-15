@@ -16,17 +16,17 @@ const SwapDetail: React.FC = () => {
     const fromSymbol = swapSettings.currencyFrom.token.symbol;
     const toSymbol = swapSettings.currencyTo.token.symbol;
 
-    const hasRoute = hippoClient.hippoSwap.hasCpPoolFor(fromSymbol, toSymbol);
-    const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(
+    const quote = hippoClient.hippoSwap.getBestQuoteBySymbols(
       fromSymbol,
       toSymbol,
-      swapSettings.currencyFrom.amount
+      swapSettings.currencyFrom.amount,
+      3
     );
-    if (hasRoute && typeof quote === 'object') {
-      const outputUiAmt = quote.outputUiAmt;
+    if (quote) {
+      const outputUiAmt = quote.bestQuote.outputUiAmt;
       output = `${outputUiAmt.toFixed(4)} ${toSymbol}`;
       minimum = `${(outputUiAmt * (1 - swapSettings.slipTolerance / 100)).toFixed(4)} ${toSymbol}`;
-      priceImpact = `${(quote.priceImpact * 100).toFixed(2)}%`;
+      priceImpact = `${(quote.bestQuote.priceImpact * 100).toFixed(2)}%`;
     } else {
       output = 'route unavailable';
       minimum = 'route unavailable';

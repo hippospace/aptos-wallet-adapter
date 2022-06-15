@@ -8,8 +8,8 @@ import PoolList from './components/PoolList';
 import SummaryPanel from './components/SummaryPanel';
 import FilterPanel from './components/FilterPanel';
 import useHippoClient from 'hooks/useHippoClient';
-import { getTypeTagFullname, StructTag } from '@manahippo/aptos-tsgen';
 import { IPool } from 'types/pool';
+import { HippoConstantProductPool, PoolType } from '@manahippo/hippo-sdk';
 
 const Pool: React.FC = () => {
   const dispatch = useDispatch();
@@ -20,22 +20,17 @@ const Pool: React.FC = () => {
   const fetchTokenList = useCallback(async () => {
     let data = { pools: [] as IPool[] };
     if (hippoSwap?.cpMetas) {
-      for (const cpMeta of hippoSwap.cpMetas) {
-        if (!(cpMeta.typeTag instanceof StructTag)) {
-          throw new Error('Unexpected cpMeta type');
-        }
-        if (cpMeta.typeTag.typeParams.length !== 2) {
-          throw new Error(
-            `Unexpected cpMeta typeparameter length: ${cpMeta.typeTag.typeParams.length}`
-          );
-        }
-        const [xTag, yTag] = cpMeta.typeTag.typeParams;
-        const [xFullname, yFullname] = [xTag, yTag].map(getTypeTagFullname);
-        const xTokenInfo = hippoSwap.tokenFullnameToTokenInfo[xFullname];
-        const yTokenInfo = hippoSwap.tokenFullnameToTokenInfo[yFullname];
+      for (const pool of hippoSwap.allPools()) {
+        const xTokenInfo = pool.xTokenInfo;
+        const yTokenInfo = pool.yTokenInfo;
         // FIXME: these methods of computing TVL only work for constant product pools whose one side is a USD stablecoin
-        const stableCoinTvl =
-          cpMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+        let stableCoinTvl;
+        if (pool instanceof HippoConstantProductPool) {
+          stableCoinTvl =
+            pool.cpPoolMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+        } else {
+          stableCoinTvl = 0;
+        }
         data.pools.push({
           id: '',
           feeTier: '',
@@ -56,6 +51,7 @@ const Pool: React.FC = () => {
             decimals: yTokenInfo.decimals.toString(),
             derivedETH: ''
           },
+          poolType: PoolType.CONSTANT_PRODUCT,
           token0Price: '',
           token1Price: '',
           volumeUSD: '',

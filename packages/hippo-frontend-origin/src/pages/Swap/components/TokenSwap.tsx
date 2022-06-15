@@ -20,12 +20,12 @@ const TokenSwap = () => {
 
   const fetchSwapPrice = useCallback(() => {
     if (hippoClient.hippoSwap && fromSymbol && toSymbol && fromUiAmt) {
-      const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
-      if (typeof quote === 'object') {
+      const quote = hippoClient.hippoSwap.getBestQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt, 3);
+      if (quote) {
         // TO UPDATE: IMPLEMENT FETCH BEST PRICE
         setFieldValue('currencyTo', {
           ...values.currencyTo,
-          amount: quote.outputUiAmt
+          amount: quote.bestQuote.outputUiAmt
         });
       }
     }
@@ -45,9 +45,9 @@ const TokenSwap = () => {
   const onClickSwap = useCallback(async () => {
     setIsSwapping(true);
     if (hippoClient.hippoSwap && hippoWallet && fromSymbol && toSymbol && fromUiAmt) {
-      const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
-      if (typeof quote === 'object') {
-        const minOut = quote.outputUiAmt * (1 - values.slipTolerance / 100);
+      const quote = hippoClient.hippoSwap.getBestQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt, 3);
+      if (quote) {
+        const minOut = quote.bestQuote.outputUiAmt * (1 - values.slipTolerance / 100);
         await hippoClient.requestSwap(fromSymbol, toSymbol, fromUiAmt, minOut, () => {
           resetForm();
         });
