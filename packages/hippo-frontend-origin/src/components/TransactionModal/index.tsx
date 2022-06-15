@@ -1,10 +1,8 @@
+import { UserTransactionRequest } from 'aptos/dist/api/data-contracts';
 import { message } from 'components/Antd';
-import HippoModal from 'components/HippoModal';
 import { WEBWALLET_URL } from 'config/aptosConstants';
 import useHippoClient from 'hooks/useHippoClient';
-import { useCallback, useEffect, useMemo } from 'react';
-import { CloseIcon } from 'resources/icons';
-import styles from './TransactionModal.module.scss';
+import { useCallback, useEffect } from 'react';
 
 interface TProps {
   className?: string;
@@ -22,7 +20,7 @@ const TransactionModal: React.FC<TProps> = () => {
           onCancel();
         } else if (e.data.method === 'success') {
           transaction?.callback();
-          message.success('Swap successfully');
+          message.success('Transaction Success');
         } else if (e.data.method === 'fail') {
           console.log('it is error', e.data, e);
           message.error(e.data.error);
@@ -38,34 +36,22 @@ const TransactionModal: React.FC<TProps> = () => {
     return () => window.removeEventListener('message', messageHandler);
   }, [messageHandler]);
 
-  const paresdRequest = useMemo(
-    () =>
-      transaction
-        ? new URLSearchParams({
-            request: JSON.stringify(transaction.transaction)
-          }).toString()
-        : '',
-    [transaction]
-  );
+  const createRequest = useCallback((tx: UserTransactionRequest) => {
+    const request = new URLSearchParams({
+      request: JSON.stringify({ method: 'signTransaction', request: tx })
+    }).toString();
+    window.open(
+      `${WEBWALLET_URL}?${request}`,
+      'Transaction Confirmation',
+      'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=440,height=700'
+    );
+  }, []);
 
-  return (
-    <HippoModal
-      onCancel={onCancel}
-      className={styles.modal}
-      destroyOnClose
-      visible={!!transaction}
-      footer={null}
-      maskClosable={false}
-      closeIcon={<CloseIcon />}>
-      <iframe
-        loading="lazy"
-        id="transactionModal"
-        src={`${WEBWALLET_URL}?${paresdRequest}`}
-        width="440"
-        height="700"
-      />
-    </HippoModal>
-  );
+  useEffect(() => {
+    if (transaction) createRequest(transaction.transaction);
+  }, [transaction]);
+
+  return null;
 };
 
 export default TransactionModal;

@@ -44,9 +44,7 @@ const TokenSwap = () => {
 
   const onClickSwap = useCallback(async () => {
     setIsSwapping(true);
-    console.log('11', hippoClient.hippoSwap, hippoWallet, fromSymbol, toSymbol, fromUiAmt);
     if (hippoClient.hippoSwap && hippoWallet && fromSymbol && toSymbol && fromUiAmt) {
-      console.log('22');
       const quote = hippoClient.hippoSwap.getCPQuoteBySymbols(fromSymbol, toSymbol, fromUiAmt);
       if (typeof quote === 'object') {
         const minOut = quote.outputUiAmt * (1 - values.slipTolerance / 100);

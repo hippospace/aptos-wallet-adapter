@@ -1,15 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { hippoSwapClient, hippoWalletClient } from 'config/hippoWalletClient';
 import { HippoSwapClient, HippoWalletClient, UITokenAmount, X0x1 } from '@manahippo/hippo-sdk';
 import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790';
 import useAptosWallet from 'hooks/useAptosWallet';
-import { aptosClient, faucetClient } from 'config/aptosClient';
-import { sendPayloadTx } from 'utils/hippoWalletUtil';
+import { aptosClient } from 'config/aptosClient';
 import { message } from 'components/Antd';
 import { TTransaction } from 'types/hippo';
-import { TransactionPayload, UserTransactionRequest } from 'aptos/dist/api/data-contracts';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
@@ -103,8 +99,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           uiAmtIn,
           uiAmtOutMin
         );
-        const newTransaction = await aptosClient.generateTransaction(activeWallet, payload);
-        setTransaction({ transaction: newTransaction, callback });
+        const swapTransaction = await aptosClient.generateTransaction(activeWallet, payload);
+        setTransaction({ transaction: swapTransaction, callback });
       } catch (error) {
         console.log('request swap error:', error);
         if (error instanceof Error) {
