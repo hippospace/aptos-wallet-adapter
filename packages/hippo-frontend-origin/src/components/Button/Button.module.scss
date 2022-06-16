@@ -37,8 +37,8 @@
   // }
 
   &.disabled {
-    @apply text-gray-400 pointer-events-none border-none cursor-not-allowed;
-    background: rgba(255, 255, 255, 0.3);
+    @apply text-white pointer-events-none border-none cursor-not-allowed bg-grey-500;
+    // background: rgba(255, 255, 255, 0.3);
   }
 
   &.loading {

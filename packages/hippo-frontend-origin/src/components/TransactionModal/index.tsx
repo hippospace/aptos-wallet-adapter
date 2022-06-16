@@ -22,7 +22,6 @@ const TransactionModal: React.FC<TProps> = () => {
           transaction?.callback();
           message.success('Transaction Success');
         } else if (e.data.method === 'fail') {
-          console.log('it is error', e.data, e);
           message.error(e.data.error);
         }
       }

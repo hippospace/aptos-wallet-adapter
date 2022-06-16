@@ -15,7 +15,12 @@
     }
 
     &.ant-menu-dark .ant-menu-item-selected::after {
-      @apply border-b-grey-900 border-[3px] bottom-3;
+      @apply border-b-grey-900 border-[3px] border-transparent bottom-3;
+    }
+
+    &.ant-menu-dark.ant-menu-horizontal > .ant-menu-item::after,
+    &.ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu::after {
+      @apply bottom-3;
     }
 
     &.ant-menu .ant-menu-item {

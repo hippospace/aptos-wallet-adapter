@@ -7,13 +7,15 @@ interface TProps {
 
 const CoinRow: React.FC<TProps> = ({ item }) => {
   return (
-    <div className="flex items-center gap-2 border-2 border-grey-900 w-full p-2 hover:bg-primePurple-100">
-      <CoinIcon logoSrc={item.logoURI} />
-      <div className="">
-        <div className="font-bold text-grey-900 uppercase">{item.symbol}</div>
-        <small className="text-grey-500 font-bold">{item.name}</small>
+    <div className="flex items-center justify-between gap-2 border-2 border-grey-900 w-full p-2 hover:bg-primePurple-100">
+      <div className="flex items-center gap-2">
+        <CoinIcon logoSrc={item.logoURI} />
+        <div className="">
+          <div className="font-bold text-grey-900 uppercase">{item.symbol}</div>
+          <small className="text-grey-500 font-bold">{item.name}</small>
+        </div>
       </div>
-      <div className="helpText text-primeBlack80 font-semibold">{item?.balance}</div>
+      <small className="text-grey-700 font-bold">{item?.balance}</small>
     </div>
   );
 };

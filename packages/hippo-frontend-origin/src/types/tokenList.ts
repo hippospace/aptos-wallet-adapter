@@ -5,5 +5,5 @@ export interface ITokenInfo {
   name: string;
   symbol: string;
   logoURI: string;
-  balance?: number;
+  balance?: string;
 }
