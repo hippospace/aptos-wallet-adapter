@@ -7,7 +7,7 @@ import {
   UITokenAmount,
   X0x1
 } from '@manahippo/hippo-sdk';
-import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790';
+import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8';
 import useAptosWallet from 'hooks/useAptosWallet';
 import { aptosClient } from 'config/aptosClient';
 import { message } from 'components/Antd';

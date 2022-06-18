@@ -9,7 +9,7 @@ import SummaryPanel from './components/SummaryPanel';
 import FilterPanel from './components/FilterPanel';
 import useHippoClient from 'hooks/useHippoClient';
 import { IPool } from 'types/pool';
-import { HippoConstantProductPool, PoolType } from '@manahippo/hippo-sdk';
+import { HippoConstantProductPool, PoolType, HippoPieceSwapPool } from '@manahippo/hippo-sdk';
 
 const Pool: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,6 +28,17 @@ const Pool: React.FC = () => {
         if (pool instanceof HippoConstantProductPool) {
           stableCoinTvl =
             pool.cpPoolMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+        } else if (pool instanceof HippoPieceSwapPool) {
+          // if one of them is USDC, USDT, DAI, just add them up
+          const stables = ['USDC', 'USDT', 'DAI'];
+          if (
+            stables.includes(pool.xTokenInfo.symbol) ||
+            stables.includes(pool.yTokenInfo.symbol)
+          ) {
+            stableCoinTvl = pool.xUiBalance() + pool.yUiBalance();
+          } else {
+            stableCoinTvl = 0;
+          }
         } else {
           stableCoinTvl = 0;
         }
