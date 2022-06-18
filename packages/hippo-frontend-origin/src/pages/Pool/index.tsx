@@ -9,7 +9,7 @@ import SummaryPanel from './components/SummaryPanel';
 import FilterPanel from './components/FilterPanel';
 import useHippoClient from 'hooks/useHippoClient';
 import { IPool } from 'types/pool';
-import { HippoConstantProductPool, PoolType, HippoPieceSwapPool } from '@manahippo/hippo-sdk';
+import { HippoConstantProductPool, HippoPieceSwapPool } from '@manahippo/hippo-sdk';
 
 const Pool: React.FC = () => {
   const dispatch = useDispatch();
@@ -24,10 +24,10 @@ const Pool: React.FC = () => {
         const xTokenInfo = pool.xTokenInfo;
         const yTokenInfo = pool.yTokenInfo;
         // FIXME: these methods of computing TVL only work for constant product pools whose one side is a USD stablecoin
-        let stableCoinTvl;
+        let totalTvlInUSD;
         if (pool instanceof HippoConstantProductPool) {
-          stableCoinTvl =
-            pool.cpPoolMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+          totalTvlInUSD =
+            (pool.cpPoolMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals)) * 2;
         } else if (pool instanceof HippoPieceSwapPool) {
           // if one of them is USDC, USDT, DAI, just add them up
           const stables = ['USDC', 'USDT', 'DAI'];
@@ -35,12 +35,12 @@ const Pool: React.FC = () => {
             stables.includes(pool.xTokenInfo.symbol) ||
             stables.includes(pool.yTokenInfo.symbol)
           ) {
-            stableCoinTvl = pool.xUiBalance() + pool.yUiBalance();
+            totalTvlInUSD = pool.xUiBalance() + pool.yUiBalance();
           } else {
-            stableCoinTvl = 0;
+            totalTvlInUSD = 0;
           }
         } else {
-          stableCoinTvl = 0;
+          totalTvlInUSD = 0;
         }
         data.pools.push({
           id: '',
@@ -62,14 +62,14 @@ const Pool: React.FC = () => {
             decimals: yTokenInfo.decimals.toString(),
             derivedETH: ''
           },
-          poolType: PoolType.CONSTANT_PRODUCT,
+          poolType: pool.getPoolType(),
           token0Price: '',
           token1Price: '',
           volumeUSD: '',
           txCount: '',
-          totalValueLockedToken0: stableCoinTvl.toFixed(2),
-          totalValueLockedToken1: stableCoinTvl.toFixed(2),
-          totalValueLockedUSD: (stableCoinTvl * 2).toFixed(2)
+          totalValueLockedToken0: totalTvlInUSD.toFixed(2),
+          totalValueLockedToken1: totalTvlInUSD.toFixed(2),
+          totalValueLockedUSD: totalTvlInUSD.toFixed(2)
         });
       }
     }
