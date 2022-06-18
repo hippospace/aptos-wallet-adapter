@@ -1795,10 +1795,10 @@
     decimal.js "^10.3.1"
     path "^0.12.7"
 
-"@manahippo/hippo-sdk@^0.0.22":
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.22.tgz#74bfba76385201f0fed0b2ebddd815a88f04a9c8"
-  integrity sha512-gJE8WiA1Np2WeWHJk7DDKm95yEtcc3cAl49Nmy63tA8kN0LHXvdvkVpj3hI1GZUr2IFtDzGgR8d5V9PcpAMOmg==
+"@manahippo/hippo-sdk@^0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.23.tgz#aba5661a9c0ceb475c86b48f52d848e7ffd5cbff"
+  integrity sha512-zi0iZGCRw7IIrO8gBUAyoG50yHYcAPbAJRr4mo876yJfAw9AK/q161hhYWPWsYL+U764PfbEZwBix4L7e4Q5IQ==
   dependencies:
     "@manahippo/aptos-tsgen" "^0.0.40"
     aptos "0.0.20"
