@@ -108,7 +108,7 @@ const CoinSelector: React.FC<TProps> = ({ dismissiModal, actionType }) => {
           <small className="text-grey-700 font-bold">Token</small>
           <small className="text-grey-700 font-bold">{hippoWallet ? 'Balance' : ''}</small>
         </div>
-        <List className="h-[376px] overflow-y-scroll border-0">
+        <List className="h-[376px] overflow-y-scroll no-scrollbar border-0">
           <VirtualList
             data={tokenListBalance || []}
             height={376}

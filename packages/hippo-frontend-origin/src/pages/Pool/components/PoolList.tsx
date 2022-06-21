@@ -25,7 +25,7 @@ const PoolList: React.FC<TProps> = ({ filteredPools }) => {
   };
   return (
     <>
-      <List className="h-full overflow-y-scroll border-0">
+      <List className="h-full overflow-y-scroll no-scrollbar border-0">
         <VirtualList
           data={filteredPools}
           height={containerHeight - 100}
