@@ -8,9 +8,15 @@ export const useLocalStorage = () => {
   ): [T, (T: any) => void] => {
     const storage = session ? sessionStorage : localStorage;
     const [state, setState] = useState(() => {
-      let storedState = storage.getItem(key);
-      if (storedState) {
-        return JSON.parse(storedState || '');
+      try {
+        let storedState = storage.getItem(key);
+        if (storedState) {
+          return JSON.parse(storedState || '');
+        }
+      } catch (error) {
+        if (typeof window !== 'undefined') {
+          console.error(error);
+        }
       }
       return defaultState;
     });

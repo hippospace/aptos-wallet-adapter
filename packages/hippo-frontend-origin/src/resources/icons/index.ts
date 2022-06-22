@@ -21,3 +21,4 @@ export { ReactComponent as CoinListIcon } from './coinList.svg';
 export { ReactComponent as FaucetIcon } from './faucet.svg';
 export { ReactComponent as LockIcon } from './lock.svg';
 export { ReactComponent as CheckIcon } from './check.svg';
+export { ReactComponent as AptosIcon } from './aptos.svg';

@@ -1,16 +1,18 @@
-import useConnector from 'hooks/useConnector';
+// import useConnector from 'hooks/useConnector';
 import Button from 'components/Button';
 import { useMemo } from 'react';
 import { MetamaskIcon, WalletConnectIcon, CoinbaseIcon, PhantomIcon } from 'resources/icons';
-import useAptosWallet from 'hooks/useAptosWallet';
-import { walletAddressEllipsis } from 'utils/utility';
+// import useAptosWallet from 'hooks/useAptosWallet';
+// import { walletAddressEllipsis } from 'utils/utility';
+import { useWallet } from 'components/WalletAdapter/useWallet';
 
 type TOptionProps = {
-  onClick?: () => {};
+  onClick?: () => void;
   label: string;
+  icon?: string;
 };
 
-const Option: React.FC<TOptionProps> = ({ onClick, label }) => {
+const Option: React.FC<TOptionProps> = ({ onClick, label, icon }) => {
   const getWalletIcon = () => {
     switch (label) {
       case 'MetaMask':
@@ -22,7 +24,11 @@ const Option: React.FC<TOptionProps> = ({ onClick, label }) => {
       case 'Phantom':
         return <PhantomIcon width={24} height={24} />;
       default:
-        return <div className="bg-grey-700 block w-6 h-6 rounded-full" />;
+        return icon ? (
+          <img src={icon} width={24} height={24} className="bg-grey-700 block rounded-full" />
+        ) : (
+          <div className="bg-grey-700 block w-6 h-6 rounded-full" />
+        );
     }
   };
 
@@ -38,23 +44,25 @@ const Option: React.FC<TOptionProps> = ({ onClick, label }) => {
 };
 
 const WalletSelector: React.FC = () => {
-  const { SUPPORTED_WALLETS } = useConnector();
-  const { activeWallet } = useAptosWallet();
+  const { wallets, connect } = useWallet();
 
   const renderButtonGroup = useMemo(() => {
-    return Object.keys(SUPPORTED_WALLETS).map((key) => {
-      const option = SUPPORTED_WALLETS[key];
-      return <Option key={key} label={option.name} onClick={() => true} />;
+    return wallets.map((wallet) => {
+      const option = wallet.adapter;
+      return (
+        <Option
+          key={option.name}
+          label={option.name}
+          icon={option.icon}
+          onClick={() => connect(option.name)}
+        />
+      );
     });
-  }, [SUPPORTED_WALLETS]);
+  }, [wallets, connect]);
 
   return (
     <div className="">
-      <h6 className="font-bold text-black">
-        {activeWallet
-          ? walletAddressEllipsis(activeWallet.toString() || '')
-          : 'Connect your wallet'}
-      </h6>
+      <h6 className="font-bold text-black">Connect your wallet</h6>
       <div className="flex flex-wrap gap-2">{renderButtonGroup}</div>
     </div>
   );

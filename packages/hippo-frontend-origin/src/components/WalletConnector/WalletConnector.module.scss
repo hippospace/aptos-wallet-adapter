@@ -1,7 +1,7 @@
 .popover {
   &:global {
     > .ant-popover-content {
-      @apply w-[600px] h-1/3 overflow-y-scroll no-scrollbar rounded-[11px] shadow-figma;
+      @apply w-[400px] h-1/3 overflow-y-scroll no-scrollbar rounded-[11px] shadow-figma;
 
       .ant-popover-arrow {
         display: none;

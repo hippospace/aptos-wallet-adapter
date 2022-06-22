@@ -12,6 +12,7 @@ import useAptosWallet from 'hooks/useAptosWallet';
 import { aptosClient } from 'config/aptosClient';
 import { message } from 'components/Antd';
 import { TTransaction } from 'types/hippo';
+import { useWallet } from 'components/WalletAdapter/useWallet';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
@@ -54,6 +55,7 @@ const HippoClientContext = createContext<HippoClientContextType>({} as HippoClie
 
 const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const { activeWallet } = useAptosWallet();
+  const { signAndSubmitTransaction } = useWallet();
   const [hippoWallet, setHippoWallet] = useState<HippoWalletClient>();
   const [hippoSwap, setHippoSwapClient] = useState<HippoSwapClient>();
   const [refresh, setRefresh] = useState(false);
@@ -93,8 +95,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
       fromSymbol: string,
       toSymbol: string,
       uiAmtIn: number,
-      uiAmtOutMin: number,
-      callback: () => void
+      uiAmtOutMin: number
+      // callback: () => void
     ) => {
       try {
         if (!activeWallet || !hippoSwap) throw new Error('Please login first');
@@ -106,8 +108,9 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           throw new Error(`No route exists from ${fromSymbol} to ${toSymbol}`);
         }
         const payload = await bestQuote.bestRoute.makeSwapPayload(uiAmtIn, uiAmtOutMin);
-        const swapTransaction = await aptosClient.generateTransaction(activeWallet, payload);
-        setTransaction({ transaction: swapTransaction, callback });
+        // const swapTransaction = await aptosClient.generateTransaction(activeWallet, payload);
+        await signAndSubmitTransaction(payload);
+        // setTransaction({ transaction: swapTransaction, callback });
       } catch (error) {
         console.log('request swap error:', error);
         if (error instanceof Error) {

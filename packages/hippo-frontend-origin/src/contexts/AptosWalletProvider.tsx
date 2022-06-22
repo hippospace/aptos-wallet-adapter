@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { HexString } from 'aptos';
+import { useWallet } from 'components/WalletAdapter/useWallet';
 import { WEBWALLET_URL } from 'config/aptosConstants';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
@@ -18,11 +22,8 @@ const AptosWalletContext = createContext<AptosWalletContextType>({} as AptosWall
 
 const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
   const { useLocalStorageState } = useLocalStorage();
-  const [activeWallet, setActiveWallet] = useLocalStorageState<ActiveAptosWallet>(
-    'hippoActiveWallet',
-    undefined,
-    true
-  );
+  const { connected, publicKey } = useWallet();
+  const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet>(undefined);
   const [open, setOpen] = useState(false);
 
   const messageHandler = useCallback(
@@ -41,6 +42,14 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
     window.addEventListener('message', messageHandler, false);
     return () => window.removeEventListener('message', messageHandler);
   }, []);
+
+  useEffect(() => {
+    if (connected && publicKey) {
+      setActiveWallet(HexString.ensure(publicKey));
+    } else {
+      setActiveWallet(undefined);
+    }
+  }, [connected, publicKey]);
 
   const openModal = useCallback(() => setOpen(true), []);
   const closeModal = useCallback(() => setOpen(false), []);
