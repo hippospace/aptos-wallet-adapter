@@ -60,6 +60,10 @@ export class WalletSignMessageError extends WalletError {
   name = 'WalletSignMessageError';
 }
 
+export class WalletSignAndSubmitMessageError extends WalletError {
+  name = 'WalletSignAndSubmitMessageError';
+}
+
 export class WalletSignTransactionError extends WalletError {
   name = 'WalletSignTransactionError';
 }

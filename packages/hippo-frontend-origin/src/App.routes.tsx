@@ -2,6 +2,7 @@ import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
 import Pool from 'pages/Pool';
 import Swap from 'pages/Swap';
+import Faucet from 'pages/Faucet';
 
 type TRoute = RouteObject & {
   name: string;
@@ -18,6 +19,11 @@ export const routes: TRoute[] = [
     path: 'pools',
     name: 'Pools',
     element: <Pool />
+  },
+  {
+    path: 'faucet',
+    name: 'Faucet',
+    element: <Faucet />
   },
   // {
   //   path: 'stake',

@@ -23,6 +23,7 @@ export interface WalletAdapterEvents {
   connect(publicKey: PublicKey): void;
   disconnect(): void;
   error(error: any): void;
+  success(value: any): void;
   readyStateChange(readyState: WalletReadyState): void;
 }
 

@@ -9,6 +9,7 @@ import { WalletProvider } from 'components/WalletAdapter/WalletProvider';
 import { useMemo } from 'react';
 import { HippoWalletAdapter } from 'components/WalletAdapter/Adapters/HippoWallet';
 import { MartianWalletAdapter } from 'components/WalletAdapter/Adapters/MartianWallet';
+import { AptosWalletAdapter } from 'components/WalletAdapter/Adapters/AptosWallet';
 
 const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
@@ -32,7 +33,8 @@ const Providers: React.FC<TProps> = (props: TProps) => {
   const wallets = useMemo(
     () => [
       new HippoWalletAdapter({ provider: 'https://hippo-wallet-test.web.app/' }),
-      new MartianWalletAdapter()
+      new MartianWalletAdapter(),
+      new AptosWalletAdapter()
     ],
     []
   );

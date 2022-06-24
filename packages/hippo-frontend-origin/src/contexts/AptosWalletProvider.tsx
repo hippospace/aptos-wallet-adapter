@@ -26,23 +26,6 @@ const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
   const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet>(undefined);
   const [open, setOpen] = useState(false);
 
-  const messageHandler = useCallback(
-    (event: MessageEvent<any>) => {
-      if (event.origin !== WEBWALLET_URL) return;
-      const { method, address } = event.data;
-      if (method === 'account') {
-        setActiveWallet(address?.hexString ? address?.hexString : null);
-      }
-      return true;
-    },
-    [setActiveWallet]
-  );
-
-  useEffect(() => {
-    window.addEventListener('message', messageHandler, false);
-    return () => window.removeEventListener('message', messageHandler);
-  }, []);
-
   useEffect(() => {
     if (connected && publicKey) {
       setActiveWallet(HexString.ensure(publicKey));

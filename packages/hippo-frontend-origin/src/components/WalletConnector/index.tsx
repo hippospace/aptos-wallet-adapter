@@ -7,18 +7,21 @@ import styles from './WalletConnector.module.scss';
 // import WebWallet from 'components/WebWallet';
 import WalletSelector from './components/WalletSelector';
 import WalletMenu from './components/WalletMenu';
+import { useWallet } from 'components/WalletAdapter/useWallet';
+import { useCallback } from 'react';
+import WebWallet from 'components/WebWallet';
 // import { useCallback } from 'react';
 
 const WalletConnector: React.FC = () => {
   const { activeWallet, openModal, open, closeModal } = useAptosWallet();
+  const { wallet } = useWallet();
 
-  // const renderActiveWallet = useCallback(() => {
-  //   return (
-  //     <div className='flex gap-2'>
-  //       <img src={}
-  //     </div>
-  //   )
-  // }, [])
+  const renderContent = useCallback(() => {
+    if (wallet && wallet.adapter.name === 'HippoWallet') {
+      return <WebWallet />;
+    }
+    return activeWallet ? <WalletMenu /> : <WalletSelector />;
+  }, [activeWallet, wallet]);
 
   return (
     <>
@@ -27,7 +30,7 @@ const WalletConnector: React.FC = () => {
         trigger="click"
         visible={open}
         onVisibleChange={(visible) => (visible ? openModal() : closeModal())}
-        content={activeWallet ? <WalletMenu /> : <WalletSelector />}
+        content={renderContent}
         destroyTooltipOnHide
         placement="bottomLeft">
         <div className="flex gap-4 items-center">

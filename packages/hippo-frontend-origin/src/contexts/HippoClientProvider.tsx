@@ -9,7 +9,7 @@ import {
 } from '@manahippo/hippo-sdk';
 import { TokenRegistry } from '@manahippo/hippo-sdk/dist/generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8';
 import useAptosWallet from 'hooks/useAptosWallet';
-import { aptosClient } from 'config/aptosClient';
+// import { aptosClient } from 'config/aptosClient';
 import { message } from 'components/Antd';
 import { TTransaction } from 'types/hippo';
 import { useWallet } from 'components/WalletAdapter/useWallet';
@@ -45,6 +45,7 @@ interface HippoClientContextType {
   ) => {};
   transaction?: TTransaction;
   setTransaction: (trans?: TTransaction) => void;
+  requestFaucet: (symbol: string, callback?: () => void) => void;
 }
 
 interface TProviderProps {
@@ -62,6 +63,33 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
   const [transaction, setTransaction] = useState<TTransaction>();
   const [tokenStores, setTokenStores] = useState<Record<string, X0x1.Coin.CoinStore>>();
   const [tokenInfos, setTokenInfos] = useState<Record<string, TokenRegistry.TokenInfo>>();
+
+  const requestFaucet = useCallback(
+    async (symbol: string, callback?: () => void) => {
+      try {
+        if (!activeWallet) throw new Error('Please login first');
+        if (symbol !== 'APTOS') {
+          const uiAmtUsed = symbol === 'BTC' ? 0.01 : 10;
+          const payload = await hippoWallet?.makeFaucetMintToPayload(uiAmtUsed, symbol);
+          if (payload) {
+            const result = await signAndSubmitTransaction(payload);
+            if (result) {
+              message.success('Transaction Success');
+              await hippoWallet?.refreshStores();
+              setRefresh(true);
+              if (callback) callback();
+            }
+          }
+        }
+      } catch (error) {
+        console.log('request swap error:', error);
+        if (error instanceof Error) {
+          message.error(error?.message);
+        }
+      }
+    },
+    [activeWallet, hippoWallet, signAndSubmitTransaction]
+  );
 
   const getHippoWalletClient = useCallback(async () => {
     if (activeWallet) {
@@ -95,8 +123,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
       fromSymbol: string,
       toSymbol: string,
       uiAmtIn: number,
-      uiAmtOutMin: number
-      // callback: () => void
+      uiAmtOutMin: number,
+      callback: () => void
     ) => {
       try {
         if (!activeWallet || !hippoSwap) throw new Error('Please login first');
@@ -108,9 +136,11 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           throw new Error(`No route exists from ${fromSymbol} to ${toSymbol}`);
         }
         const payload = await bestQuote.bestRoute.makeSwapPayload(uiAmtIn, uiAmtOutMin);
-        // const swapTransaction = await aptosClient.generateTransaction(activeWallet, payload);
-        await signAndSubmitTransaction(payload);
-        // setTransaction({ transaction: swapTransaction, callback });
+        const result = await signAndSubmitTransaction(payload);
+        if (result) {
+          message.success('Transaction Success');
+          callback();
+        }
       } catch (error) {
         console.log('request swap error:', error);
         if (error instanceof Error) {
@@ -118,7 +148,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet]
+    [hippoSwap, activeWallet, signAndSubmitTransaction]
   );
 
   const requestDeposit = useCallback(
@@ -139,8 +169,11 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           throw new Error('Desired pool does not exist');
         }
         const payload = await pool[0].makeAddLiquidityPayload(lhsUiAmt, rhsUiAmt);
-        const newTransaction = await aptosClient.generateTransaction(activeWallet, payload);
-        setTransaction({ transaction: newTransaction, callback });
+        const result = await signAndSubmitTransaction(payload);
+        if (result) {
+          message.success('Transaction Success');
+          callback();
+        }
       } catch (error) {
         console.log('request deposit error:', error);
         if (error instanceof Error) {
@@ -148,7 +181,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet]
+    [hippoSwap, activeWallet, signAndSubmitTransaction]
   );
 
   const requestWithdraw = useCallback(
@@ -174,8 +207,11 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           lhsMinAmt,
           rhsMinAmt
         );
-        const newTransaction = await aptosClient.generateTransaction(activeWallet, payload);
-        setTransaction({ transaction: newTransaction, callback });
+        const result = await signAndSubmitTransaction(payload);
+        if (result) {
+          message.success('Transaction Success');
+          callback();
+        }
       } catch (error) {
         console.log('request withdraw error:', error);
         if (error instanceof Error) {
@@ -183,7 +219,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         }
       }
     },
-    [hippoSwap, activeWallet]
+    [hippoSwap, activeWallet, signAndSubmitTransaction]
   );
 
   return (
@@ -197,7 +233,8 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         requestDeposit,
         requestWithdraw,
         transaction,
-        setTransaction
+        setTransaction,
+        requestFaucet
       }}>
       {children}
     </HippoClientContext.Provider>

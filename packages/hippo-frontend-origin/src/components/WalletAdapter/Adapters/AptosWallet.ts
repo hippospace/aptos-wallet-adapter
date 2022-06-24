@@ -1,6 +1,5 @@
 import {
   PendingTransaction,
-  ScriptFunctionPayload,
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/api/data-contracts';
@@ -18,38 +17,38 @@ import {
   WalletReadyState
 } from '../types/adapter';
 
-interface IMartianWallet {
-  connect: (params?: any) => Promise<any>;
-  publicKey?: string;
-  isConnected?: boolean;
-  signGenericTransaction(transaction: any): Promise<void>;
-  // signTransaction(transaction: any): Promise<void>;
+interface IAptosWallet {
+  requestId: number;
+  connect: () => Promise<string>;
+  account: () => Promise<string>;
+  isConnected: () => Promise<boolean>;
+  signAndSubmitTransaction(transaction: any): Promise<void>;
+  signTransaction(transaction: any): Promise<void>;
   disconnect(): Promise<void>;
 }
 
-interface MartianWindow extends Window {
-  aptos?: IMartianWallet;
+interface AptosWindow extends Window {
+  aptos?: IAptosWallet;
 }
 
-declare const window: MartianWindow;
+declare const window: AptosWindow;
 
-export const MartianWalletName = 'MartianWallet' as WalletName<'MartianWallet'>;
+export const AptosWalletName = 'AptosWallet' as WalletName<'AptosWallet'>;
 
-export interface MartianWalletAdapterConfig {
-  provider?: IMartianWallet;
+export interface AptosWalletAdapterConfig {
+  provider?: IAptosWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class MartianWalletAdapter extends BaseWalletAdapter {
-  name = MartianWalletName;
+export class AptosWalletAdapter extends BaseWalletAdapter {
+  name = AptosWalletName;
 
-  url = 'https://chrome.google.com/webstore/detail/martian-wallet/efbglgofoippbgcjepnhiblaibcnclgk';
+  url = '';
 
-  icon =
-    'https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F1159842905-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FXillBNDwQOz0oPJ4OtRH%252Ficon%252FaBwgf6d32iEu3YE56Jvk%252Flogo128_squ.png%3Falt%3Dmedia%26token%3D0f5bef1f-a4bd-495e-a447-289c235bb76a';
+  icon = 'https://miro.medium.com/fit/c/176/176/1*Gf747eyRywU8Img0tK5wvw.png';
 
-  protected _provider: IMartianWallet | undefined;
+  protected _provider: IAptosWallet | undefined;
 
   // protected _network: WalletAdapterNetwork;
   protected _timeout: number;
@@ -67,7 +66,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Mainnet,
     timeout = 10000
-  }: MartianWalletAdapterConfig = {}) {
+  }: AptosWalletAdapterConfig = {}) {
     super();
 
     this._provider = window.aptos;
@@ -79,6 +78,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.aptos) {
+          console.log('MEMEME>>', window.aptos);
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -106,9 +106,9 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      // console.log(1);
+      console.log(1);
       if (this.connected || this.connecting) return;
-      // console.log(2);
+      console.log(2);
       if (
         !(
           this._readyState === WalletReadyState.Loadable ||
@@ -116,37 +116,37 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
         )
       )
         throw new WalletNotReadyError();
-      // console.log(3);
+      console.log(3);
       this._connecting = true;
 
       const provider = window.aptos;
-      // console.log(4);
+      console.log(4);
       const loggedInAddress = await new Promise<string>((resolve, reject) => {
-        provider?.disconnect();
-        // console.log(5);
-        provider?.connect((respAddress: string) => {
-          // console.log(6);
-          try {
-            resolve(respAddress);
-          } catch (err) {
-            reject(err);
-          }
-          // 0xc4265dc8a5d90715f8a60bebf16688819427bca928a537ad35f798d4d1267716
-        });
+        // provider?.disconnect();
+        console.log(5, provider);
+        provider
+          ?.connect()
+          .then((address) => {
+            resolve(address);
+          })
+          .catch((err) => reject(err));
       });
+      this._wallet = {
+        publicKey: loggedInAddress
+      };
       // console.log(7, loggedInAddress, window.aptos?.publicKey);
-      if (loggedInAddress === window.aptos?.publicKey) {
-        // console.log(8);
-        this._wallet = window.aptos;
-      }
+      // if (loggedInAddress === window.aptos?.publicKey) {
+      //   console.log(8);
+      //   this._wallet = {};
+      // }
       // console.log(9);
       this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
-      // console.log(10, error);
+      console.log(10, error);
       this.emit('error', error);
       throw error;
     } finally {
-      // console.log(11);
+      console.log(11);
       this._connecting = false;
     }
   }
@@ -185,9 +185,9 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       try {
         const response = await new Promise<SubmitTransactionRequest>((resolve, reject) => {
           wallet.signGenericTransaction(transaction, (resp: any) => {
-            // console.log('signTransaction', resp);
+            console.log('signTransaction', resp);
             if (resp.status === 200) {
-              // console.log('Transaction is Signed successfully.');
+              console.log('Transaction is Signed successfully.');
               resolve(resp);
             } else {
               reject(resp.message);
@@ -204,21 +204,19 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signAndSubmitTransaction(tempTransaction: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
-      const transaction = tempTransaction as ScriptFunctionPayload;
 
       try {
-        // console.log('trans', 1);
+        console.log('trans', 1);
         const response = await new Promise<PendingTransaction>((resolve, reject) => {
-          // const args = [...transaction.type_arguments, transaction.arguments[0] / 1000];
-          // console.log('trans 2', wallet, transaction, args);
-          wallet.signGenericTransaction(transaction.type, transaction.arguments, (resp: any) => {
-            // console.log('signTransaction', resp);
+          console.log('trans 2', wallet, transaction);
+          wallet.signGenericTransaction(transaction.type, transaction, (resp: any) => {
+            console.log('signTransaction', resp);
             if (resp.status === 200) {
-              // console.log('Transaction is Signed successfully.');
+              console.log('Transaction is Signed successfully.');
               resolve(resp);
             } else {
               reject(resp.message);

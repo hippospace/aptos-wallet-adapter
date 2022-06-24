@@ -16,7 +16,7 @@ export interface WalletProviderProps {
   children: ReactNode;
   wallets: WalletAdapter[];
   autoConnect?: boolean;
-  onError?: (error: any) => void;
+  onError?: (error: WalletError) => void;
   localStorageKey?: string;
 }
 
@@ -103,6 +103,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // Handle the adapter's connect event
   const handleConnect = useCallback(() => {
     if (!adapter) return;
+    console.log('handle connect', adapter, adapter.connected, adapter.publicKey);
     setState((state) => ({ ...state, connected: adapter.connected, publicKey: adapter.publicKey }));
   }, [adapter]);
 
@@ -117,6 +118,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const handleError = useCallback(
     (error: WalletError) => {
       // Call onError unless the window is unloading
+      console.log('handle error', error);
       if (!isUnloading.current) (onError || console.error)(error);
       return error;
     },

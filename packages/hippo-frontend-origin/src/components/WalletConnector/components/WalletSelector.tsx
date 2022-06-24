@@ -25,7 +25,7 @@ const Option: React.FC<TOptionProps> = ({ onClick, label, icon }) => {
         return <PhantomIcon width={24} height={24} />;
       default:
         return icon ? (
-          <img src={icon} width={24} height={24} className="bg-grey-700 block rounded-full" />
+          <img src={icon} width={24} height={24} className="block rounded-full" />
         ) : (
           <div className="bg-grey-700 block w-6 h-6 rounded-full" />
         );
@@ -61,7 +61,7 @@ const WalletSelector: React.FC = () => {
   }, [wallets, connect]);
 
   return (
-    <div className="">
+    <div className="p-6 flex flex-col gap-6">
       <h6 className="font-bold text-black">Connect your wallet</h6>
       <div className="flex flex-wrap gap-2">{renderButtonGroup}</div>
     </div>
