@@ -8,7 +8,7 @@ const URLs = {
   discord: 'https://discord.gg/2WcHppqxuH',
   github: 'https://github.com/hippospace',
   docs: '/',
-  medium: '/',
+  medium: 'https://medium.com/@hippolabs',
   twitter: 'https://twitter.com/hippolabs__'
 };
 
