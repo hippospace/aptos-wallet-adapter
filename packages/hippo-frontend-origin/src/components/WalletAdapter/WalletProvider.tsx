@@ -49,7 +49,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const isDisconnecting = useRef(false);
   const isUnloading = useRef(false);
 
-  console.log('wallet provider::', wallet, adapter, publicKey, connected);
   // Wrap adapters to conform to the `Wallet` interface
   const [wallets, setWallets] = useState(() =>
     adapters.map((adpt) => ({
@@ -103,7 +102,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // Handle the adapter's connect event
   const handleConnect = useCallback(() => {
     if (!adapter) return;
-    console.log('handle connect', adapter, adapter.connected, adapter.publicKey);
     setState((state) => ({ ...state, connected: adapter.connected, publicKey: adapter.publicKey }));
   }, [adapter]);
 
@@ -118,7 +116,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const handleError = useCallback(
     (error: WalletError) => {
       // Call onError unless the window is unloading
-      console.log('handle error', error);
       if (!isUnloading.current) (onError || console.error)(error);
       return error;
     },
@@ -152,7 +149,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       if (isConnecting.current || connecting || disconnecting || connected) return;
       const selectedWallet = wallets.find((wAdapter) => wAdapter.adapter.name === walletName);
       let walletToConnect = initialState;
-      // console.log('MEMEME>>>', name, wallets, selectedWallet, adapter);
       if (selectedWallet) {
         walletToConnect = {
           wallet: selectedWallet,
@@ -222,9 +218,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (transaction: TransactionPayload) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      console.log('sign and submit', adapter, transaction);
       const response = await adapter.signAndSubmitTransaction(transaction);
-      console.log('sign and submit 2', response);
       return response;
     },
     [adapter, handleError, connected]

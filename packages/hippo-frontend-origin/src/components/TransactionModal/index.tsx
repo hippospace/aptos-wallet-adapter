@@ -37,7 +37,8 @@ const TransactionModal: React.FC<TProps> = () => {
 
   const createRequest = useCallback((tx: UserTransactionRequest) => {
     const request = new URLSearchParams({
-      request: JSON.stringify({ method: 'signTransaction', request: tx })
+      request: JSON.stringify({ method: 'signTransaction', request: tx }),
+      origin: window.location.origin
     }).toString();
     window.open(
       `${WEBWALLET_URL}?${request}`,

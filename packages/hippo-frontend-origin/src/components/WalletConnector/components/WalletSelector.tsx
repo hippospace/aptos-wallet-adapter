@@ -1,9 +1,6 @@
-// import useConnector from 'hooks/useConnector';
 import Button from 'components/Button';
 import { useMemo } from 'react';
 import { MetamaskIcon, WalletConnectIcon, CoinbaseIcon, PhantomIcon } from 'resources/icons';
-// import useAptosWallet from 'hooks/useAptosWallet';
-// import { walletAddressEllipsis } from 'utils/utility';
 import { useWallet } from 'components/WalletAdapter/useWallet';
 
 type TOptionProps = {
@@ -35,9 +32,9 @@ const Option: React.FC<TOptionProps> = ({ onClick, label, icon }) => {
   return (
     <Button
       onClick={onClick ? onClick : undefined}
-      className="flex gap-2 grow max-w-[200px] justify-start mt-2 rounded-[0px]"
+      className="flex gap-2 grow justify-start mt-2 rounded-[0px] w-full"
       variant="outlined">
-      <div>{getWalletIcon()}</div>
+      {getWalletIcon()}
       <div className="font-bold text-black">{label}</div>
     </Button>
   );

@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { HexString, MaybeHexString } from 'aptos';
-import { SubmitTransactionRequest, TransactionPayload } from 'aptos/dist/api/data-contracts';
+import { MaybeHexString } from 'aptos';
+import {
+  PendingTransaction,
+  SubmitTransactionRequest,
+  TransactionPayload
+} from 'aptos/dist/api/data-contracts';
 import { WEBWALLET_URL } from 'config/aptosConstants';
 import {
   WalletNotConnectedError,
@@ -11,7 +12,7 @@ import {
 } from '../errors';
 import { BaseWalletAdapter, PublicKey, WalletName, WalletReadyState } from '../types/adapter';
 
-export const HippoWalletName = 'HippoWallet' as WalletName<'HippoWallet'>;
+export const HippoWalletName = 'Hippo Wallet' as WalletName<'Hippo Wallet'>;
 
 export interface HippoWalletAdapterConfig {
   provider?: string;
@@ -75,17 +76,11 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       address?: {
         hexString: MaybeHexString;
       };
-      // params: {
-      //   autoApprove: boolean;
-      //   publicKey: string;
-      // };
-      // result?: string;
       error?: string;
     }>
   ): void => {
     if (e.origin === this._provider) {
       if (e.data.method === 'account') {
-        // const newPublicKey = HexString.ensure(e.data.address?.hexString || '');
         this._wallet = {
           connected: true,
           publicKey: e.data.address?.hexString || null
@@ -131,13 +126,13 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
   }
 
   async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
-    return {} as SubmitTransactionRequest;
-  }
-
-  async signAndSubmitTransaction(transaction: TransactionPayload): Promise<any> {
     try {
       const request = new URLSearchParams({
-        request: JSON.stringify({ method: 'signTransaction', payload: transaction })
+        request: JSON.stringify({
+          method: 'signTransaction',
+          payload: transaction
+        }),
+        origin: window.location.origin
       }).toString();
       const popup = window.open(
         `${WEBWALLET_URL}?${request}`,
@@ -149,7 +144,33 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         this.once('success', resolve);
         this.once('error', reject);
       });
-      return promise;
+      return promise as SubmitTransactionRequest;
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction> {
+    try {
+      const request = new URLSearchParams({
+        request: JSON.stringify({
+          method: 'signAndSubmit',
+          payload: transaction
+        }),
+        origin: window.location.origin
+      }).toString();
+      const popup = window.open(
+        `${WEBWALLET_URL}?${request}`,
+        'Transaction Confirmation',
+        'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=440,height=700'
+      );
+      if (!popup) throw new WalletNotConnectedError();
+      const promise = await new Promise((resolve, reject) => {
+        this.once('success', resolve);
+        this.once('error', reject);
+      });
+      return promise as PendingTransaction;
     } catch (error: any) {
       this.emit('error', error);
       throw error;

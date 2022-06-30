@@ -1,9 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { HexString } from 'aptos';
 import { useWallet } from 'components/WalletAdapter/useWallet';
-import { WEBWALLET_URL } from 'config/aptosConstants';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { ActiveAptosWallet } from 'types/aptos';
 
@@ -21,7 +17,6 @@ interface TProviderProps {
 const AptosWalletContext = createContext<AptosWalletContextType>({} as AptosWalletContextType);
 
 const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
-  const { useLocalStorageState } = useLocalStorage();
   const { connected, publicKey } = useWallet();
   const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet>(undefined);
   const [open, setOpen] = useState(false);

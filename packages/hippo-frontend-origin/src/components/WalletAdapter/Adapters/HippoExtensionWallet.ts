@@ -20,7 +20,6 @@ import {
   WalletWindowBlockedError,
   WalletWindowClosedError
 } from '../errors';
-import HippoWallet from '../HippoWallet';
 import {
   BaseWalletAdapter,
   PublicKey,
@@ -31,13 +30,24 @@ import {
 } from '../types/adapter';
 
 interface IHippoWallet {
-  postMessage(...args: unknown[]): unknown;
+  connect: () => Promise<{ address: string }>;
+  account: () => Promise<string>;
+  isConnected: () => Promise<boolean>;
+  signAndSubmitTransaction(transaction: any): Promise<void>;
+  signTransaction(transaction: any): Promise<void>;
+  disconnect(): Promise<void>;
 }
 
-export const HippoWalletName = 'HippoExtensionWallet' as WalletName<'HippoExtensionWallet'>;
+interface HippoWindow extends Window {
+  hippoWallet?: IHippoWallet;
+}
+
+declare const window: HippoWindow;
+
+export const HippoWalletName = 'Hippo Extension Wallet' as WalletName<'Hippo Extension Wallet'>;
 
 export interface HippoWalletAdapterConfig {
-  provider?: string | IHippoWallet;
+  provider?: IHippoWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
@@ -47,9 +57,9 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://hippo-wallet-test.web.app';
 
-  icon = '';
+  icon = 'https://ui-test1-22e7c.web.app/static/media/hippo_logo.ecded6bf411652de9b7f.png';
 
-  protected _provider: string | IHippoWallet | undefined;
+  protected _provider: IHippoWallet | undefined;
 
   // protected _network: WalletAdapterNetwork;
   protected _timeout: number;
@@ -61,34 +71,30 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   protected _connecting: boolean;
 
-  protected _wallet: HippoWallet | null;
+  protected _wallet: any | null;
 
   constructor({
-    provider,
+    // provider,
     // network = WalletAdapterNetwork.Mainnet,
     timeout = 10000
   }: HippoWalletAdapterConfig = {}) {
     super();
 
-    this._provider = provider;
+    this._provider = window.hippoWallet;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
     if (this._readyState !== WalletReadyState.Unsupported) {
-      if (typeof this._provider === 'string') {
-        this._readyState = WalletReadyState.Loadable;
-      } else {
-        scopePollingDetectionStrategy(() => {
-          if (typeof window.hippo?.postMessage === 'function') {
-            this._readyState = WalletReadyState.Installed;
-            this.emit('readyStateChange', this._readyState);
-            return true;
-          }
-          return false;
-        });
-      }
+      scopePollingDetectionStrategy(() => {
+        if (window.hippoWallet) {
+          this._readyState = WalletReadyState.Installed;
+          this.emit('readyStateChange', this._readyState);
+          return true;
+        }
+        return false;
+      });
     }
   }
 
@@ -101,7 +107,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   }
 
   get connected(): boolean {
-    return !!this._wallet?.connected;
+    return !!this._wallet?.isConnected;
   }
 
   get readyState(): WalletReadyState {
@@ -118,79 +124,17 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         )
       )
         throw new WalletNotReadyError();
-
       this._connecting = true;
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const provider = this._provider || window!.hippo!;
+      const provider = window.hippoWallet;
+      const response = await provider?.connect();
 
-      let wallet: HippoWallet;
-      try {
-        wallet = new HippoWallet(provider, '');
-      } catch (error: any) {
-        throw new WalletConfigError(error?.message, error);
-      }
+      this._wallet = {
+        publicKey: response?.address,
+        isConnected: true
+      };
 
-      try {
-        // HACK: sol-wallet-adapter doesn't reject or emit an event if the popup or extension is closed or blocked
-        const handleDisconnect: (...args: unknown[]) => unknown = (wallet as any).handleDisconnect;
-        let timeout: NodeJS.Timer | undefined;
-        let interval: NodeJS.Timer | undefined;
-        try {
-          await new Promise<void>((resolve, reject) => {
-            const connect = () => {
-              if (timeout) clearTimeout(timeout);
-              wallet.off('connect', connect);
-              resolve();
-            };
-
-            (wallet as any).handleDisconnect = (...args: unknown[]): unknown => {
-              wallet.off('connect', connect);
-              reject(new WalletWindowClosedError());
-              return handleDisconnect.apply(wallet, args);
-            };
-
-            wallet.on('connect', connect);
-
-            wallet.connect().catch((reason: any) => {
-              wallet.off('connect', connect);
-              reject(reason);
-            });
-
-            if (typeof provider === 'string') {
-              let count = 0;
-
-              interval = setInterval(() => {
-                const popup = (wallet as any)._popup;
-                if (popup) {
-                  if (popup.closed) reject(new WalletWindowClosedError());
-                } else {
-                  if (count > 50) reject(new WalletWindowBlockedError());
-                }
-
-                count++;
-              }, 100);
-            } else {
-              // HACK: sol-wallet-adapter doesn't reject or emit an event if the extension is closed or ignored
-              timeout = setTimeout(() => reject(new WalletTimeoutError()), this._timeout);
-            }
-          });
-        } finally {
-          (wallet as any).handleDisconnect = handleDisconnect;
-          if (interval) clearInterval(interval);
-        }
-      } catch (error: any) {
-        if (error instanceof WalletError) throw error;
-        throw new WalletConnectionError(error?.message, error);
-      }
-
-      if (!wallet.publicKey) throw new WalletPublicKeyError();
-
-      wallet.on('disconnect', this._disconnected);
-
-      this._wallet = wallet;
-
-      this.emit('connect', wallet.publicKey);
+      this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
       this.emit('error', error);
       throw error;
@@ -202,44 +146,12 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
     if (wallet) {
-      wallet.off('disconnect', this._disconnected);
-
       this._wallet = null;
 
-      // HACK: sol-wallet-adapter doesn't reliably fulfill its promise or emit an event on disconnect
-      const handleDisconnect: (...args: unknown[]) => unknown = (wallet as any).handleDisconnect;
       try {
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => resolve(), 250);
-
-          (wallet as any).handleDisconnect = (...args: unknown[]): unknown => {
-            clearTimeout(timeout);
-            resolve();
-            // HACK: sol-wallet-adapter rejects with an uncaught promise error
-            (wallet as any)._responsePromises = new Map();
-            return handleDisconnect.apply(wallet, args);
-          };
-
-          wallet.disconnect().then(
-            () => {
-              clearTimeout(timeout);
-              resolve();
-            },
-            (error: any) => {
-              clearTimeout(timeout);
-              // HACK: sol-wallet-adapter rejects with an error on disconnect
-              if (error?.message === 'Wallet disconnected') {
-                resolve();
-              } else {
-                reject(error);
-              }
-            }
-          );
-        });
+        await this._provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
-      } finally {
-        (wallet as any).handleDisconnect = handleDisconnect;
       }
     }
 
@@ -252,8 +164,12 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
-        const response = await wallet.signTransaction(transaction);
-        return response;
+        const response = await this._provider?.signTransaction(transaction);
+        if (response) {
+          return response;
+        } else {
+          throw new Error('Transaction failed');
+        }
       } catch (error: any) {
         throw new WalletSignTransactionError(error?.message, error);
       }
@@ -269,26 +185,19 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
-        const response = await wallet.signAndSubmitTransaction(transaction);
-        return response;
+        const provider = this._provider || window.hippoWallet;
+        const response = await provider?.signAndSubmitTransaction(transaction);
+        if (response) {
+          return response;
+        } else {
+          throw new Error('Transaction failed');
+        }
       } catch (error: any) {
-        throw new WalletSignTransactionError(error?.message, error);
+        throw new WalletSignTransactionError(error.message);
       }
     } catch (error: any) {
       this.emit('error', error);
       throw error;
     }
   }
-
-  private _disconnected = () => {
-    const wallet = this._wallet;
-    if (wallet) {
-      wallet.off('disconnect', this._disconnected);
-
-      this._wallet = null;
-
-      this.emit('error', new WalletDisconnectedError());
-      this.emit('disconnect');
-    }
-  };
 }

@@ -19,7 +19,7 @@ import {
 
 interface IAptosWallet {
   requestId: number;
-  connect: () => Promise<string>;
+  connect: () => Promise<{ address: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<void>;
@@ -33,7 +33,7 @@ interface AptosWindow extends Window {
 
 declare const window: AptosWindow;
 
-export const AptosWalletName = 'AptosWallet' as WalletName<'AptosWallet'>;
+export const AptosWalletName = 'Aptos Wallet' as WalletName<'Aptos Wallet'>;
 
 export interface AptosWalletAdapterConfig {
   provider?: IAptosWallet;
@@ -44,7 +44,7 @@ export interface AptosWalletAdapterConfig {
 export class AptosWalletAdapter extends BaseWalletAdapter {
   name = AptosWalletName;
 
-  url = '';
+  url = 'https://aptos.dev/tutorials/building-wallet-extension';
 
   icon = 'https://miro.medium.com/fit/c/176/176/1*Gf747eyRywU8Img0tK5wvw.png';
 
@@ -78,7 +78,6 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.aptos) {
-          console.log('MEMEME>>', window.aptos);
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -106,9 +105,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      console.log(1);
       if (this.connected || this.connecting) return;
-      console.log(2);
       if (
         !(
           this._readyState === WalletReadyState.Loadable ||
@@ -116,37 +113,21 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
         )
       )
         throw new WalletNotReadyError();
-      console.log(3);
       this._connecting = true;
 
       const provider = window.aptos;
-      console.log(4);
-      const loggedInAddress = await new Promise<string>((resolve, reject) => {
-        // provider?.disconnect();
-        console.log(5, provider);
-        provider
-          ?.connect()
-          .then((address) => {
-            resolve(address);
-          })
-          .catch((err) => reject(err));
-      });
+      const response = await provider?.connect();
+
       this._wallet = {
-        publicKey: loggedInAddress
+        publicKey: response?.address,
+        isConnected: true
       };
-      // console.log(7, loggedInAddress, window.aptos?.publicKey);
-      // if (loggedInAddress === window.aptos?.publicKey) {
-      //   console.log(8);
-      //   this._wallet = {};
-      // }
-      // console.log(9);
+
       this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
-      console.log(10, error);
       this.emit('error', error);
       throw error;
     } finally {
-      console.log(11);
       this._connecting = false;
     }
   }
@@ -157,18 +138,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       this._wallet = null;
 
       try {
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => resolve(), 250);
-
-          try {
-            wallet.disconnect(() => {
-              clearTimeout(timeout);
-              resolve();
-            });
-          } catch (err) {
-            reject(err);
-          }
-        });
+        await this._provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
       }
@@ -183,18 +153,12 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
-        const response = await new Promise<SubmitTransactionRequest>((resolve, reject) => {
-          wallet.signGenericTransaction(transaction, (resp: any) => {
-            console.log('signTransaction', resp);
-            if (resp.status === 200) {
-              console.log('Transaction is Signed successfully.');
-              resolve(resp);
-            } else {
-              reject(resp.message);
-            }
-          });
-        });
-        return response;
+        const response = await this._provider?.signTransaction(transaction);
+        if (response) {
+          return response;
+        } else {
+          throw new Error('Transaction failed');
+        }
       } catch (error: any) {
         throw new WalletSignTransactionError(error?.message, error);
       }
@@ -210,22 +174,14 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
-        console.log('trans', 1);
-        const response = await new Promise<PendingTransaction>((resolve, reject) => {
-          console.log('trans 2', wallet, transaction);
-          wallet.signGenericTransaction(transaction.type, transaction, (resp: any) => {
-            console.log('signTransaction', resp);
-            if (resp.status === 200) {
-              console.log('Transaction is Signed successfully.');
-              resolve(resp);
-            } else {
-              reject(resp.message);
-            }
-          });
-        });
-        return response;
+        const response = await this._provider?.signAndSubmitTransaction(transaction);
+        if (response) {
+          return response;
+        } else {
+          throw new Error('Transaction failed');
+        }
       } catch (error: any) {
-        throw new WalletSignTransactionError(error);
+        throw new WalletSignTransactionError(error.message);
       }
     } catch (error: any) {
       this.emit('error', error);

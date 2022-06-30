@@ -7,8 +7,8 @@ const WebWallet: React.FC = () => {
       id="receiver"
       className="rounded-[11px]"
       src={WEBWALLET_URL}
-      width="464"
-      height="700"
+      width="376"
+      height="629"
     />
   );
 };

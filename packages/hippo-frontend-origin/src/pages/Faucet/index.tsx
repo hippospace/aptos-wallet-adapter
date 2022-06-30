@@ -1,24 +1,22 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import Button from 'components/Button';
 import CoinIcon from 'components/CoinIcon';
 import useAptosWallet from 'hooks/useAptosWallet';
 import useHippoClient from 'hooks/useHippoClient';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 const Faucet: React.FC = () => {
   const [loading, setLoading] = useState('');
   const { activeWallet } = useAptosWallet();
-  const { tokenStores, tokenInfos, requestFaucet } = useHippoClient();
+  const { tokenStores, tokenInfos, requestFaucet, hippoWallet } = useHippoClient();
 
   const onRequestFaucet = useCallback(
     async (coin: string) => {
       setLoading(coin);
       await requestFaucet(coin);
-      // await hippoWallet?.refreshStores();
+      await hippoWallet?.refreshStores();
       setLoading('');
     },
-    [requestFaucet]
+    [requestFaucet, hippoWallet]
   );
 
   const renderTokenList = useMemo(() => {
@@ -27,7 +25,6 @@ const Faucet: React.FC = () => {
       return Object.keys(tokenInfos)
         .filter((symbol) => {
           return tokenInfos[symbol].token_type.module_name.toString().startsWith('MockCoin');
-          // || symbol === 'APTOS'
         })
         .map((symbol) => {
           const store = tokenStores[symbol];

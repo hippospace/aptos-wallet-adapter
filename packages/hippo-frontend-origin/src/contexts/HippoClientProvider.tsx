@@ -113,10 +113,11 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
       setTokenStores(hippoWallet?.symbolToCoinStore);
       setTokenInfos(hippoWallet?.symbolToTokenInfo);
       if (refresh) {
+        getHippoWalletClient();
         setRefresh(false);
       }
     }
-  }, [hippoWallet, refresh]);
+  }, [hippoWallet, refresh, getHippoWalletClient]);
 
   const requestSwap = useCallback(
     async (
@@ -139,6 +140,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         const result = await signAndSubmitTransaction(payload);
         if (result) {
           message.success('Transaction Success');
+          setRefresh(true);
           callback();
         }
       } catch (error) {
@@ -172,6 +174,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         const result = await signAndSubmitTransaction(payload);
         if (result) {
           message.success('Transaction Success');
+          setRefresh(true);
           callback();
         }
       } catch (error) {
@@ -210,6 +213,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
         const result = await signAndSubmitTransaction(payload);
         if (result) {
           message.success('Transaction Success');
+          setRefresh(true);
           callback();
         }
       } catch (error) {
