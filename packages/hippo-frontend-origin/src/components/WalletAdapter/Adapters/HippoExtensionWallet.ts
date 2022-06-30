@@ -126,7 +126,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = window.hippoWallet;
+      const provider = this._provider || window.hippoWallet;
       const response = await provider?.connect();
 
       this._wallet = {
@@ -149,7 +149,8 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       this._wallet = null;
 
       try {
-        await this._provider?.disconnect();
+        const provider = this._provider || window.hippoWallet;
+        await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
       }
@@ -164,7 +165,8 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
-        const response = await this._provider?.signTransaction(transaction);
+        const provider = this._provider || window.hippoWallet;
+        const response = await provider?.signTransaction(transaction);
         if (response) {
           return response;
         } else {
