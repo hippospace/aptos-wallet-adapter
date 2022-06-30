@@ -5,11 +5,11 @@ import { DiscordIcon, GithubIcon, DocsIcon, MediumIcon, TwitterIcon } from 'reso
 const { Footer } = Antd.Layout;
 
 const URLs = {
-  discord: '/',
-  github: '/',
+  discord: 'https://discord.gg/2WcHppqxuH',
+  github: 'https://github.com/hippospace',
   docs: '/',
   medium: '/',
-  twitter: '/'
+  twitter: 'https://twitter.com/hippolabs__'
 };
 
 const Link = ({ href, children }: { href: string; children: any }) => {
