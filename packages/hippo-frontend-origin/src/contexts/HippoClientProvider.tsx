@@ -12,7 +12,7 @@ import useAptosWallet from 'hooks/useAptosWallet';
 // import { aptosClient } from 'config/aptosClient';
 import { message } from 'components/Antd';
 import { TTransaction } from 'types/hippo';
-import { useWallet } from 'components/WalletAdapter/useWallet';
+import { useWallet } from '@manahippo/aptos-wallet-adapter';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;

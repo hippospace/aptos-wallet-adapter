@@ -1,5 +1,5 @@
 import { HexString } from 'aptos';
-import { useWallet } from 'components/WalletAdapter/useWallet';
+import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { ActiveAptosWallet } from 'types/aptos';
 

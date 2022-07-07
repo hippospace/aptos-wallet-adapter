@@ -26,7 +26,7 @@ const Link = ({ href, children }: { href: string; children: any }) => {
 
 const PageFooter: React.FC = () => {
   return (
-    <Footer className="flex gap-8 justify-center py-16 bg-transparent">
+    <Footer className="flex gap-8 justify-center py-16 bg-transparent z-10">
       <Link href={URLs.discord}>
         <DiscordIcon />
         Discord

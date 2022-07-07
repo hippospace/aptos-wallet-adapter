@@ -7,7 +7,7 @@ import styles from './WalletConnector.module.scss';
 // import WebWallet from 'components/WebWallet';
 import WalletSelector from './components/WalletSelector';
 import WalletMenu from './components/WalletMenu';
-import { useWallet } from 'components/WalletAdapter/useWallet';
+import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { useCallback } from 'react';
 import WebWallet from 'components/WebWallet';
 // import { useCallback } from 'react';

@@ -1,7 +1,7 @@
 import Button from 'components/Button';
 import { useMemo } from 'react';
 import { MetamaskIcon, WalletConnectIcon, CoinbaseIcon, PhantomIcon } from 'resources/icons';
-import { useWallet } from 'components/WalletAdapter/useWallet';
+import { useWallet } from '@manahippo/aptos-wallet-adapter';
 
 type TOptionProps = {
   onClick?: () => void;

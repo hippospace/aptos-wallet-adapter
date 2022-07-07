@@ -5,13 +5,13 @@ import { ErrorBoundary } from 'components';
 import reducer from 'modules/rootReducer';
 import { AptosWalletProvider } from 'contexts/AptosWalletProvider';
 import { HippoClientProvider } from 'contexts/HippoClientProvider';
-import { WalletProvider } from 'components/WalletAdapter/WalletProvider';
+import {
+  WalletProvider,
+  HippoWalletAdapter,
+  AptosWalletAdapter,
+  HippoExtensionWalletAdapter
+} from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
-import { HippoWalletAdapter } from 'components/WalletAdapter/Adapters/HippoWallet';
-// import { MartianWalletAdapter } from 'components/WalletAdapter/Adapters/MartianWallet';
-import { AptosWalletAdapter } from 'components/WalletAdapter/Adapters/AptosWallet';
-// import { MultiMaskWalletAdapter } from 'components/WalletAdapter/Adapters/MultiMaskWallet';
-import { HippoExtensionWalletAdapter } from 'components/WalletAdapter/Adapters/HippoExtensionWallet';
 
 const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
