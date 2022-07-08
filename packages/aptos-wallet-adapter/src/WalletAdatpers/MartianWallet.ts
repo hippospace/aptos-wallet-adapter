@@ -216,7 +216,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
           // const args = [...transaction.type_arguments, transaction.arguments[0] / 1000];
           // console.log('trans 2', wallet, transaction);
           wallet.signGenericTransaction(
-            transaction.type,
+            transaction.function,
             transaction.arguments,
             transaction.type_arguments,
             (resp: any) => {
