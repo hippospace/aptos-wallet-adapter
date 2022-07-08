@@ -1795,10 +1795,10 @@
     decimal.js "^10.3.1"
     path "^0.12.7"
 
-"@manahippo/aptos-wallet-adapter@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@manahippo/aptos-wallet-adapter/-/aptos-wallet-adapter-0.1.5.tgz#a1913d30798ad4571e5ca880d642fa55bc07b1f2"
-  integrity sha512-rMqp/w7yIg9heu035BsW+kzjwsX8wAwKt3OsB3ok4RMHzikG3tyEF24PiDD7RDDgDtKoquBr6fpc7mQRWAo6rw==
+"@manahippo/aptos-wallet-adapter@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@manahippo/aptos-wallet-adapter/-/aptos-wallet-adapter-0.1.6.tgz#fb932fa4dded172be3864fe0269c15a8d2a6f889"
+  integrity sha512-sEH3UiJY/urXoypDLxDja0s34/3DJX5Jj/0dmRiZV6qU1r9h6hwiJEj31KPZYidapTX/Z+FNfWOT6KtPqOXHlg==
 
 "@manahippo/hippo-sdk@^0.0.23":
   version "0.0.23"

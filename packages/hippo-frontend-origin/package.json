@@ -7,7 +7,7 @@
     "@craco/craco": "^6.4.3",
     "@ethersproject/providers": "^5.6.6",
     "@manahippo/aptos-tsgen": "^0.0.40",
-    "@manahippo/aptos-wallet-adapter": "^0.1.5",
+    "@manahippo/aptos-wallet-adapter": "^0.1.7",
     "@manahippo/hippo-sdk": "^0.0.23",
     "@reduxjs/toolkit": "^1.8.1",
     "@testing-library/jest-dom": "^5.14.1",
