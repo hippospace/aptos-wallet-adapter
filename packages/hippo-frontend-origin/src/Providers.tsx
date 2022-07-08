@@ -9,7 +9,8 @@ import {
   WalletProvider,
   HippoWalletAdapter,
   AptosWalletAdapter,
-  HippoExtensionWalletAdapter
+  HippoExtensionWalletAdapter,
+  MartianWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
 
@@ -35,7 +36,7 @@ const Providers: React.FC<TProps> = (props: TProps) => {
   const wallets = useMemo(
     () => [
       new HippoWalletAdapter(),
-      // new MartianWalletAdapter(),
+      new MartianWalletAdapter(),
       new AptosWalletAdapter(),
       // new MultiMaskWalletAdapter()
       new HippoExtensionWalletAdapter()
