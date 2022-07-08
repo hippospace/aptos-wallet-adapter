@@ -20,7 +20,7 @@ import {
 
 interface IMartianWallet {
   connect: (params?: any) => Promise<any>;
-  publicKey?: string;
+  address?: string;
   isConnected?: boolean;
   signGenericTransaction(transaction: any): Promise<void>;
   // signTransaction(transaction: any): Promise<void>;
@@ -89,7 +89,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }
 
   get publicKey(): PublicKey | null {
-    return this._wallet?.publicKey || null;
+    return this._wallet?.address || null;
   }
 
   get connecting(): boolean {
@@ -106,7 +106,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      // console.log(1);
+      // console.log(1, window.martian);
       if (this.connected || this.connecting) return;
       // console.log(2);
       if (
@@ -124,23 +124,23 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const loggedInAddress = await new Promise<string>((resolve, reject) => {
         provider?.disconnect();
         // console.log(5);
-        provider?.connect((respAddress: string) => {
+        provider?.connect((respAddress: { status: number; message: string; address: string }) => {
           // console.log(6);
           try {
-            resolve(respAddress);
+            resolve(respAddress.address);
           } catch (err) {
             reject(err);
           }
           // 0xc4265dc8a5d90715f8a60bebf16688819427bca928a537ad35f798d4d1267716
         });
       });
-      // console.log(7, loggedInAddress, window.martian?.publicKey);
-      if (loggedInAddress === window.martian?.publicKey) {
+      // console.log(7, loggedInAddress, window.martian?.address);
+      if (loggedInAddress === window.martian?.address) {
         // console.log(8);
         this._wallet = window.martian;
       }
       // console.log(9);
-      this.emit('connect', this._wallet.publicKey);
+      this.emit('connect', this._wallet.address);
     } catch (error: any) {
       // console.log(10, error);
       this.emit('error', error);
