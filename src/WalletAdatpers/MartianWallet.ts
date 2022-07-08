@@ -28,7 +28,7 @@ interface IMartianWallet {
 }
 
 interface MartianWindow extends Window {
-  aptos?: IMartianWallet;
+  martian?: IMartianWallet;
 }
 
 declare const window: MartianWindow;
@@ -70,7 +70,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }: MartianWalletAdapterConfig = {}) {
     super();
 
-    this._provider = window.aptos;
+    this._provider = window.martian;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
@@ -78,7 +78,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.aptos) {
+        if (window.martian) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -119,7 +119,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       // console.log(3);
       this._connecting = true;
 
-      const provider = window.aptos;
+      const provider = window.martian;
       // console.log(4);
       const loggedInAddress = await new Promise<string>((resolve, reject) => {
         provider?.disconnect();
@@ -134,10 +134,10 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
           // 0xc4265dc8a5d90715f8a60bebf16688819427bca928a537ad35f798d4d1267716
         });
       });
-      // console.log(7, loggedInAddress, window.aptos?.publicKey);
-      if (loggedInAddress === window.aptos?.publicKey) {
+      // console.log(7, loggedInAddress, window.martian?.publicKey);
+      if (loggedInAddress === window.martian?.publicKey) {
         // console.log(8);
-        this._wallet = window.aptos;
+        this._wallet = window.martian;
       }
       // console.log(9);
       this.emit('connect', this._wallet.publicKey);
