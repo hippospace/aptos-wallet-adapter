@@ -214,16 +214,21 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
         // console.log('trans', 1);
         const response = await new Promise<PendingTransaction>((resolve, reject) => {
           // const args = [...transaction.type_arguments, transaction.arguments[0] / 1000];
-          // console.log('trans 2', wallet, transaction, args);
-          wallet.signGenericTransaction(transaction.type, transaction.arguments, (resp: any) => {
-            // console.log('signTransaction', resp);
-            if (resp.status === 200) {
-              // console.log('Transaction is Signed successfully.');
-              resolve(resp);
-            } else {
-              reject(resp.message);
+          // console.log('trans 2', wallet, transaction);
+          wallet.signGenericTransaction(
+            transaction.type,
+            transaction.arguments,
+            transaction.type_arguments,
+            (resp: any) => {
+              console.log('signTransaction', resp);
+              if (resp.status === 200) {
+                // console.log('Transaction is Signed successfully.');
+                resolve(resp);
+              } else {
+                reject(resp.message);
+              }
             }
-          });
+          );
         });
         return response;
       } catch (error: any) {
