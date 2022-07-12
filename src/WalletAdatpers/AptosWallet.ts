@@ -184,7 +184,8 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
           throw new Error('Transaction failed');
         }
       } catch (error: any) {
-        throw new WalletSignTransactionError(error.message);
+        const errMsg = error instanceof Error ? error.message : error.response.data.message;
+        throw new WalletSignTransactionError(errMsg);
       }
     } catch (error: any) {
       this.emit('error', error);
