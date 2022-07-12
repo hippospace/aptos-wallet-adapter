@@ -13,6 +13,7 @@ import {
   MartianWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
+import { message } from 'antd';
 
 const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
@@ -46,7 +47,15 @@ const Providers: React.FC<TProps> = (props: TProps) => {
 
   return (
     <ErrorBoundary>
-      <WalletProvider wallets={wallets}>
+      <WalletProvider
+        wallets={wallets}
+        onError={(error: Error) => {
+          if (error instanceof Error) {
+            message.error(error?.message);
+          } else {
+            message.error(`Wallet Error: ${error}`);
+          }
+        }}>
         <AptosWalletProvider>
           <HippoClientProvider>
             <ReduxProvider store={store}>{props.children}</ReduxProvider>
