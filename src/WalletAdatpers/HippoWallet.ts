@@ -122,6 +122,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
   async disconnect(): Promise<void> {
     window.removeEventListener('message', this.handleMessage);
     window.removeEventListener('beforeunload', this._beforeUnload);
+    this._wallet = null;
     this.emit('disconnect');
   }
 
