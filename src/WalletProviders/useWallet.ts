@@ -10,7 +10,7 @@ import {
   WalletAdapter,
   WalletName,
   WalletReadyState
-} from '../WalletAdatpers/BaseAdapter';
+} from '../WalletAdapters/BaseAdapter';
 
 export interface Wallet {
   adapter: WalletAdapter;
