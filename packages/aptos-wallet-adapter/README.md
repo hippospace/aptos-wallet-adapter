@@ -14,3 +14,13 @@ Working on (PR welcome):
 
 - [Nightly wallet](https://chrome.google.com/webstore/detail/nightly/injggoambcadlfkkjcgdfbejanmgfgfm/related?hl=en&authuser=0)
 - [Pontem wallet](https://pontem.network/)
+
+
+# Frontend Integration
+
+Here's an example of how we integrate the adapter into [hippo's frontend](https://github.com/hippospace/hippo-frontend/blob/main/src/Providers.tsx):
+
+
+# Wallet integration
+
+docs incoming, but you can find examples [here](https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers).
