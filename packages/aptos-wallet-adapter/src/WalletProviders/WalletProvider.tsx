@@ -13,7 +13,7 @@ import {
   WalletAdapter,
   WalletName,
   WalletReadyState
-} from '../WalletAdatpers/BaseAdapter';
+} from '../WalletAdapters/BaseAdapter';
 import { Wallet, WalletContext } from './useWallet';
 
 export interface WalletProviderProps {

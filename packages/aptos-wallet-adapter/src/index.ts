@@ -1,2 +1,2 @@
 export * from './WalletProviders';
-export * from './WalletAdatpers';
+export * from './WalletAdapters';
