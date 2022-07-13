@@ -17,17 +17,17 @@ interface TProviderProps {
 const AptosWalletContext = createContext<AptosWalletContextType>({} as AptosWalletContextType);
 
 const AptosWalletProvider: FC<TProviderProps> = ({ children }) => {
-  const { connected, publicKey } = useWallet();
+  const { connected, account } = useWallet();
   const [activeWallet, setActiveWallet] = useState<ActiveAptosWallet>(undefined);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (connected && publicKey) {
-      setActiveWallet(HexString.ensure(publicKey));
+    if (connected && (account?.address || account?.publicKey)) {
+      setActiveWallet(HexString.ensure(account?.address || account?.publicKey || ''));
     } else {
       setActiveWallet(undefined);
     }
-  }, [connected, publicKey]);
+  }, [connected, account]);
 
   const openModal = useCallback(() => setOpen(true), []);
   const closeModal = useCallback(() => setOpen(false), []);
