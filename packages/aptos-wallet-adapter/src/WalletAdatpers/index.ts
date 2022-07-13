@@ -4,3 +4,4 @@ export * from './HippoExtensionWallet';
 export * from './HippoWallet';
 export * from './MartianWallet';
 export * from './MultiMaskWallet';
+export * from './FewchaWallet';

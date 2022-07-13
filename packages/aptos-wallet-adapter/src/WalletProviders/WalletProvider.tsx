@@ -89,7 +89,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // When the selected wallet changes, initialize the state
   // useEffect(() => {
   //   const selectedWallet = wallets.find((wAdapter) => wAdapter.adapter.name === name);
-  //   console.log('MEMEME>>>', name, wallets, selectedWallet, adapter);
   //   if (selectedWallet) {
   //     setState({
   //       wallet: selectedWallet,
