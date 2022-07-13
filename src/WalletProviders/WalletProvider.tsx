@@ -8,6 +8,7 @@ import {
   WalletNotSelectedError
 } from './errors';
 import {
+  AccountKeys,
   PublicKey,
   WalletAdapter,
   WalletName,
@@ -26,12 +27,12 @@ export interface WalletProviderProps {
 const initialState: {
   wallet: Wallet | null;
   adapter: WalletAdapter | null;
-  publicKey: PublicKey | null;
+  account: AccountKeys | null;
   connected: boolean;
 } = {
   wallet: null,
   adapter: null,
-  publicKey: null,
+  account: null,
   connected: false
 };
 
@@ -44,7 +45,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 }) => {
   const { useLocalStorageState } = useLocalStorage();
   const [, setName] = useLocalStorageState<WalletName | null>(localStorageKey, null);
-  const [{ wallet, adapter, publicKey, connected }, setState] = useState(initialState);
+  const [{ wallet, adapter, account, connected }, setState] = useState(initialState);
   const readyState = adapter?.readyState || WalletReadyState.Unsupported;
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -104,7 +105,11 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // Handle the adapter's connect event
   const handleConnect = useCallback(() => {
     if (!adapter) return;
-    setState((state) => ({ ...state, connected: adapter.connected, publicKey: adapter.publicKey }));
+    setState((state) => ({
+      ...state,
+      connected: adapter.connected,
+      account: adapter.publicAccount
+    }));
   }, [adapter]);
 
   // Handle the adapter's disconnect event
@@ -157,7 +162,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           wallet: selectedWallet,
           adapter: selectedWallet.adapter,
           connected: selectedWallet.adapter.connected,
-          publicKey: selectedWallet.adapter.publicKey
+          account: selectedWallet.adapter.publicAccount
         };
       }
       setState(walletToConnect);
@@ -242,7 +247,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         autoConnect,
         wallets,
         wallet,
-        publicKey,
+        account,
         connected,
         connecting,
         disconnecting,

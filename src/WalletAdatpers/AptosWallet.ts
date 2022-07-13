@@ -10,6 +10,9 @@ import {
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
+  AccountKeys,
+  Address,
+  AuthKey,
   BaseWalletAdapter,
   PublicKey,
   scopePollingDetectionStrategy,
@@ -87,8 +90,12 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  get publicKey(): PublicKey | null {
-    return this._wallet?.publicKey || null;
+  get publicAccount(): AccountKeys {
+    return {
+      publicKey: this._wallet?.publicKey || null,
+      address: this._wallet?.address || null,
+      authKey: this._wallet?.authcKey || null
+    };
   }
 
   get connecting(): boolean {

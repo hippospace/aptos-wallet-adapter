@@ -10,7 +10,13 @@ import {
   WalletNotReadyError,
   WalletSignAndSubmitMessageError
 } from '../WalletProviders/errors';
-import { BaseWalletAdapter, PublicKey, WalletName, WalletReadyState } from './BaseAdapter';
+import {
+  AccountKeys,
+  BaseWalletAdapter,
+  PublicKey,
+  WalletName,
+  WalletReadyState
+} from './BaseAdapter';
 
 export const HippoWalletName = 'Hippo Wallet' as WalletName<'Hippo Wallet'>;
 
@@ -53,8 +59,12 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     this._readyState = WalletReadyState.Installed;
   }
 
-  get publicKey(): PublicKey | null {
-    return this._wallet?.publicKey || null;
+  get publicAccount(): AccountKeys {
+    return {
+      publicKey: this._wallet?.publicKey || null,
+      address: this._wallet?.address || null,
+      authKey: this._wallet?.authcKey || null
+    };
   }
 
   get connecting(): boolean {
@@ -76,6 +86,12 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       address?: {
         hexString: MaybeHexString;
       };
+      publicKey?: {
+        hexString: MaybeHexString;
+      };
+      authKey?: {
+        hexString: MaybeHexString;
+      };
       error?: string;
     }>
   ): void => {
@@ -83,9 +99,11 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       if (e.data.method === 'account') {
         this._wallet = {
           connected: true,
-          publicKey: e.data.address?.hexString || null
+          publicKey: e.data.publicKey || null,
+          address: e.data.address || null,
+          authKey: e.data.authKey || null
         };
-        this.emit('connect', this._wallet.publicKey);
+        this.emit('connect', this._wallet);
       } else if (e.data.method === 'success') {
         this.emit('success', 'Transaction Success');
       } else if (e.data.method === 'fail') {

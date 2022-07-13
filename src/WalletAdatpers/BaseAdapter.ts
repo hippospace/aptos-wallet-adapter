@@ -15,6 +15,14 @@ declare global {
 export { EventEmitter };
 
 export type PublicKey = MaybeHexString;
+export type Address = MaybeHexString;
+export type AuthKey = MaybeHexString;
+
+export interface AccountKeys {
+  publicKey: PublicKey | null;
+  address: Address | null;
+  authKey: AuthKey | null;
+}
 
 export interface WalletAdapterEvents {
   connect(publicKey: PublicKey): void;
@@ -51,10 +59,9 @@ export interface WalletAdapterProps<Name extends string = string> {
   url: string;
   icon: string;
   readyState: WalletReadyState;
-  publicKey: PublicKey | null;
   connecting: boolean;
   connected: boolean;
-
+  publicAccount: AccountKeys;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
@@ -89,12 +96,12 @@ export abstract class BaseWalletAdapter
 
   abstract get readyState(): WalletReadyState;
 
-  abstract get publicKey(): PublicKey | null;
+  abstract get publicAccount(): AccountKeys;
 
   abstract get connecting(): boolean;
 
   get connected(): boolean {
-    return !!this.publicKey;
+    return !!this.publicAccount.publicKey;
   }
 
   abstract connect(): Promise<void>;

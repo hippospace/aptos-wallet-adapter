@@ -12,6 +12,7 @@ import {
 } from '../WalletProviders/errors';
 import Web3, { Web3Provider, Web3ProviderStandard } from '@fewcha/web3';
 import {
+  AccountKeys,
   BaseWalletAdapter,
   PublicKey,
   scopePollingDetectionStrategy,
@@ -99,8 +100,12 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     });
   }
 
-  get publicKey(): PublicKey | null {
-    return this._wallet?.publicKey || null;
+  get publicAccount(): AccountKeys {
+    return {
+      publicKey: this._wallet?.publicKey || null,
+      address: this._wallet?.address || null,
+      authKey: this._wallet?.authcKey || null
+    };
   }
 
   get connecting(): boolean {

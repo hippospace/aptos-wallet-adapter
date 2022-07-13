@@ -5,6 +5,7 @@ import {
 } from 'aptos/dist/api/data-contracts';
 import { createContext, useContext } from 'react';
 import {
+  AccountKeys,
   PublicKey,
   WalletAdapter,
   WalletName,
@@ -20,7 +21,7 @@ export interface WalletContextState {
   autoConnect: boolean;
   wallets: Wallet[];
   wallet: Wallet | null;
-  publicKey: PublicKey | null;
+  account: AccountKeys | null;
   connecting: boolean;
   connected: boolean;
   disconnecting: boolean;
