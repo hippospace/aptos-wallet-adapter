@@ -746,15 +746,16 @@ anymatch@^3.0.3:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-aptos@^0.0.20:
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/aptos/-/aptos-0.0.20.tgz#51ac6adcb702d808a79b3f1db65bca8c0a854ffc"
-  integrity sha512-f0nBkYiZvfsngctZtXXVjrbtVljRtAC1EXF0BgNew8troMTI014nEoNCTcu9aWEeST2/qCVsD8XbWJHjt8oKnQ==
+aptos@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/aptos/-/aptos-1.2.0.tgz#c555da3db90b66e7d623024e95ea6920cbf48403"
+  integrity sha512-4qyM8zShWPffmQoVN7hWJSKjAIWPgvZVN7oPKxnhuEetPEPV+LJyD2HtqYjUhTk/DuCANf8ziBatIKFE+vQY/A==
   dependencies:
     axios "^0.26.1"
     buffer "^6.0.3"
     js-sha3 "^0.8.0"
     tweetnacl "^1.0.3"
+    typescript-memoize "^1.1.0"
     yarn "^1.22.18"
 
 argparse@^1.0.7:
