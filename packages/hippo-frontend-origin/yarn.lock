@@ -2209,20 +2209,30 @@
     decimal.js "^10.3.1"
     path "^0.12.7"
 
-"@manahippo/aptos-wallet-adapter@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@manahippo/aptos-wallet-adapter/-/aptos-wallet-adapter-0.1.8.tgz#9e3dc055313803c6812dcdcc66257a0c15eddf51"
-  integrity sha512-WTEVRqI0I4PM+vzLIJdQ3mjYAQ7sRff/6FEHoxDtHe7YZosUO+w1oFNLivedOEUfCjI8pY1++BJE+wWeXHsCHw==
+"@manahippo/aptos-tsgen@^0.0.41":
+  version "0.0.41"
+  resolved "https://registry.yarnpkg.com/@manahippo/aptos-tsgen/-/aptos-tsgen-0.0.41.tgz#4c4e3dcfe9a5ccf9c8fa68a512a212809a8d735b"
+  integrity sha512-fmgZmr3tQsIQKqP/4AxGBvpWk9IOURtTOFs3MlUEeo4Bp7rPC8ZVejR8+vdeJeVVytXgrheiYM7hxsPwYNqaig==
+  dependencies:
+    aptos "^1.2.0"
+    big-integer "^1.6.51"
+    decimal.js "^10.3.1"
+    path "^0.12.7"
+
+"@manahippo/aptos-wallet-adapter@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@manahippo/aptos-wallet-adapter/-/aptos-wallet-adapter-0.1.10.tgz#2d803e488add91bfdc6a34f9e5ff9b324af9b74d"
+  integrity sha512-YG3GDUXr6I/bB9LBR2tnlNv3AxBuvDLeL9IbP02ydbn/72Bn3UIwButRSJKElimf5EEklAgsHc8WU52jTkC9UA==
   dependencies:
     "@fewcha/web3" "^0.0.2"
 
-"@manahippo/hippo-sdk@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.23.tgz#aba5661a9c0ceb475c86b48f52d848e7ffd5cbff"
-  integrity sha512-zi0iZGCRw7IIrO8gBUAyoG50yHYcAPbAJRr4mo876yJfAw9AK/q161hhYWPWsYL+U764PfbEZwBix4L7e4Q5IQ==
+"@manahippo/hippo-sdk@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.24.tgz#753f90a88d25571763fdc0761c9564112db11fac"
+  integrity sha512-T6oCPaAwSI+ANIamkkmsmOwlXITYaX7mtLEOogh6Rtui0C6cCGUXDUwxOAMUPCxdkpoEw0z2ecuM5QgULDdfWg==
   dependencies:
-    "@manahippo/aptos-tsgen" "^0.0.40"
-    aptos "0.0.20"
+    "@manahippo/aptos-tsgen" "^0.0.41"
+    aptos "1.2.0"
     commander "^9.3.0"
     yaml "^2.1.1"
 
@@ -3511,7 +3521,19 @@ anymatch@^3.0.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-aptos@0.0.20, aptos@^0.0.20:
+aptos@1.2.0, aptos@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/aptos/-/aptos-1.2.0.tgz#c555da3db90b66e7d623024e95ea6920cbf48403"
+  integrity sha512-4qyM8zShWPffmQoVN7hWJSKjAIWPgvZVN7oPKxnhuEetPEPV+LJyD2HtqYjUhTk/DuCANf8ziBatIKFE+vQY/A==
+  dependencies:
+    axios "^0.26.1"
+    buffer "^6.0.3"
+    js-sha3 "^0.8.0"
+    tweetnacl "^1.0.3"
+    typescript-memoize "^1.1.0"
+    yarn "^1.22.18"
+
+aptos@^0.0.20:
   version "0.0.20"
   resolved "https://registry.yarnpkg.com/aptos/-/aptos-0.0.20.tgz#51ac6adcb702d808a79b3f1db65bca8c0a854ffc"
   integrity sha512-f0nBkYiZvfsngctZtXXVjrbtVljRtAC1EXF0BgNew8troMTI014nEoNCTcu9aWEeST2/qCVsD8XbWJHjt8oKnQ==
