@@ -10,7 +10,7 @@ import {
   WalletNotReadyError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
-import Web3, { Web3Provider, Web3ProviderStandard } from '@fewcha/web3';
+import Web3, { Web3Provider, Web3ProviderType } from '@fewcha/web3';
 import {
   AccountKeys,
   BaseWalletAdapter,
@@ -38,7 +38,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
   icon = 'https://miro.medium.com/fit/c/176/176/1*a0WaY-q7gjCRiuryRG6TkQ.png';
 
-  protected _provider: Web3ProviderStandard | undefined;
+  protected _provider: Web3ProviderType | undefined;
 
   // protected _network: WalletAdapterNetwork;
   protected _timeout: number;
@@ -65,7 +65,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        const wallet = (window as any).aptos;
+        const wallet = (window as any).fewcha;
 
         if (wallet) {
           const provider = new Web3Provider(wallet);
@@ -80,12 +80,13 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     }
 
     window.addEventListener('aptos#connected', async () => {
-      const publicKey = await this._provider?.account();
+      const publicAccount = await this._provider?.account();
       const isConnected = await this._provider?.isConnected();
-      if (publicKey && isConnected) {
+      console.log('loginnnn>>', publicAccount, publicAccount?.publicKey);
+      if (publicAccount?.publicKey && isConnected) {
         this._wallet = {
           connected: isConnected,
-          publicKey: publicKey
+          ...publicAccount
         };
         this.emit('connect', this._wallet.publicKey);
       }
@@ -189,7 +190,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       try {
         const provider = this._provider;
-        const tx = await aptosClient.generateTransaction(wallet.publicKey, transaction);
+        const tx = await aptosClient.generateTransaction(wallet.address, transaction);
         await provider?.signAndSubmitTransaction(tx);
 
         const promise = await new Promise((resolve, reject) => {

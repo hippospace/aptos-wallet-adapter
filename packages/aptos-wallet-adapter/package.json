@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/aptos-wallet-adapter",
-  "version": "0.1.9",
+  "version": "0.1.7",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -29,6 +29,6 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@fewcha/web3": "^0.0.2"
+    "@fewcha/web3": "^0.1.4"
   }
 }
