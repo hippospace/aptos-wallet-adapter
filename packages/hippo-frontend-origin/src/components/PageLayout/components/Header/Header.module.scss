@@ -1,9 +1,5 @@
 .menu {
   &:global {
-    &.ant-menu.ant-menu-dark {
-      @apply bg-primary;
-    }
-
     // remove blue background
     &.ant-menu.ant-menu-dark .ant-menu-item-selected,
     &.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected,
@@ -35,5 +31,16 @@
     &.ant-menu .ant-menu-item > span > a {
       @apply text-grey-900/50;
     }
+  }
+}
+
+.blur {
+  --fallback-background: #fbf5ff;
+  background-color: var(--fallback-background) !important; /* Fallback */
+}
+@supports (backdrop-filter: blur()) {
+  .blur {
+    backdrop-filter: blur(40px);
+    @apply bg-primeBlack #{!important};
   }
 }

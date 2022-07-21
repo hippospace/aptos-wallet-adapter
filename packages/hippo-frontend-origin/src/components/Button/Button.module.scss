@@ -27,6 +27,16 @@
     // }
   }
 
+  &.icon {
+    @apply border-none p-0 w-fit h-fit;
+    &:hover {
+      @apply opacity-70;
+    }
+    &.disabled {
+      @apply opacity-50;
+    }
+  }
+
   &:hover {
     @apply text-grey-900/80;
   }

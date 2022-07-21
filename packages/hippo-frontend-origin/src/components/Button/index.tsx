@@ -7,7 +7,7 @@ type TProps = {
   children?: any;
   disabled?: boolean;
   isLoading?: boolean;
-  variant?: 'solid' | 'outlined';
+  variant?: 'solid' | 'outlined' | 'icon';
   type?: 'button' | 'submit' | 'reset' | undefined;
   onClick?: (e: React.MouseEvent<HTMLElement>) => {} | void;
 };
@@ -29,7 +29,8 @@ const Button: React.FC<TProps> = (props) => {
         [styles.disabled]: disabled,
         [styles.loading]: isLoading,
         [styles.solid]: variant === 'solid',
-        [styles.outlined]: variant === 'outlined'
+        [styles.outlined]: variant === 'outlined',
+        [styles.icon]: variant === 'icon'
       })}
       onClick={onClick}
       disabled={disabled}

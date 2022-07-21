@@ -24,28 +24,32 @@ const Link = ({ href, children }: { href: string; children: any }) => {
   );
 };
 
+const Label = ({ children }: { children: any }) => {
+  return <span className="mobile:hidden">{children}</span>;
+};
+
 const PageFooter: React.FC = () => {
   return (
     <Footer className="flex gap-8 justify-center py-16 bg-transparent z-10">
       <Link href={URLs.discord}>
         <DiscordIcon />
-        Discord
+        <Label>Discord</Label>
       </Link>
       <Link href={URLs.medium}>
         <MediumIcon />
-        Medium
+        <Label>Medium</Label>
       </Link>
       <Link href={URLs.twitter}>
         <TwitterIcon />
-        Twitter
+        <Label>Twitter</Label>
       </Link>
       <Link href={URLs.github}>
         <GithubIcon />
-        Github
+        <Label>Github</Label>
       </Link>
       <Link href={URLs.docs}>
         <DocsIcon />
-        Docs
+        <Label>Docs</Label>
       </Link>
     </Footer>
   );

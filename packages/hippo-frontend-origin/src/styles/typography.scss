@@ -1,74 +1,71 @@
-.header4 {
-  @apply font-normal text-2xl;
-  &.bold {
-    @apply font-bold;
+@layer components {
+  .header4 {
+    @apply font-normal text-2xl;
+    &.bold {
+      @apply font-bold;
+    }
   }
-}
 
-.header5 {
-  @apply font-normal text-xl;
-  &.bold {
-    @apply font-bold;
+  .header5 {
+    @apply font-normal text-xl;
+    &.bold {
+      @apply font-bold;
+    }
   }
-}
 
-.title {
-  @apply font-semibold text-lg;
-  &.bold {
-    @apply font-bold;
+  title, .title {
+    @apply font-semibold text-lg;
+    &.bold {
+      @apply font-bold;
+    }
   }
-}
 
-.paragraph {
-  @apply font-semibold text-base;
-  &.bold {
-    @apply font-extrabold;
+  .paragraph {
+    @apply font-semibold text-base;
+    &.bold {
+      @apply font-extrabold;
+    }
   }
-}
 
-.helpText {
-  @apply font-normal text-sm;
-  &.bold {
-    @apply font-semibold;
+  .helpText {
+    @apply font-normal text-sm;
+    &.bold {
+      @apply font-semibold;
+    }
+    &.hyperlink {
+      @apply underline;
+    }
   }
-  &.hyperlink {
-    @apply underline;
+
+  h1, .h1 {
+    @apply text-[56px] leading-[67px] font-bold;
   }
-}
 
-h1 {
-  @apply text-[56px] leading-none;
-}
+  h2, .h2 {
+    @apply text-[48px] leading-none;
+  }
 
-h2 {
-  @apply text-[48px] leading-none;
-}
+  h3, .h3 {
+    @apply text-[40px] leading-none;
+  }
 
-h3 {
-  @apply text-[40px] leading-none;
-}
+  h4, .h4 {
+    @apply text-[32px] leading-none;
+  }
 
-h4 {
-  @apply text-[32px] leading-none;
-}
+  h5, .h5 {
+    @apply text-2xl font-bold;
+  }
 
-h5 {
-  @apply text-2xl;
-}
+  h6, .h6 {
+    @apply text-xl;
+  }
 
-h6 {
-  @apply text-xl;
-}
+  small, .small {
+    @apply text-[14px];
+  }
 
-.title,
-title {
-  @apply text-lg;
-}
-
-small {
-  @apply text-[14px];
-}
-
-.helpText {
-  @apply text-sm;
+  .helpText {
+    @apply text-sm;
+  }
 }
