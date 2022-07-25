@@ -64,7 +64,8 @@ const CoinSelector: React.FC<TProps> = ({ dismissiModal, actionType }) => {
       const results = currentTokenList.map((token) => {
         const store = hippoWallet?.symbolToCoinStore[token?.symbol || ''];
         const ti = hippoWallet?.symbolToTokenInfo[token?.symbol || ''];
-        const uiBalance = (store?.coin?.value.toJSNumber() || 0) / Math.pow(10, ti?.decimals || 1);
+        const uiBalance =
+          (store?.coin?.value.toJsNumber() || 0) / Math.pow(10, ti?.decimals.toJsNumber() || 1);
         balance = uiBalance.toFixed(4);
         return { ...token, balance } as ITokenInfo & { balance: string };
       });

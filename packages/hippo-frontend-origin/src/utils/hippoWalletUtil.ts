@@ -1,4 +1,4 @@
-import { getTypeTagFullname, StructTag, TypeTag } from '@manahippo/aptos-tsgen';
+import { getTypeTagFullname, StructTag, TypeTag } from '@manahippo/move-to-ts';
 import { CONFIGS } from '@manahippo/hippo-sdk';
 import { AptosAccount, AptosClient, Types } from 'aptos';
 

@@ -48,7 +48,8 @@ const DepositModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       const results = [tokenPair?.token0, tokenPair?.token1].map((token) => {
         const store = hippoClient.hippoWallet?.symbolToCoinStore[token?.symbol || ''];
         const ti = hippoClient.hippoWallet?.symbolToTokenInfo[token?.symbol || ''];
-        const uiBalance = (store?.coin?.value.toJSNumber() || 0) / Math.pow(10, ti?.decimals || 1);
+        const uiBalance =
+          (store?.coin?.value.toJsNumber() || 0) / Math.pow(10, ti?.decimals.toJsNumber() || 1);
         balance = uiBalance.toFixed(4);
         return balance;
       });

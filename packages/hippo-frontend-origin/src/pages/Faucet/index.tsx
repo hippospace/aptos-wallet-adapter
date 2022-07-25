@@ -24,7 +24,7 @@ const Faucet: React.FC = () => {
     if (tokenStores && tokenInfos) {
       return Object.keys(tokenInfos)
         .filter((symbol) => {
-          return tokenInfos[symbol].token_type.module_name.toString().startsWith('MockCoin');
+          return tokenInfos[symbol].token_type.moduleName().startsWith('mock_coin');
         })
         .map((symbol) => {
           const store = tokenStores[symbol];
@@ -34,12 +34,17 @@ const Faucet: React.FC = () => {
               className="border-2 h-14 border-grey-900 py-2 px-6 flex bg-primePurple-100 justify-between items-center"
               key={symbol}>
               <div className="flex gap-3 justify-center items-center">
-                <CoinIcon logoSrc={tokenInfo.logo_url} />
-                <div className="font-bold text-grey-900">{tokenInfo.name}</div>
+                <CoinIcon logoSrc={tokenInfo.logo_url.str()} />
+                <div className="font-bold text-grey-900">{tokenInfo.name.str()}</div>
               </div>
               <div className="flex gap-4 justify-center items-center">
                 <small className="text-grey-700 font-bold uppercase">
-                  {`${store ? store.coin.value.toJSNumber() / Math.pow(10, tokenInfo.decimals) : 0} 
+                  {`${
+                    store
+                      ? store.coin.value.toJsNumber() /
+                        Math.pow(10, tokenInfo.decimals.toJsNumber())
+                      : 0
+                  } 
                   ${symbol}`}{' '}
                 </small>
                 <Button

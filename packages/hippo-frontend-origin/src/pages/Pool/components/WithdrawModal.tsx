@@ -44,10 +44,11 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
           throw new Error(`Pool for ${lhsSymbol} and ${rhsSymbol} does not exist!`);
         }
         const pool = pools[0];
-        const lpSymbol = pool.lpTokenInfo.symbol;
+        const lpSymbol = pool.lpTokenInfo.symbol.str();
         if (lpSymbol in tokenStores) {
           const uiAmt =
-            tokenStores[lpSymbol].coin.value.toJSNumber() / Math.pow(10, pool.lpTokenInfo.decimals);
+            tokenStores[lpSymbol].coin.value.toJsNumber() /
+            Math.pow(10, pool.lpTokenInfo.decimals.toJsNumber());
           setTotalUserLpUiAmt(uiAmt);
         } else {
           setTotalUserLpUiAmt(0);
@@ -71,7 +72,7 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       throw new Error(`Direct Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
     const pool = pools[0];
-    if (tokenStores && tokenStores[pool.lpTokenInfo.symbol]) {
+    if (tokenStores && tokenStores[pool.lpTokenInfo.symbol.str()]) {
       await requestWithdraw(lhsSymbol, rhsSymbol, poolType, values.amount, 0, 0, () => {
         setLoading(false);
         onDismissModal();
@@ -110,11 +111,14 @@ const WithdrawModal: React.FC<TProps> = ({ tokenPair, onDismissModal }) => {
       throw new Error(`Direct Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
     const pool = pools[0];
-    const lpSupplyRawAmt = await hippoSwap.getTokenTotalSupplyBySymbol(pool.lpTokenInfo.symbol);
+    const lpSupplyRawAmt = await hippoSwap.getTokenTotalSupplyBySymbol(
+      pool.lpTokenInfo.symbol.str()
+    );
     if (!lpSupplyRawAmt) {
       throw new Error('Unable to obtain LP token total supply');
     }
-    const lpSupplyUiAmt = lpSupplyRawAmt.toJSNumber() / Math.pow(10, pool.lpTokenInfo.decimals);
+    const lpSupplyUiAmt =
+      lpSupplyRawAmt.toJSNumber() / Math.pow(10, pool.lpTokenInfo.decimals.toJsNumber());
     const toReceive = pool.estimateWithdrawalOutput(amount, lpSupplyUiAmt);
     setReceivedX(toReceive.xUiAmt);
     setReceivedY(toReceive.yUiAmt);

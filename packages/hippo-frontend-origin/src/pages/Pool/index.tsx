@@ -27,13 +27,15 @@ const Pool: React.FC = () => {
         let totalTvlInUSD;
         if (pool instanceof HippoConstantProductPool) {
           totalTvlInUSD =
-            (pool.cpPoolMeta.balance_y.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals)) * 2;
+            (pool.cpPoolMeta.balance_y.value.toJsNumber() /
+              Math.pow(10, xTokenInfo.decimals.toJsNumber())) *
+            2;
         } else if (pool instanceof HippoPieceSwapPool) {
           // if one of them is USDC, USDT, DAI, just add them up
           const stables = ['USDC', 'USDT', 'DAI'];
           if (
-            stables.includes(pool.xTokenInfo.symbol) ||
-            stables.includes(pool.yTokenInfo.symbol)
+            stables.includes(pool.xTokenInfo.symbol.str()) ||
+            stables.includes(pool.yTokenInfo.symbol.str())
           ) {
             totalTvlInUSD = pool.xUiBalance() + pool.yUiBalance();
           } else {
@@ -50,15 +52,15 @@ const Pool: React.FC = () => {
           tick: '',
           token0: {
             id: '',
-            symbol: xTokenInfo.symbol,
-            name: xTokenInfo.name,
+            symbol: xTokenInfo.symbol.str(),
+            name: xTokenInfo.name.str(),
             decimals: xTokenInfo.decimals.toString(),
             derivedETH: ''
           },
           token1: {
             id: '',
-            symbol: yTokenInfo.symbol,
-            name: yTokenInfo.name,
+            symbol: yTokenInfo.symbol.str(),
+            name: yTokenInfo.name.str(),
             decimals: yTokenInfo.decimals.toString(),
             derivedETH: ''
           },

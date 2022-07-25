@@ -24,9 +24,10 @@ const CurrencyInput: React.FC<TProps> = ({ actionType }) => {
   let uiBalance = 0;
   if (selectedSymbol && hippoClient && hippoClient.hippoWallet) {
     const selectedRawBalance =
-      hippoClient.hippoWallet?.symbolToCoinStore[selectedSymbol]?.coin.value.toJSNumber();
-    const selectedDecimals = hippoClient.hippoWallet.symbolToTokenInfo[selectedSymbol].decimals;
-    uiBalance = selectedRawBalance! / Math.pow(10, selectedDecimals!) || 0;
+      hippoClient.hippoWallet?.symbolToCoinStore[selectedSymbol]?.coin.value.toJsNumber();
+    const selectedDecimals =
+      hippoClient.hippoWallet.symbolToTokenInfo[selectedSymbol].decimals.toJsNumber();
+    uiBalance = selectedRawBalance! / Math.pow(10, selectedDecimals) || 0;
   }
 
   const coinSelectorButton = useMemo(() => {

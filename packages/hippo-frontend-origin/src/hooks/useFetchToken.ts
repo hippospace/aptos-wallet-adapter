@@ -16,10 +16,10 @@ const useFetchToken = () => {
         data.push({
           address: '',
           chainId: 0,
-          decimals: tokenInfo.decimals,
-          name: tokenInfo.name,
-          symbol: tokenInfo.symbol,
-          logoURI: tokenInfo.logo_url
+          decimals: tokenInfo.decimals.toJsNumber(),
+          name: tokenInfo.name.str(),
+          symbol: tokenInfo.symbol.str(),
+          logoURI: tokenInfo.logo_url.str()
         });
       }
     }
