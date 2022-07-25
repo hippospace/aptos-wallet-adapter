@@ -34,7 +34,7 @@ interface HippoWindow extends Window {
 declare const window: HippoWindow;
 
 export const HippoExtensionWalletName =
-  'Hippo Extension Wallet' as WalletName<'Hippo Extension Wallet'>;
+  'Hippo Wallet' as WalletName<'Hippo Wallet'>;
 
 export interface HippoExtensionWalletAdapterConfig {
   provider?: IHippoWallet;

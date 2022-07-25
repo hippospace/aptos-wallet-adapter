@@ -18,7 +18,7 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
-export const HippoWalletName = 'Hippo Wallet' as WalletName<'Hippo Wallet'>;
+export const HippoWalletName = 'Hippo Web Wallet' as WalletName<'Hippo Web Wallet'>;
 
 export interface HippoWalletAdapterConfig {
   provider?: string;
