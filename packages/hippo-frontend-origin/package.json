@@ -8,7 +8,7 @@
     "@ethersproject/providers": "^5.6.6",
     "@fewcha/web3": "^0.0.2",
     "@fewcha/web3-react": "^0.0.2",
-    "@manahippo/aptos-wallet-adapter": "^0.1.14",
+    "@manahippo/aptos-wallet-adapter": "^0.1.15",
     "@manahippo/hippo-sdk": "^0.0.31",
     "@manahippo/move-to-ts": "^0.0.57",
     "@reduxjs/toolkit": "^1.8.1",
