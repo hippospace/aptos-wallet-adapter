@@ -92,6 +92,9 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       authKey?: {
         hexString: MaybeHexString;
       };
+      detail?: {
+        hash: MaybeHexString;
+      };
       error?: string;
     }>
   ): void => {
@@ -105,7 +108,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         };
         this.emit('connect', this._wallet);
       } else if (e.data.method === 'success') {
-        this.emit('success', 'Transaction Success');
+        this.emit('success', e.data.detail);
       } else if (e.data.method === 'fail') {
         this.emit('error', new WalletSignAndSubmitMessageError(e.data.error));
       } else if (e.data.method === 'disconnected') {

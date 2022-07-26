@@ -22,7 +22,7 @@ interface IHippoWallet {
   connect: () => Promise<{ address: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<void>;
+  signAndSubmitTransaction(transaction: any): Promise<any>;
   signTransaction(transaction: any): Promise<void>;
   disconnect(): Promise<void>;
 }
@@ -184,12 +184,13 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         const provider = this._provider || window.hippoWallet;
         const response = await provider?.signAndSubmitTransaction(transaction);
         if (response) {
-          return response;
+          return response.detail;
         } else {
           throw new Error('Transaction failed');
         }
       } catch (error: any) {
-        throw new WalletSignTransactionError(error.message);
+        // console.log('transact err', error, error.message);
+        throw new WalletSignTransactionError(error.message || error);
       }
     } catch (error: any) {
       this.emit('error', error);
