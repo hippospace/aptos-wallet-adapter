@@ -17,7 +17,7 @@ const WalletConnector: React.FC = () => {
   const { wallet } = useWallet();
 
   const renderContent = useCallback(() => {
-    if (wallet && wallet.adapter.name === 'Hippo Web Wallet') {
+    if (wallet && wallet.adapter.name === 'Hippo Wallet') {
       return <WebWallet />;
     }
     return activeWallet ? <WalletMenu /> : <WalletSelector />;

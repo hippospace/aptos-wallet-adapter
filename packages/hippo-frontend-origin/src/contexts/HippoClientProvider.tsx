@@ -10,9 +10,10 @@ import {
 import { token_registry$_ } from '@manahippo/hippo-sdk/dist/generated/token_registry';
 import useAptosWallet from 'hooks/useAptosWallet';
 // import { aptosClient } from 'config/aptosClient';
-import { message } from 'components/Antd';
+import { message, notification } from 'components/Antd';
 import { TTransaction } from 'types/hippo';
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
+import { MaybeHexString } from 'aptos';
 
 interface HippoClientContextType {
   hippoWallet?: HippoWalletClient;
@@ -52,6 +53,25 @@ interface TProviderProps {
   children: ReactNode;
 }
 
+const openNotification = (txhash: MaybeHexString) => {
+  notification.open({
+    message: 'Transaction Success',
+    description: (
+      <p>
+        You can verify the transaction by visiting the{' '}
+        <a
+          href={`https://explorer.devnet.aptos.dev/txn/${txhash}`}
+          target="_blank"
+          rel="noreferrer"
+          className="underline">
+          Aptos Transaction Explorer
+        </a>
+      </p>
+    ),
+    placement: 'bottomLeft'
+  });
+};
+
 const HippoClientContext = createContext<HippoClientContextType>({} as HippoClientContextType);
 
 const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
@@ -75,7 +95,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           if (payload) {
             const result = await signAndSubmitTransaction(payload);
             if (result) {
-              message.success('Transaction Success');
+              openNotification(result.hash);
               await hippoWallet?.refreshStores();
               setRefresh(true);
               if (callback) callback();
@@ -83,7 +103,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           }
         }
       } catch (error) {
-        console.log('request swap error:', error);
+        console.log('request faucet error:', error);
         if (error instanceof Error) {
           message.error(error?.message);
         }

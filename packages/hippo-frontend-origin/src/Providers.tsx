@@ -7,7 +7,7 @@ import { AptosWalletProvider } from 'contexts/AptosWalletProvider';
 import { HippoClientProvider } from 'contexts/HippoClientProvider';
 import {
   WalletProvider,
-  //HippoWalletAdapter,
+  HippoWalletAdapter,
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
@@ -38,7 +38,7 @@ type TProps = {
 const Providers: React.FC<TProps> = (props: TProps) => {
   const wallets = useMemo(
     () => [
-      //new HippoWalletAdapter(),
+      new HippoWalletAdapter(),
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
@@ -55,6 +55,7 @@ const Providers: React.FC<TProps> = (props: TProps) => {
         wallets={wallets}
         onError={(error: Error) => {
           if (error instanceof Error) {
+            console.log('MEMEMEME');
             message.error(error?.message);
           } else {
             message.error(`Wallet Error: ${error}`);
