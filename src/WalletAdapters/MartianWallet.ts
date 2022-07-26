@@ -1,9 +1,11 @@
+import { MaybeHexString } from 'aptos';
 import {
   PendingTransaction,
   ScriptFunctionPayload,
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/api/data-contracts';
+import { aptosClient } from '../config/aptosConstants';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -19,11 +21,24 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
+interface ConnectMartianAccount {
+  address: MaybeHexString;
+  method: string;
+  publicKey: MaybeHexString;
+  status: number;
+}
+
+interface MartianAccount {
+  address: MaybeHexString;
+  publicKey: MaybeHexString;
+  authcKey: MaybeHexString;
+  isConnected: boolean;
+}
 interface IMartianWallet {
-  connect: (params?: any) => Promise<any>;
-  address?: string;
-  isConnected?: boolean;
-  signGenericTransaction(transaction: any): Promise<void>;
+  connect: (params?: any) => Promise<ConnectMartianAccount>;
+  account(): Promise<MartianAccount>;
+  isConnected(): Promise<boolean>;
+  signAndSubmitTransaction(transaction: any): Promise<string>;
   // signTransaction(transaction: any): Promise<void>;
   disconnect(): Promise<void>;
 }
@@ -62,7 +77,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   protected _connecting: boolean;
 
-  protected _wallet: any | null;
+  protected _wallet: MartianAccount | null;
 
   constructor({
     // provider,
@@ -126,26 +141,23 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
       const provider = window.martian;
       // console.log(4);
-      const loggedInAddress = await new Promise<string>((resolve, reject) => {
-        provider?.disconnect();
-        // console.log(5);
-        provider?.connect((respAddress: { status: number; message: string; address: string }) => {
-          // console.log(6);
-          try {
-            resolve(respAddress.address);
-          } catch (err) {
-            reject(err);
-          }
-          // 0xc4265dc8a5d90715f8a60bebf16688819427bca928a537ad35f798d4d1267716
-        });
-      });
-      // console.log(7, loggedInAddress, window.martian?.address);
-      if (loggedInAddress === window.martian?.address) {
-        // console.log(8);
-        this._wallet = window.martian;
+      const response = await provider?.connect();
+      // console.log(5, response);
+
+      if (!response) {
+        throw new WalletNotConnectedError('No connect response');
       }
-      // console.log(9);
-      this.emit('connect', this._wallet.address);
+
+      const walletAccount = await provider?.account();
+      if (walletAccount) {
+        this._wallet = {
+          ...walletAccount,
+          isConnected: true
+        };
+        // console.log(6, this._wallet);
+      }
+      // console.log(9, this._wallet?.address);
+      this.emit('connect', this._wallet?.address || '');
     } catch (error: any) {
       // console.log(10, error);
       this.emit('error', error);
@@ -158,22 +170,12 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
+    const provider = this._provider;
     if (wallet) {
       this._wallet = null;
 
       try {
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => resolve(), 250);
-
-          try {
-            wallet.disconnect(() => {
-              clearTimeout(timeout);
-              resolve();
-            });
-          } catch (err) {
-            reject(err);
-          }
-        });
+        await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
       }
@@ -182,63 +184,40 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transactionPyld: TransactionPayload): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
+      const provider = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
+      const tx = await aptosClient.generateTransaction(wallet.address || '', transactionPyld);
+      const response = await provider?.signAndSubmitTransaction(tx);
 
-      try {
-        const response = await new Promise<SubmitTransactionRequest>((resolve, reject) => {
-          wallet.signGenericTransaction(transaction, (resp: any) => {
-            // console.log('signTransaction', resp);
-            if (resp.status === 200) {
-              // console.log('Transaction is Signed successfully.');
-              resolve(resp);
-            } else {
-              reject(resp.message);
-            }
-          });
-        });
-        return response;
-      } catch (error: any) {
-        throw new WalletSignTransactionError(error?.message, error);
+      if (!response) {
+        throw new WalletSignTransactionError('No response');
       }
+      return {
+        hash: response
+      } as PendingTransaction;
     } catch (error: any) {
       this.emit('error', error);
       throw error;
     }
   }
 
-  async signAndSubmitTransaction(tempTransaction: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(transactionPyld: TransactionPayload): Promise<PendingTransaction> {
     try {
       const wallet = this._wallet;
+      const provider = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
-      const transaction = tempTransaction as ScriptFunctionPayload;
+      const tx = await aptosClient.generateTransaction(wallet.address || '', transactionPyld);
+      const response = await provider?.signAndSubmitTransaction(tx);
 
-      try {
-        // console.log('trans', 1);
-        const response = await new Promise<PendingTransaction>((resolve, reject) => {
-          // const args = [...transaction.type_arguments, transaction.arguments[0] / 1000];
-          // console.log('trans 2', wallet, transaction);
-          wallet.signGenericTransaction(
-            transaction.function,
-            transaction.arguments,
-            transaction.type_arguments,
-            (resp: any) => {
-              console.log('signTransaction', resp);
-              if (resp.status === 200) {
-                // console.log('Transaction is Signed successfully.');
-                resolve(resp);
-              } else {
-                reject(resp.message);
-              }
-            }
-          );
-        });
-        return response;
-      } catch (error: any) {
-        throw new WalletSignTransactionError(error);
+      if (!response) {
+        throw new WalletSignTransactionError('No response');
       }
+      return {
+        hash: response
+      } as PendingTransaction;
     } catch (error: any) {
       this.emit('error', error);
       throw error;

@@ -93,7 +93,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     });
 
     window.addEventListener('aptos#transaction', (e) => {
-      this.emit('success', 'Transaction Success');
+      this.emit('success', e);
     });
 
     window.addEventListener('aptos#disconnected', () => {
