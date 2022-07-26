@@ -138,6 +138,7 @@ const HippoClientProvider: FC<TProviderProps> = ({ children }) => {
           throw new Error(`No route exists from ${fromSymbol} to ${toSymbol}`);
         }
         const payload = await bestQuote.bestRoute.makeSwapPayload(uiAmtIn, uiAmtOutMin);
+        console.log('request swap payload', payload);
         const result = await signAndSubmitTransaction(payload);
         if (result) {
           message.success('Transaction Success');
