@@ -29,6 +29,6 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@fewcha/web3": "^0.1.4"
+    "@fewcha/web3": "^0.1.6"
   }
 }
