@@ -6,8 +6,5 @@
   ],
   "devDependencies": {
     "lerna": "^5.2.0"
-  },
-  "dependencies": {
-    "craco": "^0.0.3"
   }
 }
