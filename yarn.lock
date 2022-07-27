@@ -2478,11 +2478,6 @@
   dependencies:
     "@fewcha/web3" "^0.1.6"
 
-"@manahippo/aptos-wallet-adapter@file:../aptos-wallet-adapter":
-  version "0.1.14"
-  dependencies:
-    "@fewcha/web3" "^0.1.6"
-
 "@manahippo/hippo-sdk@^0.0.31":
   version "0.0.31"
   resolved "https://registry.yarnpkg.com/@manahippo/hippo-sdk/-/hippo-sdk-0.0.31.tgz#c8317b7be6f1b5ac52c1c3bae3880fede5191894"
