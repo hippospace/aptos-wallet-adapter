@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/aptos-wallet-adapter",
-  "version": "0.1.14",
+  "version": "0.1.16",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
