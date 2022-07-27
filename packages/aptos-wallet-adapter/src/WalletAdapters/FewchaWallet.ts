@@ -14,7 +14,6 @@ import Web3, { Web3Provider, Web3ProviderType } from '@fewcha/web3';
 import {
   AccountKeys,
   BaseWalletAdapter,
-  PublicKey,
   scopePollingDetectionStrategy,
   WalletName,
   WalletReadyState
@@ -22,8 +21,13 @@ import {
 
 export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
 
-const defaultNodeURL = 'https://fullnode.devnet.aptoslabs.com';
-const defaultWeb3 = new Web3(new Web3Provider(defaultNodeURL));
+interface FewchaWindow extends Window {
+  fewcha: Web3ProviderType;
+}
+
+declare const window: FewchaWindow;
+
+const defaultWeb3 = new Web3(new Web3Provider(window.fewcha));
 
 export interface FewchaAdapterConfig {
   provider?: string;
@@ -65,12 +69,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        const wallet = (window as any).fewcha;
-
-        if (wallet) {
-          const provider = new Web3Provider(wallet);
-          const web3 = new Web3(provider);
-          this._provider = web3.action;
+        if (window.fewcha) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -82,7 +81,6 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     window.addEventListener('aptos#connected', async () => {
       const publicAccount = await this._provider?.account();
       const isConnected = await this._provider?.isConnected();
-      console.log('loginnnn>>', publicAccount, publicAccount?.publicKey);
       if (publicAccount?.publicKey && isConnected) {
         this._wallet = {
           connected: isConnected,
@@ -92,8 +90,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       }
     });
 
-    window.addEventListener('aptos#transaction', (e) => {
-      this.emit('success', e);
+    window.addEventListener('aptos#transaction', (e: any) => {
+      if (e?.detail?.tx) {
+        this.emit('success', e?.detail?.tx);
+      }
     });
 
     window.addEventListener('aptos#disconnected', () => {
@@ -134,6 +134,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       this._connecting = true;
       const provider = this._provider;
+      const isConnected = await this._provider?.isConnected();
+      if (isConnected) {
+        await provider?.disconnect();
+      }
       await provider?.connect();
     } catch (error: any) {
       this.emit('error', error);
@@ -197,7 +201,9 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
           this.once('success', resolve);
           this.once('error', reject);
         });
-        return promise as PendingTransaction;
+        return {
+          hash: promise
+        } as PendingTransaction;
       } catch (error: any) {
         const errMsg = error instanceof Error ? error.message : error.response.data.message;
         throw new WalletSignTransactionError(errMsg);
