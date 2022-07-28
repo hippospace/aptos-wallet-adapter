@@ -33,8 +33,7 @@ interface HippoWindow extends Window {
 
 declare const window: HippoWindow;
 
-export const HippoExtensionWalletName =
-  'Hippo Wallet' as WalletName<'Hippo Wallet'>;
+export const HippoExtensionWalletName = 'Hippo Wallet' as WalletName<'Hippo Wallet'>;
 
 export interface HippoExtensionWalletAdapterConfig {
   provider?: IHippoWallet;
@@ -45,7 +44,7 @@ export interface HippoExtensionWalletAdapterConfig {
 export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   name = HippoExtensionWalletName;
 
-  url = 'https://hippo-wallet-test.web.app';
+  url = 'https://github.com/hippospace/hippo-wallet';
 
   icon = 'https://ui-test1-22e7c.web.app/static/media/hippo_logo.ecded6bf411652de9b7f.png';
 
