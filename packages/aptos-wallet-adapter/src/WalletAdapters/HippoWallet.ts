@@ -154,7 +154,8 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
           method: 'signTransaction',
           payload: transaction
         }),
-        origin: window.location.origin
+        origin: window.location.origin,
+        isPopUp: 'true'
       }).toString();
       const popup = window.open(
         `${WEBWALLET_URL}?${request}`,
