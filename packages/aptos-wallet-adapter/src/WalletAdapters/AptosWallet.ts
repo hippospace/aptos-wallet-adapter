@@ -11,10 +11,7 @@ import {
 } from '../WalletProviders/errors';
 import {
   AccountKeys,
-  Address,
-  AuthKey,
   BaseWalletAdapter,
-  PublicKey,
   scopePollingDetectionStrategy,
   WalletName,
   WalletReadyState
@@ -94,7 +91,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 

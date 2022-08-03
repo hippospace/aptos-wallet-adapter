@@ -10,13 +10,7 @@ import {
   WalletNotReadyError,
   WalletSignAndSubmitMessageError
 } from '../WalletProviders/errors';
-import {
-  AccountKeys,
-  BaseWalletAdapter,
-  PublicKey,
-  WalletName,
-  WalletReadyState
-} from './BaseAdapter';
+import { AccountKeys, BaseWalletAdapter, WalletName, WalletReadyState } from './BaseAdapter';
 
 export const HippoWalletName = 'Hippo Web Wallet' as WalletName<'Hippo Web Wallet'>;
 
@@ -63,7 +57,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 

@@ -1,3 +1,4 @@
+import { MaybeHexString } from 'aptos';
 import {
   PendingTransaction,
   SubmitTransactionRequest,
@@ -12,14 +13,17 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
-  PublicKey,
   scopePollingDetectionStrategy,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
 
 interface IHippoWallet {
-  connect: () => Promise<{ address: string }>;
+  connect: () => Promise<{
+    address: MaybeHexString;
+    publicKey: MaybeHexString;
+    authKey: MaybeHexString;
+  }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<any>;
@@ -91,7 +95,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 
@@ -123,7 +127,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.connect();
 
       this._wallet = {
-        publicKey: response?.address,
+        ...response,
         isConnected: true
       };
 

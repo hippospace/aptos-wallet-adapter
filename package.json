@@ -6,5 +6,8 @@
   ],
   "devDependencies": {
     "lerna": "^5.2.0"
+  },
+  "dependencies": {
+    "@manahippo/aptos-wallet-adapter": "0.1.19"
   }
 }

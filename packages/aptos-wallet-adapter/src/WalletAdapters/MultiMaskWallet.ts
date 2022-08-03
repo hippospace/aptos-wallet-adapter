@@ -96,7 +96,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 

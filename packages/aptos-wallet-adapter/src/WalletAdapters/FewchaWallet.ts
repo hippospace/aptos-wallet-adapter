@@ -81,10 +81,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     window.addEventListener('aptos#connected', async () => {
       const publicAccount = await this._provider?.account();
       const isConnected = await this._provider?.isConnected();
-      if (publicAccount?.publicKey && isConnected) {
+      if (publicAccount?.data.publicKey && isConnected) {
         this._wallet = {
           connected: isConnected,
-          ...publicAccount
+          ...publicAccount.data
         };
         this.emit('connect', this._wallet.publicKey);
       }
@@ -105,7 +105,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 

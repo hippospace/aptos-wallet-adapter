@@ -1,7 +1,6 @@
 import { MaybeHexString } from 'aptos';
 import {
   PendingTransaction,
-  ScriptFunctionPayload,
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/api/data-contracts';
@@ -15,7 +14,6 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
-  PublicKey,
   scopePollingDetectionStrategy,
   WalletName,
   WalletReadyState
@@ -31,13 +29,14 @@ interface ConnectMartianAccount {
 interface MartianAccount {
   address: MaybeHexString;
   publicKey: MaybeHexString;
-  authcKey: MaybeHexString;
+  authKey: MaybeHexString;
   isConnected: boolean;
 }
 interface IMartianWallet {
   connect: (params?: any) => Promise<ConnectMartianAccount>;
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
+  generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmitTransaction(transaction: any): Promise<string>;
   // signTransaction(transaction: any): Promise<void>;
   disconnect(): Promise<void>;
@@ -108,7 +107,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authcKey || null
+      authKey: this._wallet?.authKey || null
     };
   }
 
@@ -140,6 +139,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = window.martian;
+      await provider?.disconnect();
       // console.log(4);
       const response = await provider?.connect();
       // console.log(5, response);
@@ -209,7 +209,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
-      const tx = await aptosClient.generateTransaction(wallet.address || '', transactionPyld);
+      const tx = await provider?.generateTransaction(wallet.address || '', transactionPyld);
       const response = await provider?.signAndSubmitTransaction(tx);
 
       if (!response) {

@@ -26,7 +26,9 @@ const MainPage = () => {
             setLoading(true);
             connect(option.name);
           }}
-          key={option.name}>
+          id={option.name.split(' ').join('_')}
+          key={option.name}
+          className="connect-btn">
           {option.name}
         </Button>
       );
@@ -77,7 +79,15 @@ const MainPage = () => {
     if (account) {
       return (
         <div className="flex flex-col gap-2">
-          <strong>Account: {account?.address?.toString() || account?.publicKey?.toString()}</strong>
+          <strong>
+            Address: <div id="address">{account?.address?.toString()}</div>
+          </strong>
+          <strong>
+            Public Key: <div id="publicKey">{account?.publicKey?.toString()}</div>
+          </strong>
+          <strong>
+            AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
+          </strong>
           <Button onClick={() => transferToken()} loading={txLoading}>
             Transfer Token
           </Button>
