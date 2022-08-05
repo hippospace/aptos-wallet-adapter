@@ -41,7 +41,7 @@ Wallets source code [here](https://github.com/hippospace/aptos-wallet-adapter/tr
 
 # Use React Provider
 
-```
+```typescript
 import React from "react";
 import {
   WalletProvider,
@@ -77,7 +77,7 @@ export default App;
 
 # Web3 Hook
 
-```
+```typescript
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
 
 const { connected, account, ...rest } = useWallet();
@@ -99,9 +99,9 @@ const { connected, account, ...rest } = useWallet();
 
 # Connect & Disconnect
 
-```
- const { wallets, connect, disconnect, isConnected } = useWallet();
- const wallet = 'Aptos Wallet' // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
+```typescript
+const { wallets, connect, disconnect, isConnected } = useWallet();
+const wallet = 'Aptos Wallet' // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
 
 if (!isConnected) {
   return (
@@ -128,7 +128,7 @@ if (!isConnected) {
 
 # Hippo Wallet Client
 
-```
+```typescript
 import { HippoSwapClient, HippoWalletClient } from '@manahippo/hippo-sdk';
 import { getParserRepo } from '@manahippo/hippo-sdk';
 
@@ -149,7 +149,7 @@ export const hippoWalletClient = async (account: ActiveAptosWallet) => {
 
 # Hippo Swap Client
 
-```
+```typescript
 import { HippoSwapClient, HippoWalletClient } from '@manahippo/hippo-sdk';
 import { getParserRepo } from '@manahippo/hippo-sdk/';
 
@@ -166,22 +166,22 @@ export const hippoSwapClient = async () => {
 
 **Request faucet**
 
-```
+```typescript
 const { signAndSubmitTransaction } = useWallet();
 
 const payload = await hippoWallet?.makeFaucetMintToPayload(uiAmtUsed, symbol);
-  if (payload) {
-    const result = await signAndSubmitTransaction(payload);
-    if (result) {
-      message.success('Transaction Success');
-      await hippoWallet?.refreshStores();
-    }
+if (payload) {
+  const result = await signAndSubmitTransaction(payload);
+  if (result) {
+    message.success('Transaction Success');
+    await hippoWallet?.refreshStores();
   }
+}
 ```
 
 **Swap Token**
 
-```
+```typescript
 const bestQuote = await hippoSwap.getBestQuoteBySymbols(fromSymbol, toSymbol, uiAmtIn, 3);
 if (!bestQuote) {
   throw new Error(`No route exists from ${fromSymbol} to ${toSymbol}`);
@@ -196,7 +196,7 @@ if (result) {
 
 **Deposit Transaction**
 
-```
+```typescript
 const pool = hippoSwap.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
 if (pool.length === 0) {
   throw new Error('Desired pool does not exist');

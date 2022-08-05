@@ -6,7 +6,6 @@ import {
 import { createContext, useContext } from 'react';
 import {
   AccountKeys,
-  PublicKey,
   WalletAdapter,
   WalletName,
   WalletReadyState
