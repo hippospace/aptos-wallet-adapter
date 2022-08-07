@@ -51,7 +51,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://github.com/pontem-network/aptos-chrome-extension/releases';
 
-  icon = 'https://liquidswap.pontem.network/img/logo.87454209.svg';
+  icon = 'https://home.liquidswap.com/images/Vector-1.svg';
 
   protected _provider: IMultiMaskWallet | undefined;
 
