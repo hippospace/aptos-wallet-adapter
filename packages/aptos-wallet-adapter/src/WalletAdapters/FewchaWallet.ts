@@ -3,7 +3,7 @@ import {
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/api/data-contracts';
-import { aptosClient, WEBWALLET_URL } from '../config/aptosConstants';
+import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -194,8 +194,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       try {
         const provider = this._provider;
-        const tx = await aptosClient.generateTransaction(wallet.address, transaction);
-        await provider?.signAndSubmitTransaction(tx);
+        const tx = await provider?.generateTransaction(transaction);
+        if (tx) {
+          await provider?.signAndSubmitTransaction(tx.data);
+        }
 
         const promise = await new Promise((resolve, reject) => {
           this.once('success', resolve);
