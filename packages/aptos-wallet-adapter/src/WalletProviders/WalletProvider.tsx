@@ -9,7 +9,6 @@ import {
 } from './errors';
 import {
   AccountKeys,
-  PublicKey,
   WalletAdapter,
   WalletName,
   WalletReadyState

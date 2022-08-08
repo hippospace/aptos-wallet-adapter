@@ -4,7 +4,7 @@ import {
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/api/data-contracts';
-import { aptosClient } from '../config/aptosConstants';
+// import { aptosClient } from '../config/aptosConstants';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -191,7 +191,8 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
-      const tx = await aptosClient.generateTransaction(wallet.address || '', transactionPyld);
+      const tx = await provider?.generateTransaction(wallet.address || '', transactionPyld);
+      if (!tx) throw new WalletSignTransactionError('No transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
       if (!response) {

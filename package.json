@@ -8,6 +8,7 @@
     "lerna": "^5.2.0"
   },
   "dependencies": {
+    "@fewcha/web3": "^0.1.13",
     "@manahippo/aptos-wallet-adapter": "0.1.17"
   }
 }
