@@ -139,8 +139,9 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = window.martian;
-      await provider?.disconnect();
-      // console.log(4);
+      const isConnected = await provider?.isConnected();
+      if (isConnected) await provider?.disconnect();
+      // console.log(4, isConnected);
       const response = await provider?.connect();
       // console.log(5, response);
 
@@ -149,6 +150,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       }
 
       const walletAccount = await provider?.account();
+      // console.log(6, walletAccount);
       if (walletAccount) {
         this._wallet = {
           ...walletAccount,
