@@ -1227,10 +1227,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fewcha/web3@^0.1.6":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@fewcha/web3/-/web3-0.1.12.tgz#4bb06c8c98fd48f84bc55da73905fa6603dfdf45"
-  integrity sha512-cAOkG0wS+YfXWst5PiN73pjmKu5cRAz87aXNvB5ZgItVH5vHiYckXecZGIijFxtkhFf0SPNF/CIpHe5bMn//XQ==
+"@fewcha/web3@^0.1.13":
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@fewcha/web3/-/web3-0.1.13.tgz#b177d2a81a555b60ab7958dbfaaa6022dde96aa5"
+  integrity sha512-SmuuiXIiA7xipeLp021B/tDPorPa1i/xCRLFwtCXnXLarFI7AyNb9GXdycrsNkp/PeKx8EQB6nYv/7ZjS+8Giw==
   dependencies:
     aptos "^1.2.2"
     buffer "^6.0.3"

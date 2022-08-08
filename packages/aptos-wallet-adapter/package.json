@@ -23,7 +23,7 @@
     "prettier": "^2.7.1"
   },
   "dependencies": {
-    "@fewcha/web3": "^0.1.6",
+    "@fewcha/web3": "^0.1.13",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
