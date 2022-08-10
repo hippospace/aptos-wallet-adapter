@@ -4,6 +4,7 @@ import {
   SubmitTransactionRequest,
   PendingTransaction
 } from 'aptos/dist/generated';
+import { payloadV1ToV0 } from '../utilities/util';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -208,9 +209,12 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   async signAndSubmitTransaction(transactionPyld: TransactionPayload): Promise<PendingTransaction> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider;
-      if (!wallet) throw new WalletNotConnectedError();
-      const tx = await provider?.generateTransaction(wallet.address || '', transactionPyld);
+      const provider = this._provider || window.martian;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const tx = await provider.generateTransaction(
+        wallet.address.toString() || '',
+        payloadV1ToV0(transactionPyld)
+      );
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
