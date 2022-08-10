@@ -1,8 +1,8 @@
 import {
+  TransactionPayload,
   PendingTransaction,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
+  SubmitTransactionRequest
+} from 'aptos/dist/generated';
 import { createContext, useContext } from 'react';
 import {
   AccountKeys,

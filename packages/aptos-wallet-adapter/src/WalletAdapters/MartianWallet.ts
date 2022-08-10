@@ -1,10 +1,9 @@
 import { MaybeHexString } from 'aptos';
 import {
-  PendingTransaction,
+  TransactionPayload,
   SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
-// import { aptosClient } from '../config/aptosConstants';
+  PendingTransaction
+} from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -198,9 +197,8 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       if (!response) {
         throw new WalletSignTransactionError('No response');
       }
-      return {
-        hash: response
-      } as PendingTransaction;
+      const result = { hash: response } as any;
+      return result as SubmitTransactionRequest;
     } catch (error: any) {
       this.emit('error', error);
       throw error;
@@ -213,6 +211,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
       const tx = await provider?.generateTransaction(wallet.address || '', transactionPyld);
+      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
       if (!response) {

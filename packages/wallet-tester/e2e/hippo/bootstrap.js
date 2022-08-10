@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const puppeteer = require('puppeteer');
-const extentionPath = '/Users/tom/development/Hippo/hippo-wallet/build';
+const extentionPath = process.env.HIPPO_EXT_PATH;
 
 const bootstrap = async (options = {}) => {
   const { devtools = false, slowMo = false, appUrl } = options;

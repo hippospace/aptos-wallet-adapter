@@ -2,7 +2,7 @@ import {
   PendingTransaction,
   SubmitTransactionRequest,
   TransactionPayload
-} from 'aptos/dist/api/data-contracts';
+} from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -163,7 +163,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
         if (response) {
           return response;
         } else {
-          throw new Error('Transaction failed');
+          throw new Error('Sign Transaction failed');
         }
       } catch (error: any) {
         throw new WalletSignTransactionError(error?.message, error);
@@ -188,7 +188,8 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
           throw new Error('Transaction failed');
         }
       } catch (error: any) {
-        const errMsg = error instanceof Error ? error.message : error.response.data.message;
+        console.log('MEMEMEME>>>>', error);
+        const errMsg = error.message;
         throw new WalletSignTransactionError(errMsg);
       }
     } catch (error: any) {

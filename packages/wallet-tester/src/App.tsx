@@ -4,8 +4,8 @@ import {
   // HippoWalletAdapter,
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
-  MartianWalletAdapter,
-  FewchaWalletAdapter
+  MartianWalletAdapter
+  // FewchaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import MainPage from './pages';
 
@@ -15,8 +15,8 @@ const App: React.FC = () => {
       // new HippoWalletAdapter(),
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
-      new AptosWalletAdapter(),
-      new FewchaWalletAdapter()
+      new AptosWalletAdapter()
+      // new FewchaWalletAdapter()
       // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
     ],

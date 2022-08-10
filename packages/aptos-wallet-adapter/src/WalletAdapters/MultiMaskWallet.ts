@@ -1,9 +1,9 @@
 import {
-  PendingTransaction,
-  ScriptFunctionPayload,
+  TransactionPayload,
   SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
+  PendingTransaction,
+  ScriptFunctionPayload
+} from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -216,7 +216,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
           wallet.currentProvider.sendAsync(
             {
               method: 'eth_sendTransaction',
-              params: [{ from: transaction.function.split(':')[0] }]
+              params: [{ from: transaction.function.name.split(':')[0] }]
             },
             (error, resp: any) => {
               console.log('signTransaction', error, resp);
