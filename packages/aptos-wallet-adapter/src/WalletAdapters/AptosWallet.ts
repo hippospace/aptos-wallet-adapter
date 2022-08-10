@@ -3,6 +3,7 @@ import {
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/generated';
+import { payloadV1ToV0 } from '../utilities/util';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -22,7 +23,7 @@ interface IAptosWallet {
   connect: () => Promise<{ address: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<void>;
+  signAndSubmitTransaction(transaction: any): Promise<PendingTransaction>;
   signTransaction(transaction: any): Promise<void>;
   disconnect(): Promise<void>;
 }
@@ -177,18 +178,17 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction> {
     try {
       const wallet = this._wallet;
-      if (!wallet) throw new WalletNotConnectedError();
+      const provider = this._provider || window.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
 
       try {
-        const provider = this._provider || window.aptos;
-        const response = await provider?.signAndSubmitTransaction(transaction);
+        const response = await provider?.signAndSubmitTransaction(payloadV1ToV0(transaction));
         if (response) {
           return response;
         } else {
           throw new Error('Transaction failed');
         }
       } catch (error: any) {
-        console.log('MEMEMEME>>>>', error);
         const errMsg = error.message;
         throw new WalletSignTransactionError(errMsg);
       }
