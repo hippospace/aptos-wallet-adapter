@@ -1,9 +1,9 @@
 import { MaybeHexString } from 'aptos';
 import {
+  TransactionPayload,
   PendingTransaction,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
+  SubmitTransactionRequest
+} from 'aptos/dist/generated';
 import EventEmitter from 'eventemitter3';
 
 declare global {

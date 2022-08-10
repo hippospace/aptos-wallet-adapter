@@ -1,9 +1,9 @@
 import { MaybeHexString } from 'aptos';
 import {
-  PendingTransaction,
+  TransactionPayload,
   SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
+  PendingTransaction
+} from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,

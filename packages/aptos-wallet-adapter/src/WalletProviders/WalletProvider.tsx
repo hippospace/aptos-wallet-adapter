@@ -1,4 +1,3 @@
-import { TransactionPayload } from 'aptos/dist/api/data-contracts';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -14,6 +13,7 @@ import {
   WalletReadyState
 } from '../WalletAdapters/BaseAdapter';
 import { Wallet, WalletContext } from './useWallet';
+import { TransactionPayload } from 'aptos/dist/generated';
 
 export interface WalletProviderProps {
   children: ReactNode;

@@ -1,8 +1,3 @@
-import {
-  PendingTransaction,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/api/data-contracts';
 import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
   WalletDisconnectionError,
@@ -18,6 +13,11 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
+import {
+  TransactionPayload,
+  SubmitTransactionRequest,
+  PendingTransaction
+} from 'aptos/dist/generated';
 
 export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
 

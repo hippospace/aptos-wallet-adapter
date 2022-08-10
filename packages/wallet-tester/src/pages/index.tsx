@@ -1,9 +1,12 @@
-import { useWallet } from '@manahippo/aptos-wallet-adapter';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
 import { useEffect, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { AptosAccount, Types } from 'aptos';
+import { TransactionPayload } from 'aptos/dist/generated';
+import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
+import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
   const [loading, setLoading] = useState(false);
@@ -41,16 +44,23 @@ const MainPage = () => {
       const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
       const demoAccount = new AptosAccount();
       await faucetClient.fundAccount(demoAccount.address(), 0);
-      const payload: Types.TransactionPayload = {
+      const txFunction = {
+        module: {
+          address: '0x1',
+          name: 'coin'
+        },
+        name: 'transfer'
+      };
+      const payload: TransactionPayload = {
         type: 'script_function_payload',
-        function: '0x1::coin::transfer',
-        type_arguments: ['0x1::test_coin::TestCoin'],
+        function: txFunction,
+        type_arguments: ['0x1::aptos_coin::AptosCoin'],
         arguments: [demoAccount.address().hex(), '717']
       };
       const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
       const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
-      await aptosClient.waitForTransaction(transactionRes.hash);
-      const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes.hash}`];
+      await aptosClient.waitForTransaction(transactionRes?.hash || '');
+      const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
       setTxLinks(links);
     }
     setTxLoading(false);
@@ -58,7 +68,7 @@ const MainPage = () => {
 
   const renderTxLinks = () => {
     return txLinks.map((link: string, index: number) => (
-      <div className="flex gap-2" key={link}>
+      <div className="flex gap-2 transaction" key={link}>
         <p>{index + 1}.</p>
         <a href={link} target="_blank" rel="noreferrer" className="underline">
           {link}
@@ -88,10 +98,11 @@ const MainPage = () => {
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
           </strong>
-          <Button onClick={() => transferToken()} loading={txLoading}>
+          <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading}>
             Transfer Token
           </Button>
           <Button
+            id="disconnectBtn"
             onClick={() => {
               setTxLinks([]);
               disconnect();
