@@ -2,7 +2,7 @@ import { MaybeHexString } from 'aptos';
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  PendingTransaction
+  HexEncodedBytes
 } from 'aptos/dist/generated';
 import { payloadV1ToV0 } from '../utilities/util';
 import {
@@ -33,12 +33,12 @@ interface MartianAccount {
   isConnected: boolean;
 }
 interface IMartianWallet {
-  connect: (params?: any) => Promise<ConnectMartianAccount>;
+  connect: () => Promise<ConnectMartianAccount>;
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
-  signAndSubmitTransaction(transaction: any): Promise<string>;
-  // signTransaction(transaction: any): Promise<void>;
+  signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
   disconnect(): Promise<void>;
 }
 
@@ -93,7 +93,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
     if (this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.martian) {
+        if (this._provider) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -125,9 +125,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      // console.log(1, window.martian);
       if (this.connected || this.connecting) return;
-      // console.log(2);
       if (
         !(
           this._readyState === WalletReadyState.Loadable ||
@@ -135,37 +133,31 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
         )
       )
         throw new WalletNotReadyError();
-      // console.log(3);
       this._connecting = true;
 
-      const provider = window.martian;
+      const provider = this._provider || window.martian;
       const isConnected = await provider?.isConnected();
-      if (isConnected) await provider?.disconnect();
-      // console.log(4, isConnected);
+      if (isConnected) {
+        await provider?.disconnect();
+      }
       const response = await provider?.connect();
-      // console.log(5, response);
 
       if (!response) {
         throw new WalletNotConnectedError('No connect response');
       }
 
       const walletAccount = await provider?.account();
-      // console.log(6, walletAccount);
       if (walletAccount) {
         this._wallet = {
           ...walletAccount,
           isConnected: true
         };
-        // console.log(6, this._wallet);
       }
-      // console.log(9, this._wallet?.address);
       this.emit('connect', this._wallet?.address || '');
     } catch (error: any) {
-      // console.log(10, error);
-      this.emit('error', error);
+      this.emit('error', new Error(error));
       throw error;
     } finally {
-      // console.log(11);
       this._connecting = false;
     }
   }
@@ -189,11 +181,14 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transactionPyld: TransactionPayload): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider;
-      if (!wallet) throw new WalletNotConnectedError();
-      const tx = await provider?.generateTransaction(wallet.address || '', transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('No transaction');
-      const response = await provider?.signAndSubmitTransaction(tx);
+      const provider = this._provider || window.martian;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const tx = await provider.generateTransaction(
+        wallet.address || '',
+        payloadV1ToV0(transactionPyld)
+      );
+      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      const response = await provider?.signTransaction(tx);
 
       if (!response) {
         throw new WalletSignTransactionError('No response');
@@ -206,13 +201,15 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signAndSubmitTransaction(transactionPyld: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(
+    transactionPyld: TransactionPayload
+  ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(
-        wallet.address.toString() || '',
+        wallet.address || '',
         payloadV1ToV0(transactionPyld)
       );
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
@@ -221,11 +218,9 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       if (!response) {
         throw new WalletSignTransactionError('No response');
       }
-      return {
-        hash: response
-      } as PendingTransaction;
+      return { hash: response };
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new Error(error));
       throw error;
     }
   }

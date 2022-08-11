@@ -1,8 +1,8 @@
 import { MaybeHexString } from 'aptos';
 import {
   TransactionPayload,
-  PendingTransaction,
-  SubmitTransactionRequest
+  SubmitTransactionRequest,
+  HexEncodedBytes
 } from 'aptos/dist/generated';
 import EventEmitter from 'eventemitter3';
 
@@ -68,7 +68,7 @@ export interface WalletAdapterProps<Name extends string = string> {
     transaction: TransactionPayload
     // connection: Connection,
     // options?: SendTransactionOptions
-  ): Promise<PendingTransaction>;
+  ): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(
     transaction: TransactionPayload
     // connection: Connection,
@@ -106,7 +106,9 @@ export abstract class BaseWalletAdapter
 
   abstract connect(): Promise<void>;
   abstract disconnect(): Promise<void>;
-  abstract signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction>;
+  abstract signAndSubmitTransaction(
+    transaction: TransactionPayload
+  ): Promise<{ hash: HexEncodedBytes }>;
 
   abstract signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
 }

@@ -1,8 +1,8 @@
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  PendingTransaction,
-  ScriptFunctionPayload
+  ScriptFunctionPayload,
+  HexEncodedBytes
 } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
@@ -202,7 +202,9 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signAndSubmitTransaction(tempTransaction: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(
+    tempTransaction: TransactionPayload
+  ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
@@ -210,7 +212,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
 
       try {
         // console.log('trans', 1);
-        const response = await new Promise<PendingTransaction>((resolve, reject) => {
+        const response = await new Promise<{ hash: HexEncodedBytes }>((resolve, reject) => {
           // const args = [...transaction.type_arguments, transaction.arguments[0] / 1000];
           // console.log('trans 2', transaction, transaction.function.split(':')[0]);
           wallet.currentProvider.sendAsync(
