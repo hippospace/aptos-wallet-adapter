@@ -11,8 +11,8 @@
     "build": "rm -rf dist; tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0"
+    "react": "^18.X.X || 17.X.X",
+    "react-dom": "^18.1.0 || 17.X.X"
   },
   "devDependencies": {
     "eslint-config-airbnb-typescript": "^17.0.0",
