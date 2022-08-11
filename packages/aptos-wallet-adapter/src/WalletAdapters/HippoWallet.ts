@@ -2,7 +2,7 @@ import { MaybeHexString } from 'aptos';
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  PendingTransaction
+  HexEncodedBytes
 } from 'aptos/dist/generated';
 import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
@@ -102,7 +102,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         };
         this.emit('connect', this._wallet);
       } else if (e.data.method === 'success') {
-        this.emit('success', e.data.detail);
+        this.emit('success', e.data.detail?.hash);
       } else if (e.data.method === 'fail') {
         this.emit('error', new WalletSignAndSubmitMessageError(e.data.error));
       } else if (e.data.method === 'disconnected') {
@@ -168,7 +168,9 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(
+    transaction: TransactionPayload
+  ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const request = new URLSearchParams({
         request: JSON.stringify({
@@ -187,7 +189,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         this.once('success', resolve);
         this.once('error', reject);
       });
-      return promise as PendingTransaction;
+      return promise as { hash: HexEncodedBytes };
     } catch (error: any) {
       this.emit('error', error);
       throw error;

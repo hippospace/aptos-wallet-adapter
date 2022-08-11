@@ -9,16 +9,18 @@ import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
-  const [loading, setLoading] = useState(false);
   const [txLoading, setTxLoading] = useState(false);
   const [txLinks, setTxLinks] = useState<string[]>([]);
-  const { connect, disconnect, account, wallets, signAndSubmitTransaction } = useWallet();
-
-  useEffect(() => {
-    if ((account?.address?.toString() || account?.publicKey?.toString()) && loading) {
-      setLoading(false);
-    }
-  }, [account, loading]);
+  const {
+    connect,
+    disconnect,
+    account,
+    wallets,
+    signAndSubmitTransaction,
+    connecting,
+    connected,
+    disconnecting
+  } = useWallet();
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -26,7 +28,6 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            setLoading(true);
             connect(option.name);
           }}
           id={option.name.split(' ').join('_')}
@@ -39,31 +40,36 @@ const MainPage = () => {
   };
 
   const transferToken = async () => {
-    setTxLoading(true);
-    if (account?.address || account?.publicKey) {
-      const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
-      const demoAccount = new AptosAccount();
-      await faucetClient.fundAccount(demoAccount.address(), 0);
-      const txFunction = {
-        module: {
-          address: '0x1',
-          name: 'coin'
-        },
-        name: 'transfer'
-      };
-      const payload: TransactionPayload = {
-        type: 'script_function_payload',
-        function: txFunction,
-        type_arguments: ['0x1::aptos_coin::AptosCoin'],
-        arguments: [demoAccount.address().hex(), '717']
-      };
-      const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
-      const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
-      await aptosClient.waitForTransaction(transactionRes?.hash || '');
-      const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
-      setTxLinks(links);
+    try {
+      setTxLoading(true);
+      if (account?.address || account?.publicKey) {
+        const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
+        const demoAccount = new AptosAccount();
+        await faucetClient.fundAccount(demoAccount.address(), 0);
+        const txFunction = {
+          module: {
+            address: '0x1',
+            name: 'coin'
+          },
+          name: 'transfer'
+        };
+        const payload: TransactionPayload = {
+          type: 'script_function_payload',
+          function: txFunction,
+          type_arguments: ['0x1::aptos_coin::AptosCoin'],
+          arguments: [demoAccount.address().hex(), '717']
+        };
+        const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
+        const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
+        await aptosClient.waitForTransaction(transactionRes?.hash || '');
+        const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
+        setTxLinks(links);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading(false);
     }
-    setTxLoading(false);
   };
 
   const renderTxLinks = () => {
@@ -78,15 +84,10 @@ const MainPage = () => {
   };
 
   const renderContent = () => {
-    if (loading) {
-      return (
-        <Spin
-          // className="mt-6"
-          indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
-        />
-      );
+    if (connecting || disconnecting) {
+      return <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />;
     }
-    if (account) {
+    if (connected && account) {
       return (
         <div className="flex flex-col gap-2">
           <strong>

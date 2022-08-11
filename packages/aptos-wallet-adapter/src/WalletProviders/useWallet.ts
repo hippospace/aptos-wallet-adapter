@@ -1,7 +1,7 @@
 import {
   TransactionPayload,
-  PendingTransaction,
-  SubmitTransactionRequest
+  SubmitTransactionRequest,
+  HexEncodedBytes
 } from 'aptos/dist/generated';
 import { createContext, useContext } from 'react';
 import {
@@ -31,7 +31,7 @@ export interface WalletContextState {
     transaction: TransactionPayload
     // connection: Connection,
     // options?: SendTransactionOptions
-  ): Promise<PendingTransaction>;
+  ): Promise<{ hash: HexEncodedBytes }>;
 
   signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
   // signAllTransactions: SignerWalletAdapterProps['signAllTransactions'] | undefined;

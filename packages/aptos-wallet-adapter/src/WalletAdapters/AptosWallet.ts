@@ -1,5 +1,5 @@
 import {
-  PendingTransaction,
+  HexEncodedBytes,
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/generated';
@@ -19,12 +19,11 @@ import {
 } from './BaseAdapter';
 
 interface IAptosWallet {
-  requestId: number;
   connect: () => Promise<{ address: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<PendingTransaction>;
-  signTransaction(transaction: any): Promise<void>;
+  signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(transaction: any): Promise<SubmitTransactionRequest>;
   disconnect(): Promise<void>;
 }
 
@@ -121,8 +120,12 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.aptos;
-      const response = await provider?.connect();
+      const isConnected = await this._provider?.isConnected();
+      if (isConnected === true) {
+        await provider?.disconnect();
+      }
 
+      const response = await provider?.connect();
       this._wallet = {
         publicKey: response?.address,
         isConnected: true
@@ -156,44 +159,39 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
-      if (!wallet) throw new WalletNotConnectedError();
+      const provider = this._provider || window.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      try {
-        const provider = this._provider || window.aptos;
-        const response = await provider?.signTransaction(transaction);
-        if (response) {
-          return response;
-        } else {
-          throw new Error('Sign Transaction failed');
-        }
-      } catch (error: any) {
-        throw new WalletSignTransactionError(error?.message, error);
+      const response = await provider?.signTransaction(payloadV1ToV0(transaction));
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Transaction failed');
       }
     } catch (error: any) {
-      this.emit('error', error);
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }
 
-  async signAndSubmitTransaction(transaction: TransactionPayload): Promise<PendingTransaction> {
+  async signAndSubmitTransaction(
+    transaction: TransactionPayload
+  ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      try {
-        const response = await provider?.signAndSubmitTransaction(payloadV1ToV0(transaction));
-        if (response) {
-          return response;
-        } else {
-          throw new Error('Transaction failed');
-        }
-      } catch (error: any) {
-        const errMsg = error.message;
-        throw new WalletSignTransactionError(errMsg);
+      const response = await provider?.signAndSubmitTransaction(payloadV1ToV0(transaction));
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Transaction failed');
       }
     } catch (error: any) {
-      this.emit('error', error);
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }

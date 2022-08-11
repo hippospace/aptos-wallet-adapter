@@ -4,10 +4,11 @@ import {
   // HippoWalletAdapter,
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
-  MartianWalletAdapter
-  // FewchaWalletAdapter
+  MartianWalletAdapter,
+  FewchaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import MainPage from './pages';
+import { message } from 'antd';
 
 const App: React.FC = () => {
   const wallets = useMemo(
@@ -15,8 +16,8 @@ const App: React.FC = () => {
       // new HippoWalletAdapter(),
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
-      new AptosWalletAdapter()
-      // new FewchaWalletAdapter()
+      new AptosWalletAdapter(),
+      new FewchaWalletAdapter()
       // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
     ],
@@ -27,7 +28,8 @@ const App: React.FC = () => {
     <WalletProvider
       wallets={wallets}
       onError={(error: Error) => {
-        console.log('Handle Error Message', error);
+        console.log('wallet errors: ', error);
+        message.error(error.message);
       }}>
       <MainPage />
     </WalletProvider>
