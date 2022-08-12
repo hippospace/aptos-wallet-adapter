@@ -46,16 +46,9 @@ const MainPage = () => {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
         const demoAccount = new AptosAccount();
         await faucetClient.fundAccount(demoAccount.address(), 0);
-        const txFunction = {
-          module: {
-            address: '0x1',
-            name: 'coin'
-          },
-          name: 'transfer'
-        };
         const payload: TransactionPayload = {
           type: 'script_function_payload',
-          function: txFunction,
+          function: '0x1::coin::transfer',
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
           arguments: [demoAccount.address().hex(), '717']
         };
