@@ -64,25 +64,12 @@ export interface WalletAdapterProps<Name extends string = string> {
   publicAccount: AccountKeys;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
-  signAndSubmitTransaction(
-    transaction: TransactionPayload
-    // connection: Connection,
-    // options?: SendTransactionOptions
-  ): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(
-    transaction: TransactionPayload
-    // connection: Connection,
-    // options?: SendTransactionOptions
-  ): Promise<SubmitTransactionRequest>;
+  signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &
   EventEmitter<WalletAdapterEvents>;
-
-export interface SignerWalletAdapterProps {
-  // signTransaction(transaction: Transaction): Promise<Transaction>;
-  // signAllTransactions(transaction: Transaction[]): Promise<Transaction[]>;
-}
 
 export abstract class BaseWalletAdapter
   extends EventEmitter<WalletAdapterEvents>

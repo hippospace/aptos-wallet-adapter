@@ -1,8 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const puppeteer = require('puppeteer');
 const extensionId = 'ebfidpplhabeedpnhjnobghokpiioolj';
-const version = '0.3.7_0';
-const extentionPath = `~/Library/Application\ Support/Google/Chrome/Profile\ 9/Extensions/${extensionId}/${version}`;
+const extentionPath = process.env.FEWCHA_EXT_PATH;
 
 const bootstrap = async (options = {}) => {
   const { devtools = false, slowMo = false, appUrl } = options;
@@ -17,15 +16,15 @@ const bootstrap = async (options = {}) => {
   const appPage = await browser.newPage();
   await appPage.goto(appUrl, { waitUntil: 'load' });
 
-  // const extPage = await browser.newPage();
-  // const extensionUrl = `chrome-extension://${extensionId}/index.html`;
-  // await extPage.goto(extensionUrl, { waitUntil: 'domcontentloaded' });
+  const extPage = await browser.newPage();
+  const extensionUrl = `chrome-extension://${extensionId}/index.html`;
+  await extPage.goto(extensionUrl, { waitUntil: 'domcontentloaded' });
 
   return {
     appPage,
-    browser
-    // extensionUrl,
-    // extPage
+    browser,
+    extensionUrl,
+    extPage
   };
 };
 

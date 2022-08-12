@@ -17,7 +17,7 @@ export interface Wallet {
 }
 
 export interface WalletContextState {
-  autoConnect: boolean;
+  // autoConnect: boolean;
   wallets: Wallet[];
   wallet: Wallet | null;
   account: AccountKeys | null;
@@ -27,19 +27,12 @@ export interface WalletContextState {
   select(walletName: WalletName): void;
   connect(walletName: string): Promise<void>;
   disconnect(): Promise<void>;
-  signAndSubmitTransaction(
-    transaction: TransactionPayload
-    // connection: Connection,
-    // options?: SendTransactionOptions
-  ): Promise<{ hash: HexEncodedBytes }>;
-
+  signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
-  // signAllTransactions: SignerWalletAdapterProps['signAllTransactions'] | undefined;
-  // signMessage: MessageSignerWalletAdapterProps['signMessage'] | undefined;
 }
 
 const DEFAULT_CONTEXT = {
-  autoConnect: false,
+  // autoConnect: false,
   connecting: false,
   connected: false,
   disconnecting: false
