@@ -5,7 +5,7 @@ describe('test hippo wallet extension', () => {
 
   beforeAll(async () => {
     const context = await bootstrap({
-      appUrl: 'http://localhost:3000' /*, slowMo: 50, devtools: true*/
+      appUrl: process.env.TESRTER_PATH /*, slowMo: 50, devtools: true*/
     });
 
     extPage = context.extPage;

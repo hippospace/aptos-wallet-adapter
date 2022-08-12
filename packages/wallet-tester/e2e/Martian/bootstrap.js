@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const puppeteer = require('puppeteer');
-const extensionId = 'efbglgofoippbgcjepnhiblaibcnclgk';
-const version = '0.1.5_0';
-const extentionPath = `~/Library/Application\ Support/Google/Chrome/Profile\ 9/Extensions/${extensionId}/${version}`;
+const extentionPath = process.env.MARTIAN_EXT_PATH;
 
 const bootstrap = async (options = {}) => {
   const { devtools = false, slowMo = false, appUrl } = options;

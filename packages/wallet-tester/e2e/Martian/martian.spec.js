@@ -7,7 +7,7 @@ describe('test hippo wallet extension', () => {
 
   beforeAll(async () => {
     const context = await bootstrap({
-      appUrl: 'http://localhost:3030' /*, slowMo: 50, devtools: true*/
+      appUrl: process.env.TESRTER_PATH /*, slowMo: 50, devtools: true*/
     });
 
     // extPage = context.extPage;
@@ -15,7 +15,7 @@ describe('test hippo wallet extension', () => {
     browser = context.browser;
   });
 
-  describe('fewcha wallet extension', () => {
+  describe('martian wallet extension', () => {
     it('should create a new wallet successfully', async () => {
       const pages = await browser.pages();
 

@@ -1,5 +1,6 @@
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { TransactionPayload } from 'aptos/dist/generated';
 import {
   WalletError,
   WalletNotConnectedError,
@@ -13,12 +14,10 @@ import {
   WalletReadyState
 } from '../WalletAdapters/BaseAdapter';
 import { Wallet, WalletContext } from './useWallet';
-import { TransactionPayload } from 'aptos/dist/generated';
 
 export interface WalletProviderProps {
   children: ReactNode;
   wallets: WalletAdapter[];
-  autoConnect?: boolean;
   onError?: (error: WalletError) => void;
   localStorageKey?: string;
 }
@@ -38,7 +37,6 @@ const initialState: {
 export const WalletProvider: FC<WalletProviderProps> = ({
   children,
   wallets: adapters,
-  autoConnect = false,
   onError,
   localStorageKey = 'walletName'
 }) => {
@@ -140,7 +138,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         adapter.off('error', handleError);
       };
     }
-    return () => null;
   }, [adapter, handleConnect, handleDisconnect, handleError]);
 
   // When the adapter changes, disconnect the old one
@@ -243,7 +240,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   return (
     <WalletContext.Provider
       value={{
-        autoConnect,
         wallets,
         wallet,
         account,
@@ -254,10 +250,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         connect,
         disconnect,
         signAndSubmitTransaction,
-        // sendTransaction,
         signTransaction
-        // signAllTransactions,
-        // signMessage
       }}>
       {children}
     </WalletContext.Provider>
