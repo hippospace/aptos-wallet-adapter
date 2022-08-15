@@ -1,90 +1,76 @@
 /* eslint-disable @typescript-eslint/quotes */
 const { bootstrap } = require('./bootstrap');
-const walletId = '#MartianWallet';
+const walletId = '#Aptos_Wallet';
 
-describe('test martian wallet extension', () => {
-  let appPage, browser;
+describe('test aptos wallet extension', () => {
+  let extPage, appPage, browser;
 
   beforeAll(async () => {
     const context = await bootstrap({
-      appUrl: process.env.TESRTER_PATH /*, slowMo: 50, devtools: true*/
+      appUrl: 'http://localhost:3000' /*, slowMo: 50, devtools: true*/
     });
 
+    extPage = context.extPage;
     appPage = context.appPage;
     browser = context.browser;
   });
 
-  describe('martian wallet extension', () => {
+  describe('aptos wallet extension', () => {
     it('should create a new wallet successfully', async () => {
-      const pages = await browser.pages();
-
-      const onboardingPage = await pages[pages.length - 1];
-      await onboardingPage.bringToFront();
-
-      // Wait until the page element loaded
-      await onboardingPage.waitForSelector('button[type="button"]');
-
-      // Create new wallet
-      await onboardingPage.$eval('button[type="button"]', (check) => check.click());
-
-      // Wait until password field loaded
-      await onboardingPage.waitForSelector('input[type="password"]');
-      await onboardingPage.type('input[type="password"]', '12345678');
-      const allPasswordFields = await onboardingPage.$$('input[type="password"]');
-      const confirmPassword = allPasswordFields[allPasswordFields.length - 1];
-      await confirmPassword.type('12345678');
-      await onboardingPage.$eval('input[type="checkbox"]', (check) => check.click());
-      await onboardingPage.$$eval('button[type="button"]', (elements) =>
-        elements[elements.length - 1].click()
-      );
-
-      // Pass mnemonic page
-      await onboardingPage.waitForFunction("document.querySelectorAll('p').length === 6");
-      await onboardingPage.$$eval('button[type="button"]', (elements) =>
-        elements[elements.length - 1].click()
-      );
-
-      // Pass shortcut page
-      await onboardingPage.waitForFunction(
-        `document.querySelectorAll('button[type="button"]').length === 3`
-      );
-      await onboardingPage.$$eval('button[type="button"]', (elements) =>
-        elements[elements.length - 1].click()
-      );
-
-      // Pass finish page
-      await onboardingPage.waitForFunction(
-        `document.querySelectorAll('button[type="button"]').length === 2`
-      );
-      await onboardingPage.$$eval('button[type="button"]', (elements) =>
-        elements[elements.length - 1].click()
-      );
-
-      // Request Faucet
-      const targets = await browser.targets();
-      const extensionTarget = targets.find((target) => target.type() === 'service_worker');
-      const partialExtensionUrl = extensionTarget.url() || '';
-      const [, , extensionId] = partialExtensionUrl.split('/');
-
-      const extPage = await browser.newPage();
-      const extensionUrl = `chrome-extension://${extensionId}/index.html`;
-      await extPage.goto(extensionUrl, { waitUntil: 'domcontentloaded' });
       await extPage.bringToFront();
 
-      // Login
-      await extPage.waitForSelector('input[type="password"]');
-      await extPage.type('input[type="password"]', '12345678');
-      await extPage.click('button');
+      // Wait until the page element loaded
+      await extPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
 
-      await extPage.waitForFunction("document.querySelectorAll('button').length === 2");
-      await extPage.click('button');
+      // Create new wallet
+      await extPage.$$eval('button[type="button"]', (elements) => elements[0].click());
 
-      await extPage.waitForFunction("document.querySelector('h1').innerText.includes('20000')");
-      const text = await extPage.$eval('h1', (e) => e.innerText);
-      expect(text).toEqual('20000');
+      // Wait until password field loaded
+      await extPage.waitForSelector('input[name="initialPassword"]');
+      await extPage.type('input[name="initialPassword"]', 'TT23456!!');
+      await extPage.type('input[name="confirmPassword"]', 'TT23456!!');
+      await extPage.$eval('input[name="termsOfService"]', (check) => check.parentElement.click());
+      await extPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 4`
+      );
+      await extPage.$$eval('button[type="button"]', (elements) =>
+        elements[elements.length - 1].click()
+      );
+
+      // Wait until mnemonic loaded
+      await extPage.waitForFunction("document.querySelectorAll('input[readOnly]').length === 12");
+      await extPage.$eval('input[name="secretRecoveryPhrase"]', (check) =>
+        check.parentElement.click()
+      );
+      await extPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await extPage.$$eval('button[type="button"]', (elements) =>
+        elements[elements.length - 1].click()
+      );
+
+      // Wait for Finish button
+      await extPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 1`
+      );
+      await extPage.$$eval('button[type="button"]', (elements) => elements[0].click());
+
+      // wait for faucet
+      await extPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 6`
+      );
+      await extPage.$$eval('button[type="button"]', (elements) => elements[0].click());
+      await extPage.waitForFunction(
+        "document.querySelector('h2').innerText.includes('5,000.0000')"
+      );
+      const text = await extPage.$eval('h2', (e) => e.innerText);
+      expect(text).toEqual('5,000.0000');
     });
 
     it('should connect to the extension', async () => {
+      await extPage.close();
       await appPage.bringToFront();
       const popupPagePromise = new Promise((x) =>
         browser.once('targetcreated', (target) => x(target.page()))
@@ -97,8 +83,12 @@ describe('test martian wallet extension', () => {
       await popupPage.bringToFront();
 
       // Wait until connection modal loaded
-      await popupPage.waitForFunction("document.querySelectorAll('div').length === 12");
-      await popupPage.$$eval('div', (elements) => elements[9].click());
+      await popupPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await popupPage.$$eval('button[type="button"]', (elements) =>
+        elements[elements.length - 1].click()
+      );
 
       await appPage.waitForSelector('#address');
       const addressField = await appPage.$('#address');
@@ -108,7 +98,7 @@ describe('test martian wallet extension', () => {
       const address = await addressField.evaluate((e) => e.innerText);
       const publicKey = await publicKeyField.evaluate((e) => e.innerText);
       const authKey = await authKeyField.evaluate((e) => e.innerText);
-      expect(address).not.toBe('');
+      expect(address).toBe('');
       expect(publicKey).not.toBe('');
       expect(authKey).toBe('');
     });
@@ -126,8 +116,12 @@ describe('test martian wallet extension', () => {
       await popupPage.bringToFront();
 
       // Wait until confirmation modal loaded
-      await popupPage.waitForFunction("document.querySelectorAll('div').length === 13");
-      await popupPage.$$eval('div', (elements) => elements[10].click());
+      await popupPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await popupPage.$$eval('button[type="button"]', (elements) =>
+        elements[elements.length - 1].click()
+      );
 
       await appPage.waitForSelector('.transaction');
       const txLength = await appPage.$$eval('.transaction', (ele) => ele.length);
@@ -158,15 +152,17 @@ describe('test martian wallet extension', () => {
       await popupPage.bringToFront();
 
       // Wait until connection modal loaded
-      await popupPage.waitForFunction("document.querySelectorAll('div').length === 12");
-      await popupPage.$$eval('div', (elements) => elements[10].click());
+      await popupPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await popupPage.$$eval('button[type="button"]', (elements) => elements[0].click());
 
       await appPage.waitForSelector('.ant-message-custom-content.ant-message-error');
       const errMsg = await appPage.$$eval(
         '.ant-message-custom-content.ant-message-error span',
         (elements) => elements[elements.length - 1].innerText
       );
-      expect(errMsg).toEqual('User rejected the request');
+      expect(errMsg).toEqual('The user rejected the request');
     });
 
     it('should connect to the extension again successfully after disconnect', async () => {
@@ -182,8 +178,12 @@ describe('test martian wallet extension', () => {
       await popupPage.bringToFront();
 
       // Wait until connection modal loaded
-      await popupPage.waitForFunction("document.querySelectorAll('div').length === 12");
-      await popupPage.$$eval('div', (elements) => elements[9].click());
+      await popupPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await popupPage.$$eval('button[type="button"]', (elements) =>
+        elements[elements.length - 1].click()
+      );
 
       await appPage.waitForSelector('#address');
       const addressField = await appPage.$('#address');
@@ -193,9 +193,9 @@ describe('test martian wallet extension', () => {
       const address = await addressField.evaluate((e) => e.innerText);
       const publicKey = await publicKeyField.evaluate((e) => e.innerText);
       const authKey = await authKeyField.evaluate((e) => e.innerText);
-      expect(address).not.toBe('');
+      expect(address).toBe('');
       expect(publicKey).not.toBe('');
-      expect(authKey).not.toBe(null);
+      expect(authKey).toBe('');
     });
 
     it('should display user reject transaction', async () => {
@@ -211,15 +211,17 @@ describe('test martian wallet extension', () => {
       await popupPage.bringToFront();
 
       // Wait until confirmation modal loaded
-      await popupPage.waitForFunction("document.querySelectorAll('div').length === 13");
-      await popupPage.$$eval('div', (elements) => elements[11].click());
+      await popupPage.waitForFunction(
+        `document.querySelectorAll('button[type="button"]').length === 2`
+      );
+      await popupPage.$$eval('button[type="button"]', (elements) => elements[0].click());
 
       await appPage.waitForSelector('.ant-message-custom-content.ant-message-error');
       const errMsg = await appPage.$$eval(
         '.ant-message-custom-content.ant-message-error span',
         (elements) => elements[elements.length - 1].innerText
       );
-      expect(errMsg).toEqual('User Rejected the request');
+      expect(errMsg).toEqual('The user rejected the request');
     });
   });
 

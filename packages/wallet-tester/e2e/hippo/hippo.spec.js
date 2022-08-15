@@ -1,6 +1,6 @@
 const { bootstrap } = require('./bootstrap');
 
-describe('test hippo wallet extension', () => {
+xdescribe('test hippo wallet extension', () => {
   let extPage, appPage, browser;
 
   beforeAll(async () => {
@@ -13,7 +13,7 @@ describe('test hippo wallet extension', () => {
     browser = context.browser;
   });
 
-  describe('hippo wallet extension', () => {
+  xdescribe('hippo wallet extension', () => {
     it('should create a new wallet successfully', async () => {
       await extPage.bringToFront();
 

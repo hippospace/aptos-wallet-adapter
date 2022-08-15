@@ -52,6 +52,28 @@ const MainPage = () => {
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
           arguments: [demoAccount.address().hex(), '717']
         };
+        const payloadFewcha: TransactionPayload = {
+          type: 'script_function_payload',
+          function:
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::one_step_route',
+          type_arguments: [
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WBTC',
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WUSDC',
+            '0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::registry::E0'
+          ],
+          arguments: [2, 1, true, '1000000', '9900000000']
+        };
+        const payloadAptos: TransactionPayload = {
+          type: 'script_function_payload',
+          function:
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::one_step_route',
+          type_arguments: [
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WBTC',
+            '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WUSDC',
+            '0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::registry::E0'
+          ],
+          arguments: [2, 1, true, '1000000', '9900000000']
+        };
         const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
         const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
