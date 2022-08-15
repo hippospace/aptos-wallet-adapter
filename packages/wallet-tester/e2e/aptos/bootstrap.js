@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const puppeteer = require('puppeteer');
-const extentionPath = process.env.FEWCHA_EXT_PATH;
+const extentionPath = process.env.APTOS_EXT_PATH;
 
 const bootstrap = async (options = {}) => {
   const { devtools = false, slowMo = false, appUrl } = options;

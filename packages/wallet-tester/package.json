@@ -24,9 +24,11 @@
     "dev": "react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "e2e": "jest --detectOpenHandles"
+    "e2e": "jest --detectOpenHandles",
+    "e2e:fewcha": "jest --detectOpenHandles -- fewcha.spec.js",
+    "e2e:martian": "jest --detectOpenHandles -- martian.spec.js",
+    "e2e:aptos": "jest --detectOpenHandles -- aptos.spec.js"
   },
   "eslintConfig": {
     "extends": [
