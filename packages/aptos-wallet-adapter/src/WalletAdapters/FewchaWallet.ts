@@ -28,8 +28,6 @@ interface FewchaWindow extends Window {
 
 declare const window: FewchaWindow;
 
-const defaultWeb3 = new Web3(new Web3Provider(window.fewcha));
-
 export interface FewchaAdapterConfig {
   provider?: string;
   // network?: WalletAdapterNetwork;
@@ -61,6 +59,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }: FewchaAdapterConfig = {}) {
     super();
 
+    const defaultWeb3 = new Web3(new Web3Provider(window.fewcha));
     this._provider = defaultWeb3.action;
     // this._network = network;
     this._timeout = timeout;
