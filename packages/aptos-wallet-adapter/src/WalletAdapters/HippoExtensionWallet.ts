@@ -73,13 +73,13 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   }: HippoExtensionWalletAdapterConfig = {}) {
     super();
 
-    this._provider = window.hippoWallet;
+    this._provider = typeof window !== 'undefined' ? window.hippoWallet : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
-    if (this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.hippoWallet) {
           this._readyState = WalletReadyState.Installed;

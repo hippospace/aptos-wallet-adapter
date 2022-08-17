@@ -85,13 +85,13 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }: MartianWalletAdapterConfig = {}) {
     super();
 
-    this._provider = window.martian;
+    this._provider = typeof window !== 'undefined' ? window.martian : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
-    if (this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (this._provider) {
           this._readyState = WalletReadyState.Installed;

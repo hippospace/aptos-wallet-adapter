@@ -1,15 +1,20 @@
 import { useCallback, useState } from 'react';
+import { useSSR } from './useSSR';
 
 export const useLocalStorage = () => {
+  const { isClient } = useSSR();
   const useLocalStorageState = <T>(
     key: string,
     defaultState: T,
     session?: boolean
   ): [T, (T: any) => void] => {
-    const storage = session ? sessionStorage : localStorage;
+    let storage: undefined | Storage;
+    if (isClient) {
+      storage = session ? sessionStorage : localStorage;
+    }
     const [state, setState] = useState(() => {
       try {
-        let storedState = storage.getItem(key);
+        let storedState = storage?.getItem(key);
         if (storedState) {
           return JSON.parse(storedState || '');
         }
@@ -25,9 +30,9 @@ export const useLocalStorage = () => {
       (newState: any) => {
         setState(newState);
         if (newState === null) {
-          storage.removeItem(key);
+          storage?.removeItem(key);
         } else {
-          storage.setItem(key, JSON.stringify(newState));
+          storage?.setItem(key, JSON.stringify(newState));
         }
       },
       [key, storage]

@@ -59,15 +59,15 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }: FewchaAdapterConfig = {}) {
     super();
 
-    const defaultWeb3 = new Web3(new Web3Provider(window.fewcha));
-    this._provider = defaultWeb3.action;
+    this._provider =
+      typeof window !== 'undefined' ? new Web3(new Web3Provider(window.fewcha)).action : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
     // this._readyState = WalletReadyState.Installed;
 
-    if (this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.fewcha) {
           this._readyState = WalletReadyState.Installed;

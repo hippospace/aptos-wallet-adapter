@@ -1,3 +1,4 @@
+export const NightlyWallet = () => {};
 // import { TxnBuilderTypes, BCS } from 'aptos';
 // import {
 //   PendingTransaction,

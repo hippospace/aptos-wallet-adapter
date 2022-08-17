@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   TransactionPayload,
   SubmitTransactionRequest,
@@ -74,13 +76,13 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
   }: MultiMaskWalletAdapterConfig = {}) {
     super();
 
-    this._provider = window.aptosWeb3;
+    this._provider = typeof window !== 'undefined' ? window.aptosWeb3 : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
-    if (this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (this._provider) {
           this._readyState = WalletReadyState.Installed;
@@ -218,7 +220,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
           wallet.currentProvider.sendAsync(
             {
               method: 'eth_sendTransaction',
-              params: []//[{ from: transaction.function.name.split(':')[0] }]
+              params: [] //[{ from: transaction.function.name.split(':')[0] }]
             },
             (error, resp: any) => {
               console.log('signTransaction', error, resp);
