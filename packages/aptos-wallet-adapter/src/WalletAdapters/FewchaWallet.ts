@@ -10,15 +10,16 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  TransactionPayloadScriptFunctionGeneric,
+  TransactionEntryFunctionPayloadOfRawArguments,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
+import { SubmitTransactionRequest, HexEncodedBytes } from 'aptos/dist/generated';
 import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
+  RawTransaction,
+  TransactionPayloadEntryFunction
+} from 'aptos/dist/transaction_builder/aptos_types';
 
 export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
 
@@ -163,15 +164,34 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(
+    payload: TransactionPayloadScriptFunctionGeneric
+  ): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
-
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(payloadV1ToV0(transaction));
+
+      let tx;
+      let response;
+      if (payload instanceof TransactionPayloadEntryFunction) {
+        tx = await provider.generateRawTransaction(wallet.address || '', payload);
+      } else if (payload instanceof TransactionEntryFunctionPayloadOfRawArguments) {
+        tx = await provider.generateRawTransaction(wallet.address || '', payload.toBCSPayload());
+      } else {
+        tx = await provider.generateTransaction(payload);
+      }
+
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signTransaction(tx);
+
+      if (
+        payload instanceof TransactionPayloadEntryFunction ||
+        payload instanceof TransactionEntryFunctionPayloadOfRawArguments
+      ) {
+        response = provider.generateBCSTransaction(tx.data as RawTransaction);
+      } else {
+        response = await provider.signTransaction(tx.data as SubmitTransactionRequest);
+      }
 
       if (!response) {
         throw new WalletSignTransactionError('No response');
@@ -186,23 +206,45 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
+    payload: TransactionPayloadScriptFunctionGeneric
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
-
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(payloadV1ToV0(transaction));
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signAndSubmitTransaction(tx.data);
-      if (response.status === 401) {
+
+      let tx;
+      let status;
+      let hash;
+      if (payload instanceof TransactionPayloadEntryFunction) {
+        tx = await provider.generateRawTransaction(wallet.address || '', payload);
+        const signedTx = await provider.generateBCSTransaction(tx.data);
+        ({
+          data: { hash },
+          status
+        } = await provider.submitSignedBCSTransaction(signedTx.data));
+      } else if (payload instanceof TransactionEntryFunctionPayloadOfRawArguments) {
+        tx = await provider.generateRawTransaction(wallet.address || '', payload.toBCSPayload());
+        const signedTx = await provider.generateBCSTransaction(tx.data as RawTransaction);
+        ({
+          data: { hash },
+          status
+        } = await provider.submitSignedBCSTransaction(signedTx.data));
+      } else {
+        tx = await provider.generateTransaction(payload);
+        ({ data: hash, status } = await provider.signAndSubmitTransaction(
+          tx.data as SubmitTransactionRequest
+        ));
+      }
+
+      if (status === 401) {
         throw new WalletSignTransactionError('User has rejected the transaction');
-      } else if (response.status !== 200) {
+      } else if (status !== 200) {
         throw new WalletSignTransactionError('Transaction issue');
       }
+
       return {
-        hash: response.data
+        hash
       };
     } catch (error: any) {
       const errMsg = error instanceof Error ? error.message : error.response.data.message;

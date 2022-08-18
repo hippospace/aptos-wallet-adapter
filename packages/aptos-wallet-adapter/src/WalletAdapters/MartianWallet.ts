@@ -1,10 +1,11 @@
-import { MaybeHexString } from 'aptos';
+import { MaybeHexString, TxnBuilderTypes } from 'aptos';
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  HexEncodedBytes
+  HexEncodedBytes,
+  PendingTransaction
 } from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
+import { TransactionPayloadEntryFunction } from 'aptos/dist/transaction_builder/aptos_types';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -15,6 +16,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  TransactionPayloadScriptFunctionGeneric,
+  TransactionEntryFunctionPayloadOfRawArguments,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -37,8 +40,13 @@ interface IMartianWallet {
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
+  generateBCSTransaction(
+    sender: MaybeHexString,
+    rawTxn: TxnBuilderTypes.RawTransaction
+  ): Uint8Array;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
   signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  submitSignedBCSTransaction(signedTxn: Uint8Array): Promise<PendingTransaction>;
   disconnect(): Promise<void>;
 }
 
@@ -178,17 +186,33 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(
+    transactionPyld: TransactionPayloadScriptFunctionGeneric
+  ): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(
-        wallet.address || '',
-        payloadV1ToV0(transactionPyld)
-      );
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signTransaction(tx);
+
+      let tx;
+      let response;
+      if (transactionPyld instanceof TransactionPayloadEntryFunction) {
+        tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
+      } else if (transactionPyld instanceof TransactionEntryFunctionPayloadOfRawArguments) {
+        // TODO: change to BCS as default in future
+        tx = await provider.generateTransaction(
+          wallet.address || '',
+          transactionPyld.toJSONPayload()
+        );
+      } else {
+        tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
+      }
+
+      if (transactionPyld instanceof TransactionPayloadEntryFunction) {
+        response = provider.generateBCSTransaction(wallet.address || '', tx);
+      } else {
+        response = await provider.signTransaction(tx);
+      }
 
       if (!response) {
         throw new WalletSignTransactionError('No response');
@@ -202,23 +226,37 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload
+    transactionPyld: TransactionPayloadScriptFunctionGeneric
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(
-        wallet.address || '',
-        payloadV1ToV0(transactionPyld)
-      );
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signAndSubmitTransaction(tx);
 
-      if (!response) {
-        throw new WalletSignTransactionError('No response');
+      let tx;
+      let hash;
+      if (transactionPyld instanceof TransactionPayloadEntryFunction) {
+        tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
+      } else if (transactionPyld instanceof TransactionEntryFunctionPayloadOfRawArguments) {
+        // TODO: change to BCS as default in future
+        tx = await provider.generateTransaction(
+          wallet.address || '',
+          transactionPyld.toJSONPayload()
+        );
+      } else {
+        tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
       }
-      return { hash: response };
+
+      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+
+      if (transactionPyld instanceof TransactionPayloadEntryFunction) {
+        const signTx = provider.generateBCSTransaction(wallet.address || '', tx);
+        ({ hash } = await provider.submitSignedBCSTransaction(signTx));
+      } else {
+        hash = await provider.signAndSubmitTransaction(tx);
+      }
+
+      return { hash };
     } catch (error: any) {
       this.emit('error', new Error(error));
       throw error;

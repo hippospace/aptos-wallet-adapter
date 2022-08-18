@@ -1,9 +1,12 @@
-import { MaybeHexString } from 'aptos';
+import { payloadArg, U128, U64, U8 } from '@manahippo/move-to-ts';
+import { BCS, MaybeHexString, TxnBuilderTypes } from 'aptos';
 import {
-  TransactionPayload,
   SubmitTransactionRequest,
-  HexEncodedBytes
+  HexEncodedBytes,
+  TransactionPayload_EntryFunctionPayload
 } from 'aptos/dist/generated';
+import { TransactionPayloadEntryFunction } from 'aptos/dist/transaction_builder/aptos_types';
+import { Bytes, Seq, Serializer } from 'aptos/dist/transaction_builder/bcs';
 import EventEmitter from 'eventemitter3';
 
 declare global {
@@ -11,6 +14,79 @@ declare global {
     hippo: any;
   }
 }
+
+interface Serializable {
+  serialize(serializer: Serializer): void;
+}
+
+type RawArgument = U8 | U64 | U128 | boolean | string | Serializable | Uint8Array;
+
+export class TransactionEntryFunctionPayloadOfRawArguments {
+  constructor(
+    public payload: Omit<TransactionPayload_EntryFunctionPayload, 'arguments'> & {
+      arguments: RawArgument[];
+    }
+  ) {
+    if (!/^0x[0-9a-f]+::[\w\d_-]+::[\w\d_-]+$/.test(this.payload.function)) {
+      throw new Error('Incorrect function argument');
+    }
+  }
+
+  toJSONPayload(): TransactionPayload_EntryFunctionPayload {
+    return {
+      type: 'script_function_payload',
+      function: this.payload.function,
+      type_arguments: this.payload.type_arguments,
+      arguments: this.payload.arguments.map((arg) => payloadArg(arg))
+    };
+  }
+
+  toBCSPayload(): TransactionPayloadEntryFunction {
+    const tyArgs = this.payload.type_arguments.map(
+      (ta) => new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(ta))
+    );
+
+    const parts = this.payload.function.split('::');
+    const func = parts.pop()!;
+    const module = parts.join('::');
+    return new TxnBuilderTypes.TransactionPayloadEntryFunction(
+      TxnBuilderTypes.EntryFunction.natural(
+        module,
+        func,
+        tyArgs,
+        TransactionEntryFunctionPayloadOfRawArguments.rawArgumentsToBytesSeq(this.payload.arguments)
+      )
+    );
+  }
+
+  static rawArgumentsToBytesSeq(rawArguments: RawArgument[]): Seq<Bytes> {
+    return rawArguments.map((ra) => {
+      if (ra instanceof U8) {
+        return BCS.bcsSerializeU8(ra.toJsNumber());
+      } else if (ra instanceof U64) {
+        return BCS.bcsSerializeUint64(ra.toBigInt());
+      } else if (ra instanceof U128) {
+        return BCS.bcsSerializeU128(ra.toBigInt());
+      } else if (typeof ra === 'boolean') {
+        return BCS.bcsSerializeBool(ra);
+      } else if (typeof ra === 'string') {
+        return BCS.bcsSerializeStr(ra);
+      } else if (ra instanceof Uint8Array) {
+        // support serialize beforehand
+        return ra;
+      } else if (typeof (ra as Serializable).serialize === 'function') {
+        return BCS.bcsToBytes(ra as Serializable);
+      } else {
+        throw new Error(`Invalid raw argument: ${ra}`);
+      }
+    });
+  }
+}
+
+export type TransactionPayloadScriptFunctionGeneric =
+  | TransactionPayload_EntryFunctionPayload
+  | TransactionPayloadEntryFunction
+  | TransactionEntryFunctionPayloadOfRawArguments;
 
 export { EventEmitter };
 
@@ -64,8 +140,12 @@ export interface WalletAdapterProps<Name extends string = string> {
   publicAccount: AccountKeys;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
-  signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  signAndSubmitTransaction(
+    payload: TransactionPayloadScriptFunctionGeneric
+  ): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(
+    payload: TransactionPayloadScriptFunctionGeneric
+  ): Promise<SubmitTransactionRequest>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &
@@ -94,10 +174,12 @@ export abstract class BaseWalletAdapter
   abstract connect(): Promise<void>;
   abstract disconnect(): Promise<void>;
   abstract signAndSubmitTransaction(
-    transaction: TransactionPayload
+    transaction: TransactionPayloadScriptFunctionGeneric
   ): Promise<{ hash: HexEncodedBytes }>;
 
-  abstract signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  abstract signTransaction(
+    transaction: TransactionPayloadScriptFunctionGeneric
+  ): Promise<SubmitTransactionRequest>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {

@@ -1,9 +1,4 @@
-import {
-  HexEncodedBytes,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
+import { HexEncodedBytes, SubmitTransactionRequest } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -14,6 +9,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  TransactionPayloadScriptFunctionGeneric,
+  TransactionEntryFunctionPayloadOfRawArguments,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -156,13 +153,18 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(
+    payload: TransactionPayloadScriptFunctionGeneric
+  ): Promise<SubmitTransactionRequest> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(payloadV1ToV0(transaction));
+      const response = await this.tryPayloadWithAction(
+        payload,
+        provider.signTransaction.bind(this)
+      );
       if (response) {
         return response;
       } else {
@@ -176,14 +178,18 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
+    payload: TransactionPayloadScriptFunctionGeneric
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signAndSubmitTransaction(payloadV1ToV0(transaction));
+      const response = await this.tryPayloadWithAction(
+        payload,
+        provider.signAndSubmitTransaction.bind(provider)
+      );
+
       if (response) {
         return response;
       } else {
@@ -194,5 +200,24 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
+  }
+
+  private async tryPayloadWithAction<T>(
+    payload: TransactionPayloadScriptFunctionGeneric,
+    act: (payload: any) => Promise<T>
+  ) {
+    let response: T;
+    if (payload instanceof TransactionEntryFunctionPayloadOfRawArguments) {
+      try {
+        response = await act(payload.toBCSPayload());
+      } catch (error) {
+        // TODO: check if the error is caused by incorrect payload type
+        response = await act(payload.toJSONPayload());
+      }
+    } else {
+      // when payload is either BCS or JSON format
+      response = await act(payload);
+    }
+    return response;
   }
 }

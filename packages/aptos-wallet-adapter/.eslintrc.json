@@ -16,7 +16,8 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:prettier/recommended",
-    "airbnb-typescript"
+    "airbnb-typescript",
+    "prettier" // for eslint-config-prettier, make sure it goes last
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
