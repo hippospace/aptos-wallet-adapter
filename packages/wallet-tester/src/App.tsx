@@ -5,7 +5,8 @@ import {
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
-  FewchaWalletAdapter
+  FewchaWalletAdapter,
+  PontemWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import MainPage from './pages';
 import { message } from 'antd';
@@ -17,7 +18,8 @@ const App: React.FC = () => {
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
-      new FewchaWalletAdapter()
+      new FewchaWalletAdapter(),
+      new PontemWalletAdapter()
       // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
     ],

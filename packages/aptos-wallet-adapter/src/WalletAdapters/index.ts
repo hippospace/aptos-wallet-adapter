@@ -5,4 +5,5 @@ export * from './HippoWallet';
 export * from './MartianWallet';
 export * from './MultiMaskWallet';
 export * from './FewchaWallet';
+export * from './PontemWallet';
 // export * from './NightlyWallet';
