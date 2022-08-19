@@ -1,0 +1,18 @@
+{
+  "name": "@manahippo/auto-tester",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "e2e": "jest --detectOpenHandles",
+    "e2e:fewcha": "jest --detectOpenHandles -- fewcha.spec.js",
+    "e2e:martian": "jest --detectOpenHandles -- martian.spec.js",
+    "e2e:aptos": "jest --detectOpenHandles -- aptos.spec.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^28.1.3",
+    "puppeteer": "^15.5.0"
+  }
+}
