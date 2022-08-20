@@ -3,8 +3,8 @@
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  ScriptFunctionPayload,
-  HexEncodedBytes
+  HexEncodedBytes,
+  EntryFunctionPayload
 } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
@@ -210,7 +210,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
     try {
       const wallet = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
-      const transaction = tempTransaction as ScriptFunctionPayload;
+      const transaction = tempTransaction as EntryFunctionPayload;
 
       try {
         // console.log('trans', 1);

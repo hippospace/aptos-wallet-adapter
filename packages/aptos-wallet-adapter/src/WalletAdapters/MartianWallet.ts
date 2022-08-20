@@ -4,7 +4,6 @@ import {
   SubmitTransactionRequest,
   HexEncodedBytes
 } from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -183,10 +182,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(
-        wallet.address || '',
-        payloadV1ToV0(transactionPyld)
-      );
+      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signTransaction(tx);
 
@@ -208,10 +204,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(
-        wallet.address || '',
-        payloadV1ToV0(transactionPyld)
-      );
+      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 

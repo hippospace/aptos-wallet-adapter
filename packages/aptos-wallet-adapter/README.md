@@ -42,7 +42,7 @@ Wallets source code [here](https://github.com/hippospace/aptos-wallet-adapter/tr
 # Use React Provider
 
 ```typescript
-import React from "react";
+import React from 'react';
 import {
   WalletProvider,
   HippoWalletAdapter,
@@ -65,7 +65,7 @@ const App: React.FC = () => {
     <WalletProvider
       wallets={wallets}
       onError={(error: Error) => {
-        console.log('Handle Error Message', error)
+        console.log('Handle Error Message', error);
       }}>
       {/* your website */}
     </WalletProvider>
@@ -101,15 +101,14 @@ const { connected, account, ...rest } = useWallet();
 
 ```typescript
 const { wallets, connect, disconnect, isConnected } = useWallet();
-const wallet = 'Aptos Wallet' // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
+const wallet = 'Aptos Wallet'; // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
 
 if (!isConnected) {
   return (
     <Button
       onClick={() => {
         connect(wallet);
-      }}
-    >
+      }}>
       Connect
     </Button>
   );
@@ -118,8 +117,7 @@ if (!isConnected) {
     <Button
       onClick={() => {
         disconnect();
-      }}
-    >
+      }}>
       Disconnect
     </Button>
   );

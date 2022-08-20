@@ -18,7 +18,6 @@ import {
   SubmitTransactionRequest,
   HexEncodedBytes
 } from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
 
 export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
 
@@ -169,9 +168,9 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(payloadV1ToV0(transaction));
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signTransaction(tx);
+      const res = await provider.generateTransaction(transaction);
+      if (!res.data) throw new WalletSignTransactionError('Cannot generate transaction');
+      const response = await provider?.signTransaction(res.data);
 
       if (!response) {
         throw new WalletSignTransactionError('No response');
@@ -193,7 +192,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(payloadV1ToV0(transaction));
+      const tx = await provider.generateTransaction(transaction);
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx.data);
       if (response.status === 401) {
