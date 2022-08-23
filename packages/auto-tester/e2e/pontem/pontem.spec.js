@@ -133,7 +133,7 @@ describe("test pontem wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(4);
+      expect(connectionBtnLength).toEqual(5);
     });
 
     xit("should display user reject connection", async () => {

@@ -3,7 +3,6 @@ import {
   SubmitTransactionRequest,
   TransactionPayload
 } from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -162,7 +161,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(payloadV1ToV0(transaction));
+      const response = await provider?.signTransaction(transaction);
       if (response) {
         return response;
       } else {
@@ -183,7 +182,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signAndSubmitTransaction(payloadV1ToV0(transaction));
+      const response = await provider?.signAndSubmitTransaction(transaction);
       if (response) {
         return response;
       } else {
