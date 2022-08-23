@@ -15,6 +15,7 @@ Supports:
 - [Fewcha wallet](https://fewcha.app/)
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
+- [Pontem Wallet](https://pontem.network/pontem-wallet)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 

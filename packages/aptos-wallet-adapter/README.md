@@ -9,11 +9,11 @@ Supports:
 - [Fewcha wallet](https://fewcha.app/)
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
+- [Pontem Wallet](https://pontem.network/pontem-wallet)
 
 Working on (PR welcome):
 
 - [Nightly wallet](https://chrome.google.com/webstore/detail/nightly/injggoambcadlfkkjcgdfbejanmgfgfm/related?hl=en&authuser=0)
-- [Pontem wallet](https://pontem.network/)
 
 # Installation
 
@@ -49,7 +49,8 @@ import {
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
-  FewchaWalletAdapter
+  FewchaWalletAdapter,
+  PontemWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = () => [
@@ -57,7 +58,8 @@ const wallets = () => [
   new MartianWalletAdapter(),
   new AptosWalletAdapter(),
   new FewchaWalletAdapter(),
-  new HippoExtensionWalletAdapter()
+  new HippoExtensionWalletAdapter(),
+  new PontemWalletAdapter()
 ];
 
 const App: React.FC = () => {
