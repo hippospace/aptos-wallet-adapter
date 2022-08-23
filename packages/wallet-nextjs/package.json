@@ -14,8 +14,8 @@
     "next": "12.2.5",
     "antd": "^4.21.7",
     "aptos": "^1.3.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.X.X || 17.X.X",
+    "react-dom": "^18.X.X || 17.X.X"
   },
   "devDependencies": {
     "eslint-config-airbnb-typescript": "^17.0.0",

@@ -3,7 +3,6 @@
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  ScriptFunctionPayload,
   HexEncodedBytes
 } from 'aptos/dist/generated';
 import {
@@ -210,7 +209,7 @@ export class MultiMaskWalletAdapter extends BaseWalletAdapter {
     try {
       const wallet = this._provider;
       if (!wallet) throw new WalletNotConnectedError();
-      const transaction = tempTransaction as ScriptFunctionPayload;
+      // const transaction = tempTransaction as ScriptFunctionPayload;
 
       try {
         // console.log('trans', 1);

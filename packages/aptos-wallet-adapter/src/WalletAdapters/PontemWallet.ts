@@ -4,7 +4,6 @@ import {
   SubmitTransactionRequest,
   HexEncodedBytes
 } from 'aptos/dist/generated';
-import { payloadV1ToV0 } from '../utilities/util';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -212,9 +211,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = payloadV1ToV0(transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      const response = await provider?.signAndSubmit(tx);
+      const response = await provider?.signAndSubmit(transactionPyld);
 
       if (!response || !response.success) {
         throw new WalletSignTransactionError('No response');
