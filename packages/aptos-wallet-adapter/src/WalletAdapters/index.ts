@@ -7,3 +7,4 @@ export * from './MultiMaskWallet';
 export * from './FewchaWallet';
 export * from './PontemWallet';
 // export * from './NightlyWallet';
+export * from "./SpikaWallet"
