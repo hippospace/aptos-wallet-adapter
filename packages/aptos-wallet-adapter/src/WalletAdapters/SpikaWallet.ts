@@ -1,24 +1,24 @@
 import {
   HexEncodedBytes,
   SubmitTransactionRequest,
-  TransactionPayload,
-} from "aptos/dist/generated";
+  TransactionPayload
+} from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
-  WalletSignTransactionError,
-} from "../WalletProviders/errors";
+  WalletSignTransactionError
+} from '../WalletProviders/errors';
 import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
   WalletName,
-  WalletReadyState,
-} from "./BaseAdapter";
+  WalletReadyState
+} from './BaseAdapter';
 
 interface ISpikaWallet {
-  connect: () => Promise<{ publicKey: string; address: string; authKey: string }>;
+  connect: () => Promise<{ publicKey: string; account: string; authKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
@@ -32,7 +32,7 @@ interface SpikaWindow extends Window {
 
 declare const window: SpikaWindow;
 
-export const SpikaWalletName = "Spika Wallet" as WalletName<"Spika Wallet">;
+export const SpikaWalletName = 'Spika Wallet' as WalletName<'Spika Wallet'>;
 
 export interface SpikaWalletAdapterConfig {
   provider?: ISpikaWallet;
@@ -43,9 +43,9 @@ export interface SpikaWalletAdapterConfig {
 export class SpikaWalletAdapter extends BaseWalletAdapter {
   name = SpikaWalletName;
 
-  url = "https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb";
+  url = 'https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb';
 
-  icon = "https://twitter.com/SpikaApp/photo";
+  icon = 'https://twitter.com/SpikaApp/photo';
 
   protected _provider: ISpikaWallet | undefined;
 
@@ -53,7 +53,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
-    typeof window === "undefined" || typeof document === "undefined"
+    typeof window === 'undefined' || typeof document === 'undefined'
       ? WalletReadyState.Unsupported
       : WalletReadyState.NotDetected;
 
@@ -64,21 +64,21 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   constructor({
     // provider,
     // network = WalletAdapterNetwork.Mainnet,
-    timeout = 10000,
+    timeout = 10000
   }: SpikaWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== "undefined" ? window.spika : undefined;
+    this._provider = typeof window !== 'undefined' ? window.spika : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
-    if (typeof window !== "undefined" && this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.spika) {
           this._readyState = WalletReadyState.Installed;
-          this.emit("readyStateChange", this._readyState);
+          this.emit('readyStateChange', this._readyState);
           return true;
         }
         return false;
@@ -90,7 +90,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     return {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
-      authKey: this._wallet?.authKey || null,
+      authKey: this._wallet?.authKey || null
     };
   }
 
@@ -131,19 +131,19 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       if (response?.publicKey !== undefined) {
         this._wallet = {
           publicKey: response?.publicKey,
-          address: response?.address,
+          address: response?.account,
           authKey: response?.authKey,
-          isConnected: true,
+          isConnected: true
         };
       } else {
         this._wallet = {
-          isConnected: false,
+          isConnected: false
         };
       }
 
-      this.emit("connect", this._wallet.publicKey);
+      this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
-      this.emit("error", error);
+      this.emit('error', error);
       throw error;
     } finally {
       this._connecting = false;
@@ -159,11 +159,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
         const provider = this._provider || window.spika;
         await provider?.disconnect();
       } catch (error: any) {
-        this.emit("error", new WalletDisconnectionError(error?.message, error));
+        this.emit('error', new WalletDisconnectionError(error?.message, error));
       }
     }
 
-    this.emit("disconnect");
+    this.emit('disconnect');
   }
 
   async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
@@ -176,11 +176,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       if (response) {
         return response;
       } else {
-        throw new Error("Sign Transaction failed");
+        throw new Error('Sign Transaction failed');
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit("error", new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }
@@ -197,11 +197,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       if (response) {
         return response;
       } else {
-        throw new Error("Transaction failed");
+        throw new Error('Transaction failed');
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit("error", new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }
