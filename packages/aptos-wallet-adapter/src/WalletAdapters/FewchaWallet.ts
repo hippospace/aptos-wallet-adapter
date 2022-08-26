@@ -20,7 +20,7 @@ import {
   EntryFunctionPayload
 } from 'aptos/dist/generated';
 
-export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
+export const FewchaWalletName = 'Fewcha' as WalletName<'Fewcha'>;
 
 interface FewchaWindow extends Window {
   fewcha: Web3ProviderType;

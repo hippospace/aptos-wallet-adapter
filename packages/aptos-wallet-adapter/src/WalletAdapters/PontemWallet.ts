@@ -54,7 +54,7 @@ interface PontemWindow extends Window {
 
 declare const window: PontemWindow;
 
-export const PontemWalletName = 'PontemWallet' as WalletName<'PontemWallet'>;
+export const PontemWalletName = 'Pontem' as WalletName<'Pontem'>;
 
 export interface PontemWalletAdapterConfig {
   provider?: IPontemWallet;

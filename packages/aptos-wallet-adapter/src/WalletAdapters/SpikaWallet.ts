@@ -32,7 +32,7 @@ interface SpikaWindow extends Window {
 
 declare const window: SpikaWindow;
 
-export const SpikaWalletName = 'Spika Wallet' as WalletName<'Spika Wallet'>;
+export const SpikaWalletName = 'Spika' as WalletName<'Spika'>;
 
 export interface SpikaWalletAdapterConfig {
   provider?: ISpikaWallet;
