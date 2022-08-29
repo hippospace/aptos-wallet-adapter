@@ -7,6 +7,7 @@ import {
   MartianWalletAdapter,
   FewchaWalletAdapter,
   PontemWalletAdapter,
+  RiseWalletAdapter,
   SpikaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import MainPage from './pages';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
       new AptosWalletAdapter(),
       new FewchaWalletAdapter(),
       new PontemWalletAdapter(),
+      new RiseWalletAdapter(),
       new SpikaWalletAdapter()
       // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
