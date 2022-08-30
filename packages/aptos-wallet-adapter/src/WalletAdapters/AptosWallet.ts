@@ -18,7 +18,7 @@ import {
 } from './BaseAdapter';
 
 interface IAptosWallet {
-  connect: () => Promise<{ address: string }>;
+  connect: () => Promise<{ address: string; publicKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
@@ -32,7 +32,7 @@ interface AptosWindow extends Window {
 
 declare const window: AptosWindow;
 
-export const AptosWalletName = 'Aptos Wallet' as WalletName<'Aptos Wallet'>;
+export const AptosWalletName = 'Aptos' as WalletName<'Aptos'>;
 
 export interface AptosWalletAdapterConfig {
   provider?: IAptosWallet;
@@ -126,7 +126,8 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
       const response = await provider?.connect();
       this._wallet = {
-        publicKey: response?.address,
+        address: response?.address,
+        publicKey: response?.publicKey,
         isConnected: true
       };
 

@@ -12,7 +12,7 @@ import {
 } from '../WalletProviders/errors';
 import { AccountKeys, BaseWalletAdapter, WalletName, WalletReadyState } from './BaseAdapter';
 
-export const HippoWalletName = 'Hippo Web Wallet' as WalletName<'Hippo Web Wallet'>;
+export const HippoWalletName = 'Hippo Web' as WalletName<'Hippo Web'>;
 
 export interface HippoWalletAdapterConfig {
   provider?: string;

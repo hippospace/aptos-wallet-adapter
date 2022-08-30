@@ -64,8 +64,14 @@ export interface WalletAdapterProps<Name extends string = string> {
   publicAccount: AccountKeys;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
-  signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  signAndSubmitTransaction(
+    transaction: TransactionPayload,
+    options?: any
+  ): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(
+    transaction: TransactionPayload,
+    options?: any
+  ): Promise<SubmitTransactionRequest>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &

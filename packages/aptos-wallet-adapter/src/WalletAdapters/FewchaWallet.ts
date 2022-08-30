@@ -16,10 +16,11 @@ import {
 import {
   TransactionPayload,
   SubmitTransactionRequest,
-  HexEncodedBytes
+  HexEncodedBytes,
+  EntryFunctionPayload
 } from 'aptos/dist/generated';
 
-export const FewchaWalletName = 'Fewcha Wallet' as WalletName<'Fewcha Wallet'>;
+export const FewchaWalletName = 'Fewcha' as WalletName<'Fewcha'>;
 
 interface FewchaWindow extends Window {
   fewcha: Web3ProviderType;
@@ -168,7 +169,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction);
+      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signTransaction(tx.data);
 
@@ -192,7 +193,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction);
+      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
       if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx.data);
       if (response.status === 401) {

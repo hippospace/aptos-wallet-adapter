@@ -35,7 +35,10 @@ interface IPontemWallet {
   connect: () => Promise<ConnectPontemAccount>;
   account(): Promise<MaybeHexString>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
-  signAndSubmit(transaction: TransactionPayload): Promise<{
+  signAndSubmit(
+    transaction: TransactionPayload,
+    options?: any
+  ): Promise<{
     success: boolean;
     result: {
       hash: HexEncodedBytes;
@@ -51,7 +54,7 @@ interface PontemWindow extends Window {
 
 declare const window: PontemWindow;
 
-export const PontemWalletName = 'PontemWallet' as WalletName<'PontemWallet'>;
+export const PontemWalletName = 'Pontem' as WalletName<'Pontem'>;
 
 export interface PontemWalletAdapterConfig {
   provider?: IPontemWallet;
@@ -205,13 +208,14 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload
+    transactionPyld: TransactionPayload,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signAndSubmit(transactionPyld);
+      const response = await provider?.signAndSubmit(transactionPyld, options);
 
       if (!response || !response.success) {
         throw new WalletSignTransactionError('No response');

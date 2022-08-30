@@ -19,7 +19,8 @@ const MainPage = () => {
     signAndSubmitTransaction,
     connecting,
     connected,
-    disconnecting
+    disconnecting,
+    wallet: currentWallet
   } = useWallet();
 
   const renderWalletConnectorGroup = () => {
@@ -50,10 +51,13 @@ const MainPage = () => {
           type: 'entry_function_payload',
           function: '0x1::coin::transfer',
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
-          arguments: [demoAccount.address().hex(), '717']
+          arguments: [
+            demoAccount.address().hex(),
+            currentWallet?.adapter?.name === 'MartianWallet' ? 717 : '717'
+          ]
         };
-        const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
-        const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
+        // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
+        const transactionRes = await signAndSubmitTransaction(payload);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);
