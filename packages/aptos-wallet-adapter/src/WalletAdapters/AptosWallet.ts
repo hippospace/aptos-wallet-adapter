@@ -18,7 +18,7 @@ import {
 } from './BaseAdapter';
 
 interface IAptosWallet {
-  connect: () => Promise<{ address: string }>;
+  connect: () => Promise<{ address: string; publicKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
@@ -126,7 +126,8 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
       const response = await provider?.connect();
       this._wallet = {
-        publicKey: response?.address,
+        address: response?.address,
+        publicKey: response?.publicKey,
         isConnected: true
       };
 
