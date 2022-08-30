@@ -210,4 +210,22 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       throw error;
     }
   }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.fewcha;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response.data;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
+      throw error;
+    }
+  }
 }

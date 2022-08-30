@@ -11,6 +11,7 @@ import { AptosAccount } from 'aptos';
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState(false);
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [signature, setSignature] = useState<string>('');
   const {
     connect,
     disconnect,
@@ -20,7 +21,8 @@ const MainPage = () => {
     connecting,
     connected,
     disconnecting,
-    wallet: currentWallet
+    wallet: currentWallet,
+    signMessage
   } = useWallet();
 
   const renderWalletConnectorGroup = () => {
@@ -80,6 +82,22 @@ const MainPage = () => {
     ));
   };
 
+  const signMess = async () => {
+    try {
+      setTxLoading(true);
+      if (account?.publicKey) {
+        const addressKey = account?.publicKey?.toString() || '';
+        const signedMessage = (await signMessage(`Hello from account ${addressKey}`)) as any;
+        setSignature(signedMessage.signedMessage.toString());
+        alert(`Signature is, ${signedMessage.signedMessage}`);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
   const renderContent = () => {
     if (connecting || disconnecting) {
       return <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />;
@@ -96,6 +114,10 @@ const MainPage = () => {
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
           </strong>
+          <strong>Message to Sign : Hello from account {account?.publicKey?.toString()}</strong>
+          <Button id="transferBtn" onClick={() => signMess()} loading={txLoading}>
+            Sign Message
+          </Button>
           <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading}>
             Transfer Token
           </Button>
