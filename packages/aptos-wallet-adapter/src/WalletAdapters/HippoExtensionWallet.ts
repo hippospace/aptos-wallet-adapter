@@ -8,6 +8,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -196,7 +198,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         }
       } catch (error: any) {
         // console.log('transact err', error, error.message);
-        throw new WalletSignTransactionError(error.message || error);
+        throw new WalletSignAndSubmitMessageError(error.message || error);
       }
     } catch (error: any) {
       this.emit('error', error);
@@ -217,7 +219,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

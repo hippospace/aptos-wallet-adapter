@@ -8,6 +8,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -184,16 +186,16 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx);
 
       if (!response) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       const result = { hash: response } as any;
       return result as SubmitTransactionRequest;
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new WalletSignTransactionError(error));
       throw error;
     }
   }
@@ -206,15 +208,15 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
       if (!response) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       return { hash: response };
     } catch (error: any) {
-      this.emit('error', new Error(error));
+      this.emit('error', new WalletSignAndSubmitMessageError(error));
       throw error;
     }
   }
@@ -232,7 +234,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

@@ -8,6 +8,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -203,7 +205,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       // const result = { hash: response } as any;
       return {} as SubmitTransactionRequest;
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new WalletSignTransactionError(error));
       throw error;
     }
   }
@@ -219,11 +221,11 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.signAndSubmit(transactionPyld, options);
 
       if (!response || !response.success) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       return { hash: response.result.hash };
     } catch (error: any) {
-      this.emit('error', new Error(error.error.message));
+      this.emit('error', new WalletSignAndSubmitMessageError(error.error.message));
       throw error;
     }
   }
@@ -241,7 +243,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

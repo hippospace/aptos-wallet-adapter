@@ -3,6 +3,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import Web3, { Web3Provider, Web3ProviderType } from '@fewcha/web3';
@@ -170,11 +172,11 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       const provider = this._provider || window.fewcha;
       const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx.data);
 
       if (!response) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       const result = { hash: response } as any;
       return result as SubmitTransactionRequest;
@@ -194,19 +196,19 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       const provider = this._provider || window.fewcha;
       const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx.data);
       if (response.status === 401) {
-        throw new WalletSignTransactionError('User has rejected the transaction');
+        throw new Error('User has rejected the transaction');
       } else if (response.status !== 200) {
-        throw new WalletSignTransactionError('Transaction issue');
+        throw new Error('Transaction issue');
       }
       return {
         hash: response.data
       };
     } catch (error: any) {
       const errMsg = error instanceof Error ? error.message : error.response.data.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
       throw error;
     }
   }
@@ -224,7 +226,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

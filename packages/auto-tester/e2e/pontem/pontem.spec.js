@@ -66,7 +66,7 @@ describe("test pontem wallet extension", () => {
       expect(text).toContain("0.01");
     });
 
-    it("should connect to the extension", async () => {
+    xit("should connect to the extension", async () => {
       await appPage.bringToFront();
       const popupPagePromise = new Promise((x) =>
         browser.once("targetcreated", (target) => x(target.page()))
