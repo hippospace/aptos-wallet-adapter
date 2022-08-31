@@ -196,6 +196,32 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     }
   }
 
+  async signMessage(message: string): Promise<string> {
+    try {
+      const request = new URLSearchParams({
+        request: JSON.stringify({
+          method: 'signMessage',
+          payload: message
+        }),
+        origin: window.location.origin
+      }).toString();
+      const popup = window.open(
+        `${WEBWALLET_URL}?${request}`,
+        'Transaction Confirmation',
+        'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=440,height=700'
+      );
+      if (!popup) throw new WalletNotConnectedError();
+      const promise = await new Promise((resolve, reject) => {
+        this.once('success', resolve);
+        this.once('error', reject);
+      });
+      return promise as string;
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
   private _beforeUnload = (): void => {
     void this.disconnect();
   };

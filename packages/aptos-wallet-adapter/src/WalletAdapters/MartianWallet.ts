@@ -38,6 +38,7 @@ interface IMartianWallet {
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
   signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -214,6 +215,24 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       return { hash: response };
     } catch (error: any) {
       this.emit('error', new Error(error));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.martian;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }

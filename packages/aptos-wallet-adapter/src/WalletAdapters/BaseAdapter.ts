@@ -72,6 +72,7 @@ export interface WalletAdapterProps<Name extends string = string> {
     transaction: TransactionPayload,
     options?: any
   ): Promise<SubmitTransactionRequest>;
+  signMessage(message: string): Promise<string>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &
@@ -104,6 +105,8 @@ export abstract class BaseWalletAdapter
   ): Promise<{ hash: HexEncodedBytes }>;
 
   abstract signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+
+  abstract signMessage(message: string): Promise<string>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {

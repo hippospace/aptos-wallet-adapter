@@ -31,6 +31,7 @@ interface IAptosWallet {
     transaction: any
   ): Promise<{ hash: HexEncodedBytes } | IApotsErrorResult>;
   signTransaction(transaction: any): Promise<SubmitTransactionRequest | IApotsErrorResult>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -195,6 +196,24 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
         throw new Error((response as IApotsErrorResult).message);
       }
       return response as { hash: HexEncodedBytes };
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));

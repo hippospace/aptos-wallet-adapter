@@ -237,6 +237,15 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     [adapter, handleError, connected]
   );
 
+  const signMessage = useCallback(
+    async (message: string) => {
+      if (!adapter) throw handleError(new WalletNotSelectedError());
+      if (!connected) throw handleError(new WalletNotConnectedError());
+      return adapter.signMessage(message);
+    },
+    [adapter, handleError, connected]
+  );
+
   return (
     <WalletContext.Provider
       value={{
@@ -250,7 +259,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         connect,
         disconnect,
         signAndSubmitTransaction,
-        signTransaction
+        signTransaction,
+        signMessage
       }}>
       {children}
     </WalletContext.Provider>
