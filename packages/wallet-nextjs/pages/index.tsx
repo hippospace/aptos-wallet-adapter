@@ -8,8 +8,12 @@ import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
-  const [txLoading, setTxLoading] = useState(false);
+  const [txLoading, setTxLoading] = useState({
+    sign: false,
+    transaction: false
+  });
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [signature, setSignature] = useState<string>('');
   const {
     connect,
     disconnect,
@@ -18,7 +22,9 @@ const MainPage = () => {
     signAndSubmitTransaction,
     connecting,
     connected,
-    disconnecting
+    disconnecting,
+    wallet: currentWallet,
+    signMessage
   } = useWallet();
 
   const renderWalletConnectorGroup = () => {
@@ -40,7 +46,10 @@ const MainPage = () => {
 
   const transferToken = async () => {
     try {
-      setTxLoading(true);
+      setTxLoading({
+        ...txLoading,
+        transaction: true
+      });
       if (account?.address || account?.publicKey) {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
         const demoAccount = new AptosAccount();
@@ -49,10 +58,13 @@ const MainPage = () => {
           type: 'entry_function_payload',
           function: '0x1::coin::transfer',
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
-          arguments: [demoAccount.address().hex(), '717']
+          arguments: [
+            demoAccount.address().hex(),
+            currentWallet?.adapter?.name === 'Martian' ? 717 : '717'
+          ]
         };
-        const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
-        const transactionRes = await signAndSubmitTransaction(txnRequest.payload);
+        // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
+        const transactionRes = await signAndSubmitTransaction(payload);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);
@@ -60,7 +72,10 @@ const MainPage = () => {
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
-      setTxLoading(false);
+      setTxLoading({
+        ...txLoading,
+        transaction: false
+      });
     }
   };
 
@@ -73,6 +88,27 @@ const MainPage = () => {
         </a>
       </div>
     ));
+  };
+
+  const signMess = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        sign: true
+      });
+      if (account?.publicKey) {
+        const addressKey = account?.publicKey?.toString() || '';
+        const signedMessage = (await signMessage(`Hello from account ${addressKey}`)) as any;
+        setSignature(signedMessage.signedMessage.toString());
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        sign: false
+      });
+    }
   };
 
   const renderContent = () => {
@@ -91,13 +127,25 @@ const MainPage = () => {
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
           </strong>
-          <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading}>
+          <strong>Message to Sign : Hello from account {account?.publicKey?.toString()}</strong>
+          {signature ? (
+            <div className="flex gap-2 transaction">
+              <strong>Signature: </strong>
+              <textarea className="w-full" readOnly rows={4} value={signature} />
+            </div>
+          ) : (
+            <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
+              Sign Message
+            </Button>
+          )}
+          <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading.transaction}>
             Transfer Token
           </Button>
           <Button
             id="disconnectBtn"
             onClick={() => {
               setTxLinks([]);
+              setSignature('');
               disconnect();
             }}>
             Disconnect
