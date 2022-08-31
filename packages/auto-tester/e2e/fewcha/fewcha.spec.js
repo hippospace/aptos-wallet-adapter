@@ -1,5 +1,5 @@
 const { bootstrap } = require("./bootstrap");
-const walletId = "#Fewcha_Wallet";
+const walletId = "#Fewcha";
 
 describe("test fewcha wallet extension", () => {
   let extPage, appPage, browser;
@@ -129,7 +129,7 @@ describe("test fewcha wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     it("should display user reject connection", async () => {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/quotes */
 const { bootstrap } = require("./bootstrap");
-const walletId = "#Aptos_Wallet";
+const walletId = "#Aptos";
 
 describe("test aptos wallet extension", () => {
   let extPage, appPage, browser;
@@ -109,7 +109,7 @@ describe("test aptos wallet extension", () => {
       const address = await addressField.evaluate((e) => e.innerText);
       const publicKey = await publicKeyField.evaluate((e) => e.innerText);
       const authKey = await authKeyField.evaluate((e) => e.innerText);
-      expect(address).toBe("");
+      expect(address).not.toBe("");
       expect(publicKey).not.toBe("");
       expect(authKey).toBe("");
     });
@@ -153,7 +153,7 @@ describe("test aptos wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     it("should display user reject connection", async () => {
@@ -214,7 +214,7 @@ describe("test aptos wallet extension", () => {
       const address = await addressField.evaluate((e) => e.innerText);
       const publicKey = await publicKeyField.evaluate((e) => e.innerText);
       const authKey = await authKeyField.evaluate((e) => e.innerText);
-      expect(address).toBe("");
+      expect(address).not.toBe("");
       expect(publicKey).not.toBe("");
       expect(authKey).toBe("");
     });
