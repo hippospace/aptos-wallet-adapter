@@ -95,7 +95,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (this._provider) {
+        if (window.martian) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -166,7 +166,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider;
+    const provider = this._provider || window.martian;
     if (wallet) {
       this._wallet = null;
 
