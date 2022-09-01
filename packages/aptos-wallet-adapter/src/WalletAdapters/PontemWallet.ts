@@ -102,7 +102,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (this._provider) {
+        if (window.pontem) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -173,7 +173,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider;
+    const provider = this._provider || window.pontem;
     if (wallet) {
       this._wallet = null;
 
