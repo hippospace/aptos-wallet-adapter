@@ -48,7 +48,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   // protected _network: WalletAdapterNetwork;
   protected _timeout: number;
 
-  protected _readyState: WalletReadyState = WalletReadyState.Installed;
+  protected _readyState: WalletReadyState =
+    typeof window === 'undefined' || typeof document === 'undefined'
+      ? WalletReadyState.Unsupported
+      : WalletReadyState.NotDetected;
 
   protected _connecting: boolean;
 
@@ -146,7 +149,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }
 
   async disconnect(): Promise<void> {
-    const provider = this._provider;
+    const provider = this._provider || window.fewcha;
     if (provider) {
       try {
         const isDisconnected = await provider.disconnect();
