@@ -7,7 +7,7 @@ import {
   WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
-import Web3, { Web3Provider, Web3ProviderType } from '@fewcha/web3';
+import Web3, { Web3ProviderType } from '@fewcha/web3';
 import {
   AccountKeys,
   BaseWalletAdapter,
@@ -61,8 +61,6 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }: FewchaAdapterConfig = {}) {
     super();
 
-    this._provider =
-      typeof window !== 'undefined' ? new Web3(new Web3Provider(window.fewcha)).action : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
@@ -113,12 +111,12 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
 
       this._connecting = true;
-      const provider = this._provider || window.fewcha;
-      const isConnected = await this._provider?.isConnected();
+      const provider = new Web3().action;
+      const isConnected = await provider.isConnected();
       if (isConnected?.data === true) {
-        await provider?.disconnect();
+        await provider.disconnect();
       }
-      const response = await provider?.connect();
+      const response = await provider.connect();
       if (response.status === 401) {
         throw new WalletConnectionError('User has rejected the connection');
       } else if (response.status !== 200) {
@@ -127,7 +125,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       let accountDetail = { ...response.data };
 
       if (!accountDetail.publicKey) {
-        const accountResp = await provider?.account();
+        const accountResp = await provider.account();
         if (!accountResp.data.publicKey) {
           throw new WalletConnectionError('Wallet connect issue', response.data);
         }
@@ -137,6 +135,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
         connected: true,
         ...accountDetail
       };
+      this._provider = provider;
       this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
       this.emit('error', error);
@@ -147,22 +146,22 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }
 
   async disconnect(): Promise<void> {
-    const wallet = this._wallet;
-    if (wallet) {
-      this._wallet = null;
-
+    const provider = this._provider;
+    if (provider) {
       try {
-        const provider = this._provider || window.fewcha;
-        const isDisconnected = await provider?.disconnect();
+        const isDisconnected = await provider.disconnect();
         if (isDisconnected.data === true) {
-          this.emit('disconnect');
+          this._provider = undefined;
+          this._wallet = null;
         } else {
           throw new Error('Disconnect failed');
         }
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
+        throw error;
       }
     }
+    this.emit('disconnect');
   }
 
   async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
