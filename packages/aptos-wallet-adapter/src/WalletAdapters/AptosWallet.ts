@@ -153,11 +153,11 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
+    const provider = this._provider || window.aptos;
     if (wallet) {
       this._wallet = null;
 
       try {
-        const provider = this._provider || window.aptos;
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
