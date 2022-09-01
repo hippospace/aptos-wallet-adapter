@@ -56,8 +56,8 @@ const MainPage = () => {
             // TODO - handle this better, amount argument should be number or bigint for this function
             currentWallet?.adapter?.name === 'MartianWallet' ||
             currentWallet?.adapter?.name === 'Rise Wallet'
-              ? 717
-              : '717'
+              ? 123123
+              : '123123'
           ]
         };
         // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
