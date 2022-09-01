@@ -60,7 +60,9 @@ const MainPage = () => {
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
           arguments: [
             demoAccount.address().hex(),
-            currentWallet?.adapter?.name === 'Martian' ? 717 : '717'
+            currentWallet?.adapter?.name === 'Martian' || currentWallet?.adapter?.name === 'SafePal'
+            ? 717
+            : '717'
           ]
         };
         // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
