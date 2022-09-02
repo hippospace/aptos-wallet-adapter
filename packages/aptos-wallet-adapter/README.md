@@ -102,14 +102,17 @@ const { connected, account, ...rest } = useWallet();
 # Connect & Disconnect
 
 ```typescript
+import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
+
+...
+
 const { wallets, connect, disconnect, isConnected } = useWallet();
-const wallet = 'Aptos Wallet' // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
 
 if (!isConnected) {
   return (
     <Button
       onClick={() => {
-        connect(wallet);
+        connect(AptosWalletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect
