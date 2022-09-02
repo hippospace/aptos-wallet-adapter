@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/quotes */
 const { bootstrap } = require("./bootstrap");
-const walletId = "#MartianWallet";
+const walletId = "#Martian";
 
 describe("test martian wallet extension", () => {
   let appPage, browser;
@@ -166,7 +166,7 @@ describe("test martian wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     it("should display user reject connection", async () => {

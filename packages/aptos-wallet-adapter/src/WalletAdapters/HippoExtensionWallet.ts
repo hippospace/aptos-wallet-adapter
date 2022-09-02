@@ -8,6 +8,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -28,6 +30,7 @@ interface IHippoWallet {
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<any>;
   signTransaction(transaction: any): Promise<void>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -195,10 +198,28 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         }
       } catch (error: any) {
         // console.log('transact err', error, error.message);
-        throw new WalletSignTransactionError(error.message || error);
+        throw new WalletSignAndSubmitMessageError(error.message || error);
       }
     } catch (error: any) {
       this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.hippoWallet;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

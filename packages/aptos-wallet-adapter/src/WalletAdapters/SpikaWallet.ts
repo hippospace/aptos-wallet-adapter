@@ -7,6 +7,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -23,6 +25,7 @@ interface ISpikaWallet {
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(transaction: any): Promise<SubmitTransactionRequest>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -122,7 +125,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.spika;
-      const isConnected = await this._provider?.isConnected();
+      const isConnected = await provider?.isConnected();
       if (isConnected === true) {
         await provider?.disconnect();
       }
@@ -201,7 +204,25 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.spika;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

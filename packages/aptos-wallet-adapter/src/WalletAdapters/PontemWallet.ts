@@ -8,6 +8,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -45,6 +47,7 @@ interface IPontemWallet {
     };
   }>;
   // signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -99,7 +102,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (this._provider) {
+        if (window.pontem) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -170,7 +173,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider;
+    const provider = this._provider || window.pontem;
     if (wallet) {
       this._wallet = null;
 
@@ -202,7 +205,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       // const result = { hash: response } as any;
       return {} as SubmitTransactionRequest;
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new WalletSignTransactionError(error));
       throw error;
     }
   }
@@ -218,11 +221,29 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.signAndSubmit(transactionPyld, options);
 
       if (!response || !response.success) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       return { hash: response.result.hash };
     } catch (error: any) {
-      this.emit('error', new Error(error.error.message));
+      this.emit('error', new WalletSignAndSubmitMessageError(error.error.message));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.pontem;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

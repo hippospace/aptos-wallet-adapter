@@ -22,7 +22,6 @@ const App: React.FC = () => {
       new FewchaWalletAdapter(),
       new PontemWalletAdapter(),
       new SpikaWalletAdapter()
-      // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
     ],
     []

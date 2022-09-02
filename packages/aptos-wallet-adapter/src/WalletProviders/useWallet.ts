@@ -29,6 +29,7 @@ export interface WalletContextState {
   disconnect(): Promise<void>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  signMessage(message: string): Promise<string>;
 }
 
 const DEFAULT_CONTEXT = {

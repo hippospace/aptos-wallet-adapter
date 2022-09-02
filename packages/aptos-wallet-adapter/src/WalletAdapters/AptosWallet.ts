@@ -7,6 +7,8 @@ import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -17,12 +19,21 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
+interface IApotsErrorResult {
+  code: number;
+  name: string;
+  message: string;
+}
+
 interface IAptosWallet {
   connect: () => Promise<{ address: string; publicKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: any): Promise<SubmitTransactionRequest>;
+  signAndSubmitTransaction(
+    transaction: any
+  ): Promise<{ hash: HexEncodedBytes } | IApotsErrorResult>;
+  signTransaction(transaction: any): Promise<SubmitTransactionRequest | IApotsErrorResult>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -142,11 +153,11 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
+    const provider = this._provider || window.aptos;
     if (wallet) {
       this._wallet = null;
 
       try {
-        const provider = this._provider || window.aptos;
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
@@ -162,12 +173,11 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(transaction);
-      if (response) {
-        return response;
-      } else {
-        throw new Error('Sign Transaction failed');
+      const response = await provider.signTransaction(transaction);
+      if ((response as IApotsErrorResult).code) {
+        throw new Error((response as IApotsErrorResult).message);
       }
+      return response as SubmitTransactionRequest;
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));
@@ -183,15 +193,32 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signAndSubmitTransaction(transaction);
+      const response = await provider.signAndSubmitTransaction(transaction);
+      if ((response as IApotsErrorResult).code) {
+        throw new Error((response as IApotsErrorResult).message);
+      }
+      return response as { hash: HexEncodedBytes };
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
       if (response) {
         return response;
       } else {
-        throw new Error('Transaction failed');
+        throw new Error('Sign Message failed');
       }
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }
