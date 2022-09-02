@@ -94,6 +94,7 @@ export class SafePalWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
+        this._provider = typeof window !== 'undefined' ? window.safePal : undefined;
         if (this._provider) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
