@@ -11,7 +11,8 @@ import { AptosAccount } from 'aptos';
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState({
     sign: false,
-    transaction: false
+    transaction: false,
+    faucet: false
   });
   const [txLinks, setTxLinks] = useState<string[]>([]);
   const [signature, setSignature] = useState<string>('');
@@ -112,6 +113,28 @@ const MainPage = () => {
     }
   };
 
+  const fundAccount = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        faucet: true
+      });
+      if (account?.address) {
+        const transactionRes = await faucetClient.fundAccount(account.address, 1000);
+        await aptosClient.waitForTransaction(`0x${transactionRes[0]}` || '');
+        const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/0x${transactionRes[0]}`];
+        setTxLinks(links);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        faucet: false
+      });
+    }
+  };
+
   const renderContent = () => {
     if (connecting || disconnecting) {
       return <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />;
@@ -150,6 +173,9 @@ const MainPage = () => {
               disconnect();
             }}>
             Disconnect
+          </Button>
+          <Button id="faucetBtn" onClick={() => fundAccount()} loading={txLoading.faucet}>
+            Faucet
           </Button>
           <div className="mt-4">
             <h4>Transaction History:</h4>
