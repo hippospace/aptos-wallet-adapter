@@ -53,7 +53,7 @@ import {
   PontemWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
-const wallets = () => [
+const wallets = [
   new HippoWalletAdapter(),
   new MartianWalletAdapter(),
   new AptosWalletAdapter(),
@@ -106,27 +106,27 @@ import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
 ...
 
-const { wallets, connect, disconnect, isConnected } = useWallet();
+const { connect, disconnect, connected } = useWallet();
 
-if (!isConnected) {
+if (!connected) {
   return (
-    <Button
+    <button
       onClick={() => {
         connect(AptosWalletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect
-    </Button>
+    </button>
   );
 } else {
   return (
-    <Button
+    <button
       onClick={() => {
         disconnect();
       }}
     >
       Disconnect
-    </Button>
+    </button>
   );
 }
 ```
