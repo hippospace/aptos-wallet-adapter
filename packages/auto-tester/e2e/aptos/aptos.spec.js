@@ -21,7 +21,7 @@ describe("test aptos wallet extension", () => {
 
       // Wait until the page element loaded
       await extPage.waitForFunction(
-        `document.querySelectorAll('button[type="button"]').length === 1`
+        `document.querySelectorAll('button[type="button"]').length === 2`
       );
 
       // Create new wallet
@@ -67,14 +67,14 @@ describe("test aptos wallet extension", () => {
 
       // wait for faucet
       await extPage.waitForFunction(
-        `document.querySelectorAll('button[type="button"]').length === 7`
+        `document.querySelectorAll('button[type="button"]').length === 10`
       );
       await extPage.$$eval('button[type="button"]', (elements) =>
-        elements[0].click()
+        elements[1].click()
       );
 
       await extPage.waitForFunction(
-        `document.querySelectorAll('span').length === 7`
+        `document.querySelectorAll('span').length === 11`
       );
       const text = await extPage.$$eval("span", (e) => e[1].innerText);
       expect(text).toEqual("50,000");
