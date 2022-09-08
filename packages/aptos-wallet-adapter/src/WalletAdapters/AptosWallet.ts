@@ -39,7 +39,7 @@ interface AptosWindow extends Window {
 
 declare const window: AptosWindow;
 
-export const AptosWalletName = 'Aptos' as WalletName<'Aptos'>;
+export const AptosWalletName = 'Petra' as WalletName<'Petra'>;
 
 export interface AptosWalletAdapterConfig {
   provider?: IAptosWallet;
