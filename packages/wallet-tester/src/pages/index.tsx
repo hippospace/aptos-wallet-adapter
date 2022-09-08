@@ -86,8 +86,11 @@ const MainPage = () => {
         ...txLoading,
         transaction: true
       });
+      const pontemOptions = {
+        max_gas_amount: '1000',
+        gas_unit_price: '1'
+      };
       if (account?.address || account?.publicKey) {
-        const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
         const demoAccount = new AptosAccount();
         await faucetClient.fundAccount(demoAccount.address(), 0);
         const payload: TransactionPayload = {
@@ -99,8 +102,7 @@ const MainPage = () => {
             ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
           ]
         };
-        // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
-        const transactionRes = await signAndSubmitTransaction(payload);
+        const transactionRes = await signAndSubmitTransaction(payload, pontemOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);
