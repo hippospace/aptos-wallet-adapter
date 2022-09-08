@@ -1,8 +1,4 @@
-import {
-  HexEncodedBytes,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -24,7 +20,7 @@ interface ISpikaWallet {
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: any): Promise<SubmitTransactionRequest>;
+  signTransaction(transaction: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
@@ -169,7 +165,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.spika;

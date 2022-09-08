@@ -1,8 +1,4 @@
-import {
-  HexEncodedBytes,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -32,8 +28,8 @@ interface IAptosWallet {
   signAndSubmitTransaction(
     transaction: any
   ): Promise<{ hash: HexEncodedBytes } | IApotsErrorResult>;
-  signTransaction(transaction: any): Promise<SubmitTransactionRequest | IApotsErrorResult>;
-  signMessage(message: string): Promise<string>;
+  signTransaction(transaction: any): Promise<Uint8Array | IApotsErrorResult>;
+  signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
 
@@ -167,7 +163,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
@@ -177,7 +173,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       if ((response as IApotsErrorResult).code) {
         throw new Error((response as IApotsErrorResult).message);
       }
-      return response as SubmitTransactionRequest;
+      return response as Uint8Array;
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));
@@ -211,8 +207,8 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const response = await provider?.signMessage(message);
-      if (response) {
-        return response;
+      if (response?.signature) {
+        return response.signature;
       } else {
         throw new Error('Sign Message failed');
       }

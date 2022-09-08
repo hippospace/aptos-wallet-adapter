@@ -15,12 +15,7 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes,
-  EntryFunctionPayload
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes, EntryFunctionPayload } from 'aptos/dist/generated';
 
 export const FewchaWalletName = 'Fewcha' as WalletName<'Fewcha'>;
 
@@ -167,7 +162,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
@@ -177,11 +172,10 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx.data);
 
-      if (!response) {
+      if (!response || response.status !== 200) {
         throw new Error('No response');
       }
-      const result = { hash: response } as any;
-      return result as SubmitTransactionRequest;
+      return response.data;
     } catch (error: any) {
       const errMsg = error instanceof Error ? error.message : error.response.data.message;
       this.emit('error', new WalletSignTransactionError(errMsg));

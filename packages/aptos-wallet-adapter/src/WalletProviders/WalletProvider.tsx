@@ -219,20 +219,20 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
   // Send a transaction using the provided connection
   const signAndSubmitTransaction = useCallback(
-    async (transaction: TransactionPayload) => {
+    async (transaction: TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      const response = await adapter.signAndSubmitTransaction(transaction);
+      const response = await adapter.signAndSubmitTransaction(transaction, option);
       return response;
     },
     [adapter, handleError, connected]
   );
 
   const signTransaction = useCallback(
-    async (transaction: TransactionPayload) => {
+    async (transaction: TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signTransaction(transaction);
+      return adapter.signTransaction(transaction, option);
     },
     [adapter, handleError, connected]
   );

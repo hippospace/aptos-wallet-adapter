@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { TransactionPayload } from 'aptos/dist/generated';
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
@@ -15,6 +15,7 @@ const MainPage = () => {
     faucet: false
   });
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
   const [signature, setSignature] = useState<string>('');
   const {
     connect,
@@ -26,7 +27,8 @@ const MainPage = () => {
     connected,
     disconnecting,
     wallet: currentWallet,
-    signMessage
+    signMessage,
+    signTransaction
   } = useWallet();
 
   const renderWalletConnectorGroup = () => {
@@ -44,6 +46,38 @@ const MainPage = () => {
         </Button>
       );
     });
+  };
+
+  const signTransac = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        transaction: true
+      });
+      if (account?.address || account?.publicKey) {
+        const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
+        const demoAccount = new AptosAccount();
+        await faucetClient.fundAccount(demoAccount.address(), 0);
+        const payload: TransactionPayload = {
+          type: 'entry_function_payload',
+          function: '0x1::coin::transfer',
+          type_arguments: ['0x1::aptos_coin::AptosCoin'],
+          arguments: [
+            demoAccount.address().hex(),
+            ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
+          ]
+        };
+        const transactionRes = await signTransaction(payload);
+        console.log('test sign transaction: ', transactionRes);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        transaction: false
+      });
+    }
   };
 
   const transferToken = async () => {
@@ -92,17 +126,31 @@ const MainPage = () => {
     ));
   };
 
+  const renderFaucetTxLinks = () => {
+    return faucetTxLinks.map((link: string, index: number) => (
+      <div className="flex gap-2 faucet" key={link}>
+        <p>{index + 1}.</p>
+        <a href={link} target="_blank" rel="noreferrer" className="underline">
+          {link}
+        </a>
+      </div>
+    ));
+  };
+
+  const messageToSign = useMemo(
+    () =>
+      `Hello from account ${account?.publicKey?.toString() || account?.address?.toString() || ''}`,
+    [account]
+  );
+
   const signMess = async () => {
     try {
       setTxLoading({
         ...txLoading,
         sign: true
       });
-      if (account?.publicKey) {
-        const addressKey = account?.publicKey?.toString() || '';
-        const signedMessage = (await signMessage(`Hello from account ${addressKey}`)) as any;
-        setSignature(signedMessage.signedMessage.toString());
-      }
+      const signedMessage = await signMessage(messageToSign);
+      setSignature(signedMessage);
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
@@ -120,10 +168,10 @@ const MainPage = () => {
         faucet: true
       });
       if (account?.address) {
-        const transactionRes = await faucetClient.fundAccount(account.address, 1000);
+        const transactionRes = await faucetClient.fundAccount(account.address, 50000);
         await aptosClient.waitForTransaction(`0x${transactionRes[0]}` || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/0x${transactionRes[0]}`];
-        setTxLinks(links);
+        setFaucetTxLinks(links);
       }
     } catch (err: any) {
       console.log('tx error: ', err.msg);
@@ -151,7 +199,7 @@ const MainPage = () => {
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
           </strong>
-          <strong>Message to Sign : Hello from account {account?.publicKey?.toString()}</strong>
+          <strong>Message to Sign : {messageToSign}</strong>
           {signature ? (
             <div className="flex gap-2 transaction">
               <strong>Signature: </strong>
@@ -162,8 +210,14 @@ const MainPage = () => {
               Sign Message
             </Button>
           )}
+          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.transaction}>
+            Sign Transaction
+          </Button> */}
           <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading.transaction}>
             Transfer Token
+          </Button>
+          <Button id="faucetBtn" onClick={() => fundAccount()} loading={txLoading.faucet}>
+            Faucet
           </Button>
           <Button
             id="disconnectBtn"
@@ -174,12 +228,13 @@ const MainPage = () => {
             }}>
             Disconnect
           </Button>
-          <Button id="faucetBtn" onClick={() => fundAccount()} loading={txLoading.faucet}>
-            Faucet
-          </Button>
           <div className="mt-4">
             <h4>Transaction History:</h4>
             <div className="flex flex-col gap-2">{renderTxLinks()}</div>
+          </div>
+          <div className="mt-4">
+            <h4>Faucet History:</h4>
+            <div className="flex flex-col gap-2">{renderFaucetTxLinks()}</div>
           </div>
         </div>
       );

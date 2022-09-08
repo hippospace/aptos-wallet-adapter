@@ -1,9 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/dist/generated';
 import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
   WalletNotConnectedError,
@@ -141,7 +137,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const request = new URLSearchParams({
         request: JSON.stringify({
@@ -161,7 +157,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         this.once('success', resolve);
         this.once('error', reject);
       });
-      return promise as SubmitTransactionRequest;
+      return promise as Uint8Array;
     } catch (error: any) {
       this.emit('error', error);
       throw error;

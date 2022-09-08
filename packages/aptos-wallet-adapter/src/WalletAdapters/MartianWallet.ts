@@ -1,9 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/dist/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -39,8 +35,8 @@ interface IMartianWallet {
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
-  signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
-  signMessage(message: string): Promise<string>;
+  signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+  signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
 
@@ -180,7 +176,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transactionPyld: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
@@ -192,8 +188,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       if (!response) {
         throw new Error('No response');
       }
-      const result = { hash: response } as any;
-      return result as SubmitTransactionRequest;
+      return response;
     } catch (error: any) {
       this.emit('error', new WalletSignTransactionError(error));
       throw error;
@@ -227,8 +222,8 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const response = await provider?.signMessage(message);
-      if (response) {
-        return response;
+      if (response?.signature) {
+        return response?.signature;
       } else {
         throw new Error('Sign Message failed');
       }

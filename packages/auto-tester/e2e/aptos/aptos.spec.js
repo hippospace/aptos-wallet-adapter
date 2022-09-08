@@ -64,20 +64,6 @@ describe("test aptos wallet extension", () => {
       await extPage.$$eval('button[type="button"]', (elements) =>
         elements[0].click()
       );
-
-      // wait for faucet
-      await extPage.waitForFunction(
-        `document.querySelectorAll('button[type="button"]').length === 10`
-      );
-      await extPage.$$eval('button[type="button"]', (elements) =>
-        elements[1].click()
-      );
-
-      await extPage.waitForFunction(
-        `document.querySelectorAll('span').length === 11`
-      );
-      const text = await extPage.$$eval("span", (e) => e[1].innerText);
-      expect(text).toEqual("50,000");
     });
 
     it("should connect to the extension", async () => {
@@ -112,6 +98,17 @@ describe("test aptos wallet extension", () => {
       expect(address).not.toBe("");
       expect(publicKey).not.toBe("");
       expect(authKey).toBe("");
+    });
+
+    it("should request faucet successfully", async () => {
+      await appPage.bringToFront();
+
+      const faucetBtn = await appPage.$("#faucetBtn");
+      await faucetBtn.click();
+
+      await appPage.waitForSelector(".faucet");
+      const txLength = await appPage.$$eval(".faucet", (ele) => ele.length);
+      expect(txLength).toEqual(1);
     });
 
     it("should transfer token successfully", async () => {
