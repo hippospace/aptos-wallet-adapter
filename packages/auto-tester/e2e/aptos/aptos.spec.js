@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/quotes */
 const { bootstrap } = require("./bootstrap");
-const walletId = "#Aptos";
+const walletId = "#Petra";
 
-describe("test aptos wallet extension", () => {
+describe("test petra wallet extension", () => {
   let extPage, appPage, browser;
 
   beforeAll(async () => {
@@ -15,7 +15,7 @@ describe("test aptos wallet extension", () => {
     browser = context.browser;
   });
 
-  describe("aptos wallet extension", () => {
+  describe("petra wallet extension", () => {
     it("should create a new wallet successfully", async () => {
       await extPage.bringToFront();
 

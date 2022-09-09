@@ -13,7 +13,7 @@ export interface Wallet {
 }
 
 export interface WalletContextState {
-  // autoConnect: boolean;
+  autoConnect: boolean;
   wallets: Wallet[];
   wallet: Wallet | null;
   account: AccountKeys | null;
@@ -32,7 +32,7 @@ export interface WalletContextState {
 }
 
 const DEFAULT_CONTEXT = {
-  // autoConnect: false,
+  autoConnect: false,
   connecting: false,
   connected: false,
   disconnecting: false

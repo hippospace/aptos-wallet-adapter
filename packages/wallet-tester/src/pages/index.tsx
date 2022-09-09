@@ -172,7 +172,10 @@ const MainPage = () => {
       if (account?.address) {
         const transactionRes = await faucetClient.fundAccount(account.address, 50000);
         await aptosClient.waitForTransaction(`0x${transactionRes[0]}` || '');
-        const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/0x${transactionRes[0]}`];
+        const links = [
+          ...faucetTxLinks,
+          `https://explorer.devnet.aptos.dev/txn/0x${transactionRes[0]}`
+        ];
         setFaucetTxLinks(links);
       }
     } catch (err: any) {
@@ -192,6 +195,9 @@ const MainPage = () => {
     if (connected && account) {
       return (
         <div className="flex flex-col gap-2">
+          <strong>
+            Wallet: <div id="address">{currentWallet?.adapter.name}</div>
+          </strong>
           <strong>
             Address: <div id="address">{account?.address?.toString()}</div>
           </strong>
