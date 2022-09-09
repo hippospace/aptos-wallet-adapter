@@ -15,13 +15,14 @@ export type Address = MaybeHexString;
 export type AuthKey = MaybeHexString;
 
 export interface AccountKeys {
-  publicKey: PublicKey | null;
+  publicKeys: PublicKey[] | null;
   address: Address | null;
   authKey: AuthKey | null;
+  minKeysRequired?: number;
 }
 
 export interface WalletAdapterEvents {
-  connect(publicKey: PublicKey): void;
+  connect(publicKeys: PublicKey[]): void;
   disconnect(): void;
   error(error: any): void;
   success(value: any): void;
@@ -109,7 +110,7 @@ export abstract class BaseWalletAdapter
   abstract get connecting(): boolean;
 
   get connected(): boolean {
-    return !!this.publicAccount.publicKey;
+    return !!this.publicAccount.publicKeys?.length;
   }
 
   abstract connect(): Promise<void>;

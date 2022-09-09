@@ -25,7 +25,7 @@ interface ConnectPontemAccount {
 
 interface PontemAccount {
   address: MaybeHexString;
-  publicKey?: MaybeHexString;
+  publicKeys?: MaybeHexString[];
   authKey?: MaybeHexString;
   isConnected: boolean;
 }
@@ -117,7 +117,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKeys || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -163,11 +163,11 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       if (walletAccount) {
         this._wallet = {
           address: walletAccount,
-          publicKey,
+          publicKeys: publicKey ? [publicKey] : [],
           isConnected: true
         };
       }
-      this.emit('connect', this._wallet?.address || '');
+      this.emit('connect', this._wallet?.publicKeys || []);
     } catch (error: any) {
       this.emit('error', new Error('User has rejected the connection'));
       throw error;

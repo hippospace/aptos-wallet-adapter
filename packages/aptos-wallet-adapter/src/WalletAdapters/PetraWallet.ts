@@ -99,7 +99,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKeys || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -138,11 +138,11 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.connect();
       this._wallet = {
         address: response?.address,
-        publicKey: response?.publicKey,
+        publicKeys: [response?.publicKey],
         isConnected: true
       };
 
-      this.emit('connect', this._wallet.publicKey);
+      this.emit('connect', this._wallet.publicKeys);
     } catch (error: any) {
       this.emit('error', error);
       throw error;

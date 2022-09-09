@@ -51,7 +51,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -92,11 +92,11 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       if (e.data.method === 'account') {
         this._wallet = {
           connected: true,
-          publicKey: e.data.publicKey || null,
+          publicKeys: e.data.publicKey ? [e.data.publicKey] : null,
           address: e.data.address || null,
           authKey: e.data.authKey || null
         };
-        this.emit('connect', this._wallet);
+        this.emit('connect', this._wallet.publicKeys);
       } else if (e.data.method === 'success') {
         this.emit('success', e.data.detail?.hash);
       } else if (e.data.method === 'fail') {

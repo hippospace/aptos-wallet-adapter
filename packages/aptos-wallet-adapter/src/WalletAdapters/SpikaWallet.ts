@@ -87,7 +87,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKeys || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -130,7 +130,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.connect();
       if (response?.publicKey !== undefined) {
         this._wallet = {
-          publicKey: response?.publicKey,
+          publicKeys: response?.publicKey ? [response.publicKey] : null,
           address: response?.account,
           authKey: response?.authKey,
           isConnected: true
@@ -141,7 +141,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
         };
       }
 
-      this.emit('connect', this._wallet.publicKey);
+      this.emit('connect', this._wallet.publicKeys);
     } catch (error: any) {
       this.emit('error', error);
       throw error;

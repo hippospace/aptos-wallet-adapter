@@ -92,7 +92,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKeys || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -127,10 +127,11 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
       this._wallet = {
         ...response,
+        publicKeys: response?.publicKey ? [response.publicKey] : [],
         isConnected: true
       };
 
-      this.emit('connect', this._wallet.publicKey);
+      this.emit('connect', this._wallet.publicKeys);
     } catch (error: any) {
       this.emit('error', error);
       throw error;

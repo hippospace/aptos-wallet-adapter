@@ -28,6 +28,7 @@ interface ConnectMartianAccount {
 interface MartianAccount {
   address: MaybeHexString;
   publicKey: MaybeHexString;
+  publicKeys: MaybeHexString[] | null;
   authKey: MaybeHexString;
   isConnected: boolean;
 }
@@ -105,7 +106,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
+      publicKeys: this._wallet?.publicKeys || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
     };
@@ -150,10 +151,11 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       if (walletAccount) {
         this._wallet = {
           ...walletAccount,
+          publicKeys: walletAccount.publicKey ? [walletAccount.publicKey] : null,
           isConnected: true
         };
       }
-      this.emit('connect', this._wallet?.address || '');
+      this.emit('connect', this._wallet?.publicKeys || []);
     } catch (error: any) {
       this.emit('error', new Error(error));
       throw error;
