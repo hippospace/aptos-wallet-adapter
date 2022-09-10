@@ -25,6 +25,7 @@ const MainPage = () => {
     signAndSubmitTransaction,
     connecting,
     connected,
+    select,
     disconnecting,
     wallet: currentWallet,
     signMessage,
@@ -37,6 +38,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
+            select(option.name);
             connect(option.name);
           }}
           id={option.name.split(' ').join('_')}

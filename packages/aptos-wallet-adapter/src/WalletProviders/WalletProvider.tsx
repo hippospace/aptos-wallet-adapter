@@ -203,7 +203,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const connect = useCallback(
     async (walletName: WalletName) => {
       if (isConnecting.current || isDisconnecting.current || connected) return;
-      if (!name) {
+      if (!walletName) {
         setName(walletName);
       } else {
         if (!adapter) throw handleError(new WalletNotSelectedError());
