@@ -1,5 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -205,7 +205,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
   async signAndSubmitTransaction(
     transactionPyld: TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: HexEncodedBytes; }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;

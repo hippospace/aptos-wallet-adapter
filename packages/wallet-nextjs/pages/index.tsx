@@ -2,7 +2,7 @@
 import { Button, Spin } from 'antd';
 import { useEffect, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { TransactionPayload } from 'aptos/dist/generated';
+import { TransactionPayload } from 'aptos/src/generated';
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
