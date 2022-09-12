@@ -1,45 +1,39 @@
-import { useCallback, useState } from 'react';
-import { useSSR } from './useSSR';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export const useLocalStorage = () => {
-  const { isClient } = useSSR();
-  const useLocalStorageState = <T>(
-    key: string,
-    defaultState: T,
-    session?: boolean
-  ): [T, (T: any) => void] => {
-    let storage: undefined | Storage;
-    if (isClient) {
-      storage = session ? sessionStorage : localStorage;
-    }
-    const [state, setState] = useState(() => {
-      try {
-        let storedState = storage?.getItem(key);
-        if (storedState) {
-          return JSON.parse(storedState || '');
-        }
-      } catch (error) {
-        if (typeof window !== 'undefined') {
-          console.error(error);
-        }
+export function useLocalStorage<T>(key: string, defaultState: T): [T, Dispatch<SetStateAction<T>>] {
+  const state = useState<T>(() => {
+    try {
+      const value = localStorage.getItem(key);
+      if (value) return JSON.parse(value) as T;
+    } catch (error: any) {
+      if (typeof window !== 'undefined') {
+        console.error(error);
       }
-      return defaultState;
-    });
+    }
 
-    const setLocalStorageState = useCallback(
-      (newState: any) => {
-        setState(newState);
-        if (newState === null) {
-          storage?.removeItem(key);
-        } else {
-          storage?.setItem(key, JSON.stringify(newState));
-        }
-      },
-      [key, storage]
-    );
+    return defaultState;
+  });
+  const value = state[0];
 
-    return [state, setLocalStorageState];
-  };
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    try {
+      if (value === null) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch (error: any) {
+      if (typeof window !== 'undefined') {
+        console.error(error);
+      }
+    }
+  }, [value, key]);
 
-  return { useLocalStorageState };
-};
+  return state;
+}

@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -16,42 +15,38 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
-interface IHippoWallet {
-  connect: () => Promise<{
-    address: MaybeHexString;
-    publicKey: MaybeHexString;
-    authKey: MaybeHexString;
-  }>;
+interface ISpikaWallet {
+  connect: () => Promise<{ publicKey: string; account: string; authKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<any>;
-  signTransaction(transaction: any): Promise<void>;
+  signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(transaction: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
-interface HippoWindow extends Window {
-  hippoWallet?: IHippoWallet;
+interface SpikaWindow extends Window {
+  spika?: ISpikaWallet;
 }
 
-declare const window: HippoWindow;
+declare const window: SpikaWindow;
 
-export const HippoExtensionWalletName = 'Hippo' as WalletName<'Hippo'>;
+export const SpikaWalletName = 'Spika' as WalletName<'Spika'>;
 
-export interface HippoExtensionWalletAdapterConfig {
-  provider?: IHippoWallet;
+export interface SpikaWalletAdapterConfig {
+  provider?: ISpikaWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
-  name = HippoExtensionWalletName;
+export class SpikaWalletAdapter extends BaseWalletAdapter {
+  name = SpikaWalletName;
 
-  url = 'https://github.com/hippospace/hippo-wallet';
+  url = 'https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb';
 
-  icon = 'https://ui-test1-22e7c.web.app/static/media/hippo_logo.ecded6bf411652de9b7f.png';
+  icon = 'https://pbs.twimg.com/profile_images/1562544739181887488/vSqEIeyh_400x400.png';
 
-  protected _provider: IHippoWallet | undefined;
+  protected _provider: ISpikaWallet | undefined;
 
   // protected _network: WalletAdapterNetwork;
   protected _timeout: number;
@@ -69,10 +64,10 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Mainnet,
     timeout = 10000
-  }: HippoExtensionWalletAdapterConfig = {}) {
+  }: SpikaWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== 'undefined' ? window.hippoWallet : undefined;
+    this._provider = typeof window !== 'undefined' ? window.spika : undefined;
     // this._network = network;
     this._timeout = timeout;
     this._connecting = false;
@@ -80,7 +75,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.hippoWallet) {
+        if (window.spika) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -112,7 +107,10 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      if (this.connected || this.connecting) return;
+      if (this.connected || this.connecting) {
+        return;
+      }
+
       if (
         !(
           this._readyState === WalletReadyState.Loadable ||
@@ -122,13 +120,25 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = this._provider || window.hippoWallet;
-      const response = await provider?.connect();
+      const provider = this._provider || window.spika;
+      const isConnected = await provider?.isConnected();
+      if (isConnected === true) {
+        await provider?.disconnect();
+      }
 
-      this._wallet = {
-        ...response,
-        isConnected: true
-      };
+      const response = await provider?.connect();
+      if (response?.publicKey !== undefined) {
+        this._wallet = {
+          publicKey: response?.publicKey,
+          address: response?.account,
+          authKey: response?.authKey,
+          isConnected: true
+        };
+      } else {
+        this._wallet = {
+          isConnected: false
+        };
+      }
 
       this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
@@ -145,7 +155,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       this._wallet = null;
 
       try {
-        const provider = this._provider || window.hippoWallet;
+        const provider = this._provider || window.spika;
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
@@ -158,21 +168,18 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
-      if (!wallet) throw new WalletNotConnectedError();
+      const provider = this._provider || window.spika;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      try {
-        const provider = this._provider || window.hippoWallet;
-        const response = await provider?.signTransaction(transaction);
-        if (response) {
-          return response;
-        } else {
-          throw new Error('Transaction failed');
-        }
-      } catch (error: any) {
-        throw new WalletSignTransactionError(error?.message, error);
+      const response = await provider?.signTransaction(transaction);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Transaction failed');
       }
     } catch (error: any) {
-      this.emit('error', error);
+      const errMsg = error.message;
+      this.emit('error', new WalletSignTransactionError(errMsg));
       throw error;
     }
   }
@@ -182,22 +189,18 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
-      if (!wallet) throw new WalletNotConnectedError();
+      const provider = this._provider || window.spika;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      try {
-        const provider = this._provider || window.hippoWallet;
-        const response = await provider?.signAndSubmitTransaction(transaction);
-        if (response) {
-          return response.detail.hash;
-        } else {
-          throw new Error('Transaction failed');
-        }
-      } catch (error: any) {
-        // console.log('transact err', error, error.message);
-        throw new WalletSignAndSubmitMessageError(error.message || error);
+      const response = await provider?.signAndSubmitTransaction(transaction);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Transaction failed');
       }
     } catch (error: any) {
-      this.emit('error', error);
+      const errMsg = error.message;
+      this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
       throw error;
     }
   }
@@ -205,7 +208,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
   async signMessage(message: string): Promise<string> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.hippoWallet;
+      const provider = this._provider || window.spika;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const response = await provider?.signMessage(message);
       if (response) {

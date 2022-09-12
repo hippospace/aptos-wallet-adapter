@@ -1,5 +1,5 @@
 const { bootstrap } = require("./bootstrap");
-const walletId = "#PontemWallet";
+const walletId = "#Pontem";
 
 describe("test pontem wallet extension", () => {
   let extPage, appPage, browser;
@@ -66,7 +66,7 @@ describe("test pontem wallet extension", () => {
       expect(text).toContain("0.01");
     });
 
-    it("should connect to the extension", async () => {
+    xit("should connect to the extension", async () => {
       await appPage.bringToFront();
       const popupPagePromise = new Promise((x) =>
         browser.once("targetcreated", (target) => x(target.page()))
@@ -133,7 +133,7 @@ describe("test pontem wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     xit("should display user reject connection", async () => {

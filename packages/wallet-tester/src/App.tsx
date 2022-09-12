@@ -6,7 +6,8 @@ import {
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
   FewchaWalletAdapter,
-  PontemWalletAdapter
+  PontemWalletAdapter,
+  SpikaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import MainPage from './pages';
 import { message } from 'antd';
@@ -19,8 +20,8 @@ const App: React.FC = () => {
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
       new FewchaWalletAdapter(),
-      new PontemWalletAdapter()
-      // new MultiMaskWalletAdapter()
+      new PontemWalletAdapter(),
+      new SpikaWalletAdapter()
       // new NightlyWalletAdapter()
     ],
     []
@@ -29,6 +30,7 @@ const App: React.FC = () => {
   return (
     <WalletProvider
       wallets={wallets}
+      autoConnect
       onError={(error: Error) => {
         console.log('wallet errors: ', error);
         message.error(error.message);

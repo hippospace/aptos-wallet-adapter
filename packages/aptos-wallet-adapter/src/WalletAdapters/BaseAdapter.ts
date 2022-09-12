@@ -1,9 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import EventEmitter from 'eventemitter3';
 
 declare global {
@@ -64,8 +60,12 @@ export interface WalletAdapterProps<Name extends string = string> {
   publicAccount: AccountKeys;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
-  signAndSubmitTransaction(transaction: TransactionPayload): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  signAndSubmitTransaction(
+    transaction: TransactionPayload,
+    options?: any
+  ): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
+  signMessage(message: string): Promise<string>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &
@@ -97,7 +97,9 @@ export abstract class BaseWalletAdapter
     transaction: TransactionPayload
   ): Promise<{ hash: HexEncodedBytes }>;
 
-  abstract signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest>;
+  abstract signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+
+  abstract signMessage(message: string): Promise<string>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {

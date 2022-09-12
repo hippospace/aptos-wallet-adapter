@@ -9,11 +9,11 @@ Supports:
 - [Fewcha wallet](https://fewcha.app/)
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
+- [Pontem Wallet](https://pontem.network/pontem-wallet)
 
 Working on (PR welcome):
 
 - [Nightly wallet](https://chrome.google.com/webstore/detail/nightly/injggoambcadlfkkjcgdfbejanmgfgfm/related?hl=en&authuser=0)
-- [Pontem wallet](https://pontem.network/)
 
 # Installation
 
@@ -49,15 +49,17 @@ import {
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
-  FewchaWalletAdapter
+  FewchaWalletAdapter,
+  PontemWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
-const wallets = () => [
+const wallets = [
   new HippoWalletAdapter(),
   new MartianWalletAdapter(),
   new AptosWalletAdapter(),
   new FewchaWalletAdapter(),
-  new HippoExtensionWalletAdapter()
+  new HippoExtensionWalletAdapter(),
+  new PontemWalletAdapter()
 ];
 
 const App: React.FC = () => {
@@ -100,28 +102,31 @@ const { connected, account, ...rest } = useWallet();
 # Connect & Disconnect
 
 ```typescript
-const { wallets, connect, disconnect, isConnected } = useWallet();
-const wallet = 'Aptos Wallet' // Name can be found in the adapters files in https://github.com/hippospace/aptos-wallet-adapter/tree/main/src/WalletAdatpers
+import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
-if (!isConnected) {
+...
+
+const { connect, disconnect, connected } = useWallet();
+
+if (!connected) {
   return (
-    <Button
+    <button
       onClick={() => {
-        connect(wallet);
+        connect(AptosWalletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect
-    </Button>
+    </button>
   );
 } else {
   return (
-    <Button
+    <button
       onClick={() => {
         disconnect();
       }}
     >
       Disconnect
-    </Button>
+    </button>
   );
 }
 ```

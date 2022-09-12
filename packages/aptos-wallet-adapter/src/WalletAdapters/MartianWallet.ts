@@ -1,13 +1,11 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -37,7 +35,8 @@ interface IMartianWallet {
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
-  signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+  signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
 
@@ -47,7 +46,7 @@ interface MartianWindow extends Window {
 
 declare const window: MartianWindow;
 
-export const MartianWalletName = 'MartianWallet' as WalletName<'MartianWallet'>;
+export const MartianWalletName = 'Martian' as WalletName<'Martian'>;
 
 export interface MartianWalletAdapterConfig {
   provider?: IMartianWallet;
@@ -61,7 +60,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   url = 'https://chrome.google.com/webstore/detail/martian-wallet/efbglgofoippbgcjepnhiblaibcnclgk';
 
   icon =
-    'https://www.gitbook.com/cdn-cgi/image/width=40,height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F1159842905-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FXillBNDwQOz0oPJ4OtRH%252Ficon%252FaBwgf6d32iEu3YE56Jvk%252Flogo128_squ.png%3Falt%3Dmedia%26token%3D0f5bef1f-a4bd-495e-a447-289c235bb76a';
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUyIiBoZWlnaHQ9IjM1MiIgdmlld0JveD0iMCAwIDM1MiAzNTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzNTIiIGhlaWdodD0iMzUyIiByeD0iODciIGZpbGw9IiMxRjFGMUYiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNjkuNzAxIDg5LjA4NDFDMTU5LjUwOCA4OS44MzA5IDE1MC41NDcgOTIuMDAxNCAxNDEuMDc2IDk2LjAxNjlDMTM5LjQyNCA5Ni43MTc0IDEzMy43MDIgOTkuNjAzNyAxMzIuMTE2IDEwMC41MzdDMTI4LjEzMSAxMDIuODgxIDEyMy4wNDMgMTA2LjQ5NiAxMTkuNTg2IDEwOS40NEMxMTYuOTc1IDExMS42NjUgMTExLjIxNiAxMTcuNDUyIDEwOS4yMDIgMTE5Ljg3NkMxMDUuMDg1IDEyNC44MzIgMTAxLjA4OCAxMzAuODg2IDk4LjQzODQgMTM2LjE3OUM5Ny45OTQyIDEzNy4wNjYgOTcuNTYzNSAxMzcuODE3IDk3LjQ4MTMgMTM3Ljg0OEM5Ny4zOTkzIDEzNy44OCA5Ny4zMzIgMTM3Ljk5NSA5Ny4zMzIgMTM4LjEwNUM5Ny4zMzIgMTM4LjIxNCA5Ni43Njg1IDEzOS42MDggOTYuMDc5NiAxNDEuMkM5NC42OTc1IDE0NC4zOTYgOTIuOTE3NiAxNDkuNDk2IDkxLjk5MjUgMTUyLjkwOUM4OS42MjY3IDE2MS42NCA4OC41NDA3IDE3Mi40OTUgODkuMTgxMSAxODEuMDExQzkwLjM4ODggMTk3LjA3MSA5NS4xODY2IDIxMS4xMiAxMDMuODUzIDIyMy45NzVDMTEwLjE0NyAyMzMuMzExIDExOC4zMzYgMjQxLjQxMyAxMjcuOTk1IDI0Ny44NjFDMTM4LjkzNiAyNTUuMTYzIDE1MS45NzEgMjU5LjkxIDE2NS41MzIgMjYxLjUyOUMxNjkuMjQ3IDI2MS45NzIgMTc3LjczMSAyNjIuMTQ2IDE4MS43NjIgMjYxLjg2MUMxOTguMDkzIDI2MC43MDYgMjEzLjYxNiAyNTQuOTk0IDIyNi43OCAyNDUuMjk3QzI0NC4wODIgMjMyLjU1MiAyNTYuMDc2IDIxMy43OTcgMjYwLjMzMiAxOTIuODM0QzI2MS42MDEgMTg2LjU4MiAyNjIuMDA2IDE4Mi4zNTUgMjYyIDE3NS40MDdDMjYxLjk5NiAxNzAuMzM3IDI2MS45NDYgMTY5LjI5NSAyNjEuNTQxIDE2NS44MjlDMjU5LjcwNSAxNTAuMTQyIDI1NC4wNTkgMTM1Ljg4OCAyNDQuNzgzIDEyMy41MjdDMjM4LjkwMyAxMTUuNjg5IDIzMC45OTIgMTA4LjI0OCAyMjMuMDk4IDEwMy4xMjlDMjE4LjQ4NSAxMDAuMTM2IDIxNi4xNzggOTguODU1NSAyMTEuNjYxIDk2Ljc3NzRDMjAyLjMzOCA5Mi40ODc5IDE5Mi4zNzYgODkuOTA5MSAxODIuMTg3IDg5LjE0NzlDMTgwLjA0MiA4OC45ODc2IDE3MS42MDYgODguOTQ0NSAxNjkuNzAxIDg5LjA4NDFaTTE4My4wMjUgMTAzLjY1N0MxODkuNTAzIDEwNC4zNDggMTk2LjI4NCAxMDYuMDM0IDIwMi4zNiAxMDguNDY0TDIwNC4zNTYgMTA5LjI2MkwyMDQuMzU2IDExMC44MjJDMjA0LjM1NyAxMTYuODk2IDIwMC4zNDQgMTIyLjMwNyAxOTQuMzMzIDEyNC4zMzRMMTkyLjcyIDEyNC44NzhMMTczLjUyMyAxMjQuOTg3QzE1NS4yODkgMTI1LjA5IDE1MS45OTQgMTI1LjE3NSAxNDcuNjE2IDEyNS42NTdDMTM3LjY3NiAxMjYuNzUyIDEyOS44NzIgMTI4LjI2NSAxMjEuMzAyIDEzMC43NjFDMTIwLjA1IDEzMS4xMjUgMTE4LjkxNyAxMzEuNDI0IDExOC43ODUgMTMxLjQyNEMxMTguNDY0IDEzMS40MjQgMTE4LjkwOSAxMzAuNzkxIDEyMC43NTIgMTI4LjYyMkMxMjQuNDgzIDEyNC4yMzMgMTMwLjczMiAxMTguNTk4IDEzNC43MDYgMTE2LjA0MUMxMzUuMTI2IDExNS43NyAxMzUuNTA4IDExNS41MDkgMTM1LjU1NSAxMTUuNDZDMTM1LjYwMiAxMTUuNDExIDEzNi4yNTEgMTE0Ljk3OSAxMzYuOTk5IDExNC41MDFDMTQyLjI2MyAxMTEuMTMxIDE0OC4wMzYgMTA4LjQ0MSAxNTQuMDcyIDEwNi41NDNDMTU5LjY1OCAxMDQuNzg3IDE2NC44MTQgMTAzLjg3MiAxNzIuMTY0IDEwMy4zMzFDMTczLjg3NCAxMDMuMjA2IDE4MC43MjMgMTAzLjQxMSAxODMuMDI1IDEwMy42NTdaTTIxOS4xMzMgMTE4LjAyMkMyMjIuNzUxIDEyMC43NzkgMjI5LjQ5OSAxMjcuMTM2IDIyOS40OTkgMTI3Ljc4N0MyMjkuNDk5IDEyOC42MDYgMjI2Ljc1IDEzMy40OTMgMjI0Ljc4NCAxMzYuMTY4QzIxOC4wMzIgMTQ1LjM1NSAyMDcuOTIxIDE1MS41NTYgMTk2Ljc5NyAxNTMuMzMyQzE5My45NDUgMTUzLjc4OCAxOTEuOTk0IDE1My44MzUgMTc1LjczMiAxNTMuODQ1QzE1NS4zOTYgMTUzLjg1NyAxNTIuNTc3IDE1My45NjYgMTQ1LjA2OCAxNTUuMDI4QzEzMS4xNjkgMTU2Ljk5NCAxMTguMDA0IDE2MS4zODUgMTA1Ljc3IDE2OC4xMzdDMTA0Ljc1NyAxNjguNjk1IDEwMy44ODUgMTY5LjEwOCAxMDMuODMxIDE2OS4wNTRDMTAzLjY1IDE2OC44NzMgMTA0LjMxMyAxNjMuOTY5IDEwNC44OTUgMTYxLjE4MkMxMDUuNTE0IDE1OC4yMTggMTA2LjU0MiAxNTQuNDE0IDEwNy4zMTEgMTUyLjI0N0wxMDcuNzg2IDE1MC45MDlMMTA5LjQ4MSAxNTAuMTU2QzEyMC45OTQgMTQ1LjA0MiAxMzQuODA4IDE0MS4zODIgMTQ3LjQ0NyAxNDAuMDk3QzE1NC4yNTggMTM5LjQwNSAxNTUuMTY2IDEzOS4zNzggMTczLjk0OCAxMzkuMzA0QzE4NC45MTIgMTM5LjI2MSAxOTMuMTE2IDEzOS4xNiAxOTMuOTMgMTM5LjA2QzE5NS4yOCAxMzguODkyIDE5Ny44NDYgMTM4LjI4NyAxOTkuNDEgMTM3Ljc2NkMxOTkuODQxIDEzNy42MjIgMjAxLjE4OCAxMzcuMDI1IDIwMi40MDMgMTM2LjQzOUMyMDkuNTU2IDEzMi45ODcgMjE0LjkxIDEyNi43OTggMjE3LjM1OCAxMTkuMTU0QzIxNy43OTIgMTE3Ljc5OCAyMTguMDU3IDExNy4yMDQgMjE4LjE4NCAxMTcuM0MyMTguMjg3IDExNy4zNzggMjE4LjcxNCAxMTcuNzAzIDIxOS4xMzMgMTE4LjAyMlpNMjM5LjM5OSAxNDEuODI1QzI0MC42NzggMTQ0LjAyMyAyNDIuODA1IDE0OS4xNjMgMjQ0LjA5MSAxNTMuMTZDMjQ1LjE0MSAxNTYuNDI2IDI0NS4yMTggMTU2LjgxOCAyNDQuODk5IDE1Ny4zMDVDMjQ0LjQ1MyAxNTcuOTg1IDIzOC45OTEgMTYzLjUxMSAyMzcuMzc3IDE2NC45MTZDMjI5LjUxNCAxNzEuNzU2IDIyMC4yNTIgMTc2Ljg4MiAyMTAuNTc1IDE3OS43NUMyMDUuNzczIDE4MS4xNzMgMjAxLjM0NCAxODIuMDAxIDE5NS42MjMgMTgyLjU0NkMxOTQuNjk4IDE4Mi42MzQgMTg1Ljk0NSAxODIuNzE2IDE3Ni4xNzIgMTgyLjcyOUMxNTUuMDkgMTgyLjc1NSAxNTMuODA5IDE4Mi44MTEgMTQ2LjU5NyAxODQuMDAxQzEzMy44MDkgMTg2LjExMiAxMjAuNjg1IDE5MS43MDYgMTEwLjA5NCAxOTkuNTZDMTA5LjIwNSAyMDAuMjE5IDEwOC4zNjggMjAwLjc2NyAxMDguMjM1IDIwMC43NzdDMTA3Ljk1NCAyMDAuNzk4IDEwNy4zODIgMTk5LjIxOCAxMDYuMjQ0IDE5NS4yNzZDMTA1LjQyOSAxOTIuNDUyIDEwNC4yNDggMTg2LjgxNCAxMDQuMzMxIDE4Ni4xNEMxMDQuMzcxIDE4NS44MTkgMTA0Ljg5NyAxODUuNDAxIDEwNi43NiAxODQuMjExQzExNy42NTkgMTc3LjI0NiAxMjkuNDk5IDE3Mi40ODcgMTQxLjkyNSAxNzAuMDc1QzE0NS4zODMgMTY5LjQwNCAxNDUuOTMxIDE2OS4zMjIgMTQ5Ljk5NSAxNjguODY1QzE1NSAxNjguMzAyIDE1Ni42NjQgMTY4LjI2MSAxNzcuMDA2IDE2OC4yMDVDMTk1LjY3MiAxNjguMTUzIDE5NS44ODMgMTY4LjE0NCAyMDAuODc0IDE2Ny4xNzRDMjA4LjYzNiAxNjUuNjY3IDIxNi4yMDcgMTYyLjQ3MyAyMjIuNjI4IDE1Ny45OThDMjI4LjUzMyAxNTMuODgyIDIzNC40MDMgMTQ3Ljg5MiAyMzcuOTcgMTQyLjM0QzIzOC40MDMgMTQxLjY2NiAyMzguODA3IDE0MS4xMTIgMjM4Ljg2OCAxNDEuMTA5QzIzOC45MjkgMTQxLjEwNiAyMzkuMTY4IDE0MS40MjggMjM5LjM5OSAxNDEuODI1Wk0yNDcuNjc1IDE3Ni44MDhDMjQ3LjY3MiAxODEuNTQ5IDI0Ni43NTUgMTg4LjE3NyAyNDUuMzU5IDE5My41MzNDMjQ0Ljk1NyAxOTUuMDc3IDI0NC44NDcgMTk1LjMwOCAyNDQuMzggMTk1LjU5QzI0NC4wOSAxOTUuNzY2IDI0My4zMTggMTk2LjIzOCAyNDIuNjY0IDE5Ni42NDFDMjMwLjUzNCAyMDQuMTA4IDIxNi40MTUgMjA5LjEzNyAyMDMuMTIxIDIxMC43MjVDMjAxLjUxMSAyMTAuOTE3IDE5OS41NDQgMjExLjE2MyAxOTguNzUgMjExLjI3MUMxOTcuNzcgMjExLjQwNCAxOTAuNzU0IDIxMS41MDcgMTc2LjkyMSAyMTEuNTkxQzE2NS43MDkgMjExLjY1OCAxNTYuMzA2IDIxMS43NTYgMTU2LjAyNSAyMTEuODA3QzE1NS43NDUgMjExLjg1OSAxNTQuNzkgMjExLjk4OSAxNTMuOTAyIDIxMi4wOTdDMTQzLjc3MiAyMTMuMzI1IDEzMy4yMDggMjE3Ljg1OSAxMjUuMTU2IDIyNC40MzRDMTI0LjQzNiAyMjUuMDIyIDEyMy43NzIgMjI1LjUwMyAxMjMuNjggMjI1LjUwM0MxMjMuMTkxIDIyNS41MDMgMTE4LjA5MiAyMTkuMjc5IDExNS44OSAyMTUuOTk0QzExNC45NDQgMjE0LjU4MiAxMTQuNzM2IDIxNC4xNjEgMTE0Ljg5IDIxMy45NzJDMTE1LjIyNyAyMTMuNTU4IDExOS40MjggMjEwLjM5MSAxMjEuMiAyMDkuMjE1QzEyNy40NDEgMjA1LjA3NCAxMzQuMTA1IDIwMS45NjQgMTQwLjk5MSAxOTkuOThDMTQ1LjAwMyAxOTguODI0IDE0Ny45NDkgMTk4LjIyNyAxNTMuMDM3IDE5Ny41NDJDMTU1LjMzMiAxOTcuMjMzIDE1OC42NjcgMTk3LjE3NSAxODAuMTQ4IDE5Ny4wNzJDMTk1Ljg1OCAxOTYuOTk2IDE5Ny4xMiAxOTYuOTQ2IDIwMi4zMTggMTk2LjE5N0MyMTQuNzAxIDE5NC40MTIgMjI2LjYyNyAxODkuODU3IDIzNy4zOTggMTgyLjc5N0MyMzkuNTQ4IDE4MS4zODggMjQzLjcxMiAxNzguMjU2IDI0NS43MjIgMTc2LjUzNUMyNDYuNjU2IDE3NS43MzUgMjQ3LjQ3OCAxNzUuMDc4IDI0Ny41NDggMTc1LjA3NEMyNDcuNjE4IDE3NS4wNyAyNDcuNjc1IDE3NS44NSAyNDcuNjc1IDE3Ni44MDhaTTIzNC40MjUgMjE3LjEyOUMyMzQuNDI1IDIxNy4yOTQgMjMyLjIxOCAyMjAuMTc1IDIzMC42MTYgMjIyLjEwMkMyMjguODg1IDIyNC4xODUgMjIzLjkyOSAyMjkuMTM0IDIyMS44NjYgMjMwLjg0MUMyMTAuMzQ3IDI0MC4zNzEgMTk3LjE0MSAyNDUuOTA2IDE4Mi4yNzIgMjQ3LjQzNUMxNzkuMjIyIDI0Ny43NDggMTcxLjA4OSAyNDcuNjk4IDE2OC4xMDQgMjQ3LjM0NkMxNjAuNTU1IDI0Ni40NTggMTUzLjk3MiAyNDQuNzYzIDE0Ny40NDcgMjQyLjAyOEMxNDUuOTEzIDI0MS4zODUgMTQxLjgxNCAyMzkuMzc5IDE0MC41MDMgMjM4LjYyOUMxMzcuODA3IDIzNy4wODkgMTM0Ljg3MyAyMzUuMjExIDEzNC44NzggMjM1LjAzMUMxMzQuODg4IDIzNC42ODQgMTM5LjY4MSAyMzEuNjU0IDE0Mi4xOTUgMjMwLjQwN0MxNDYuMDU3IDIyOC40OSAxNDkuNDU3IDIyNy4zOTcgMTU0LjM5IDIyNi40ODdDMTU2LjMxMiAyMjYuMTMyIDE1Ni45MTEgMjI2LjExOSAxNzYuNDExIDIyNi4wMDFDMTg3LjQzNiAyMjUuOTM0IDE5Ni44MDEgMjI1LjgzNSAxOTcuMjIxIDIyNS43OEMxOTcuNjQyIDIyNS43MjUgMTk5LjAxOCAyMjUuNTk3IDIwMC4yNzkgMjI1LjQ5NEMyMDUuMTI2IDIyNS4xIDIxMS44NDMgMjIzLjk3NiAyMTYuOTU5IDIyMi43MDRDMjE5LjYzOSAyMjIuMDM4IDIyNC4xNTggMjIwLjc5NCAyMjQuNjU3IDIyMC41ODZDMjI0Ljg0NCAyMjAuNTA4IDIyNi4wMjkgMjIwLjA5MiAyMjcuMjkgMjE5LjY2MkMyMjguNTUxIDIxOS4yMzEgMjMwLjYxNSAyMTguNDY2IDIzMS44NzcgMjE3Ljk2MUMyMzQuMzIzIDIxNi45ODIgMjM0LjQyNSAyMTYuOTQ5IDIzNC40MjUgMjE3LjEyOVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=';
 
   protected _provider: IMartianWallet | undefined;
 
@@ -92,7 +91,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (this._provider) {
+        if (window.martian) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -163,7 +162,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider;
+    const provider = this._provider || window.martian;
     if (wallet) {
       this._wallet = null;
 
@@ -177,22 +176,21 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transactionPyld: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx);
 
       if (!response) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
-      const result = { hash: response } as any;
-      return result as SubmitTransactionRequest;
+      return response;
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new WalletSignTransactionError(error));
       throw error;
     }
   }
@@ -205,15 +203,33 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
-      if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
+      if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
       if (!response) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       return { hash: response };
     } catch (error: any) {
-      this.emit('error', new Error(error));
+      this.emit('error', new WalletSignAndSubmitMessageError(error));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.martian;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response?.signature) {
+        return response?.signature;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }
