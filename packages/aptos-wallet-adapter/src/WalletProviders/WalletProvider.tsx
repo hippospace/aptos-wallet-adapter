@@ -1,6 +1,6 @@
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { TransactionPayload } from 'aptos/dist/generated';
+import { TransactionPayload } from 'aptos/src/generated';
 import {
   WalletError,
   WalletNotConnectedError,

@@ -1,4 +1,4 @@
-import { HexEncodedBytes, TransactionPayload } from 'aptos/dist/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,

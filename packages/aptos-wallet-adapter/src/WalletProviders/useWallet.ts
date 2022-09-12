@@ -1,4 +1,4 @@
-import { TransactionPayload, HexEncodedBytes } from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import { createContext, useContext } from 'react';
 import {
   AccountKeys,
