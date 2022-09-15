@@ -1,12 +1,9 @@
-import {
-  HexEncodedBytes,
-  SubmitTransactionRequest,
-  TransactionPayload
-} from 'aptos/dist/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders';
 import {
@@ -30,7 +27,8 @@ interface IRiseWallet {
   account(): Promise<RiseAccount>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: any): Promise<SubmitTransactionRequest>;
+  signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
+  signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
 
@@ -175,7 +173,7 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
@@ -211,6 +209,26 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.rise;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+
+      const response = await provider?.signMessage(message);
+      if (response?.signature) {
+        return response.signature;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      console.log('err', error);
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }
