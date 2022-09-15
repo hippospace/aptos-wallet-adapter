@@ -1,4 +1,4 @@
-import { HexEncodedBytes, TransactionPayload } from 'aptos/dist/generated';
+import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -26,9 +26,10 @@ interface IAptosWallet {
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(
-    transaction: any
+    transaction: any,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes } | IApotsErrorResult>;
-  signTransaction(transaction: any): Promise<Uint8Array | IApotsErrorResult>;
+  signTransaction(transaction: any, options?: any): Promise<Uint8Array | IApotsErrorResult>;
   signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
@@ -163,13 +164,13 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider.signTransaction(transaction);
+      const response = await provider.signTransaction(transaction, options);
       if ((response as IApotsErrorResult).code) {
         throw new Error((response as IApotsErrorResult).message);
       }
@@ -182,14 +183,15 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
+    transaction: TransactionPayload,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider.signAndSubmitTransaction(transaction);
+      const response = await provider.signAndSubmitTransaction(transaction, options);
       if ((response as IApotsErrorResult).code) {
         throw new Error((response as IApotsErrorResult).message);
       }

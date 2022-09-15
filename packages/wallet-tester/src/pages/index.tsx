@@ -3,7 +3,7 @@
 import { Button, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { TransactionPayload } from 'aptos/dist/generated';
+import { TransactionPayload } from 'aptos/src/generated';
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
@@ -86,7 +86,7 @@ const MainPage = () => {
         ...txLoading,
         transaction: true
       });
-      const pontemOptions = {
+      const txOptions = {
         max_gas_amount: '1000',
         gas_unit_price: '1'
       };
@@ -102,7 +102,7 @@ const MainPage = () => {
             ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
           ]
         };
-        const transactionRes = await signAndSubmitTransaction(payload, pontemOptions);
+        const transactionRes = await signAndSubmitTransaction(payload, txOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);

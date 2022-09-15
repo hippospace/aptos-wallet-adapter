@@ -1,5 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -33,7 +33,7 @@ interface IMartianWallet {
   connect: () => Promise<ConnectMartianAccount>;
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
-  generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
+  generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
   signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
   signMessage(message: string): Promise<{ signature: string }>;
@@ -176,12 +176,12 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transactionPyld: TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
+      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld, options);
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx);
 
@@ -196,13 +196,14 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload
+    transactionPyld: TransactionPayload,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld);
+      const tx = await provider.generateTransaction(wallet.address || '', transactionPyld, options);
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx);
 
