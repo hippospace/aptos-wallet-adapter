@@ -1,5 +1,5 @@
 const { bootstrap } = require("./bootstrap");
-const walletId = "#Fewcha_Wallet";
+const walletId = "#Fewcha";
 
 describe("test fewcha wallet extension", () => {
   let extPage, appPage, browser;
@@ -53,13 +53,6 @@ describe("test fewcha wallet extension", () => {
       await extPage.evaluate(() =>
         document.querySelector('.sidebar button[type="button"]').click()
       );
-
-      // wait for faucet
-      await extPage.waitForFunction(
-        "document.querySelector('.balance').innerText.includes('500000')"
-      );
-      const text = await extPage.$eval(".balance", (e) => e.innerText);
-      expect(text).toEqual("500000");
     });
 
     it("should connect to the extension", async () => {
@@ -92,6 +85,17 @@ describe("test fewcha wallet extension", () => {
       expect(address).not.toBe("");
       expect(publicKey).not.toBe("");
       expect(authKey).toBe("");
+    });
+
+    it("should request faucet successfully", async () => {
+      await appPage.bringToFront();
+
+      const faucetBtn = await appPage.$("#faucetBtn");
+      await faucetBtn.click();
+
+      await appPage.waitForSelector(".faucet");
+      const txLength = await appPage.$$eval(".faucet", (ele) => ele.length);
+      expect(txLength).toEqual(1);
     });
 
     it("should transfer token successfully", async () => {
@@ -129,7 +133,7 @@ describe("test fewcha wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     it("should display user reject connection", async () => {

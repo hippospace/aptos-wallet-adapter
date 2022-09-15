@@ -1,9 +1,5 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
   WalletNotConnectedError,
@@ -12,7 +8,7 @@ import {
 } from '../WalletProviders/errors';
 import { AccountKeys, BaseWalletAdapter, WalletName, WalletReadyState } from './BaseAdapter';
 
-export const HippoWalletName = 'Hippo Web Wallet' as WalletName<'Hippo Web Wallet'>;
+export const HippoWalletName = 'Hippo Web' as WalletName<'Hippo Web'>;
 
 export interface HippoWalletAdapterConfig {
   provider?: string;
@@ -141,7 +137,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const request = new URLSearchParams({
         request: JSON.stringify({
@@ -161,7 +157,7 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         this.once('success', resolve);
         this.once('error', reject);
       });
-      return promise as SubmitTransactionRequest;
+      return promise as Uint8Array;
     } catch (error: any) {
       this.emit('error', error);
       throw error;
@@ -190,6 +186,32 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
         this.once('error', reject);
       });
       return promise as { hash: HexEncodedBytes };
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const request = new URLSearchParams({
+        request: JSON.stringify({
+          method: 'signMessage',
+          payload: message
+        }),
+        origin: window.location.origin
+      }).toString();
+      const popup = window.open(
+        `${WEBWALLET_URL}?${request}`,
+        'Transaction Confirmation',
+        'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=440,height=700'
+      );
+      if (!popup) throw new WalletNotConnectedError();
+      const promise = await new Promise((resolve, reject) => {
+        this.once('success', resolve);
+        this.once('error', reject);
+      });
+      return promise as string;
     } catch (error: any) {
       this.emit('error', error);
       throw error;

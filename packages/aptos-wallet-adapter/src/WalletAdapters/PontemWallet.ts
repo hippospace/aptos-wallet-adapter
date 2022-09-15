@@ -1,13 +1,11 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -34,6 +32,7 @@ interface PontemAccount {
 interface IPontemWallet {
   connect: () => Promise<ConnectPontemAccount>;
   account(): Promise<MaybeHexString>;
+  publicKey(): Promise<MaybeHexString>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmit(
     transaction: TransactionPayload,
@@ -44,7 +43,14 @@ interface IPontemWallet {
       hash: HexEncodedBytes;
     };
   }>;
-  // signTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
+  isConnected(): Promise<boolean>;
+  signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
+  signMessage(message: string): Promise<{
+    success: boolean;
+    result: {
+      hexString: HexEncodedBytes;
+    };
+  }>;
   disconnect(): Promise<void>;
 }
 
@@ -54,7 +60,7 @@ interface PontemWindow extends Window {
 
 declare const window: PontemWindow;
 
-export const PontemWalletName = 'PontemWallet' as WalletName<'PontemWallet'>;
+export const PontemWalletName = 'Pontem' as WalletName<'Pontem'>;
 
 export interface PontemWalletAdapterConfig {
   provider?: IPontemWallet;
@@ -99,7 +105,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (this._provider) {
+        if (window.pontem) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -142,10 +148,10 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.pontem;
-      // const isConnected = await provider?.isConnected();
-      // if (isConnected) {
-      //   await provider?.disconnect();
-      // }
+      const isConnected = await provider?.isConnected();
+      if (isConnected) {
+        await provider?.disconnect();
+      }
       const response = await provider?.connect();
 
       if (!response) {
@@ -153,9 +159,11 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       }
 
       const walletAccount = await provider?.account();
+      const publicKey = await provider?.publicKey();
       if (walletAccount) {
         this._wallet = {
           address: walletAccount,
+          publicKey,
           isConnected: true
         };
       }
@@ -170,7 +178,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider;
+    const provider = this._provider || window.pontem;
     if (wallet) {
       this._wallet = null;
 
@@ -184,25 +192,16 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(): Promise<SubmitTransactionRequest> {
+  async signTransaction(transactionPyld: TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
-      // const wallet = this._wallet;
-      // const provider = this._provider || window.pontem;
-      // if (!wallet || !provider) throw new WalletNotConnectedError();
-      // const tx = await provider.generateTransaction(
-      //   wallet.address || '',
-      //   payloadV1ToV0(transactionPyld)
-      // );
-      // if (!tx) throw new WalletSignTransactionError('Cannot generate transaction');
-      // const response = await provider?.signTransaction(tx);
+      const wallet = this._wallet;
+      const provider = this._provider || window.pontem;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signTransaction(transactionPyld, options);
 
-      // if (!response) {
-      //   throw new WalletSignTransactionError('No response');
-      // }
-      // const result = { hash: response } as any;
-      return {} as SubmitTransactionRequest;
+      return response as Uint8Array;
     } catch (error: any) {
-      this.emit('error', error);
+      this.emit('error', new WalletSignTransactionError(error));
       throw error;
     }
   }
@@ -218,11 +217,30 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const response = await provider?.signAndSubmit(transactionPyld, options);
 
       if (!response || !response.success) {
-        throw new WalletSignTransactionError('No response');
+        throw new Error('No response');
       }
       return { hash: response.result.hash };
     } catch (error: any) {
-      this.emit('error', new Error(error.error.message));
+      this.emit('error', new WalletSignAndSubmitMessageError(error.error.message));
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.pontem;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      console.log('MEMEM>>>', response);
+      if (response.success) {
+        return response.result.hexString;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }

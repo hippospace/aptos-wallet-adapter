@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/quotes */
 const { bootstrap } = require("./bootstrap");
-const walletId = "#MartianWallet";
+const walletId = "#Martian";
 
 describe("test martian wallet extension", () => {
   let appPage, browser;
@@ -67,35 +67,6 @@ describe("test martian wallet extension", () => {
       await onboardingPage.$$eval('button[type="button"]', (elements) =>
         elements[elements.length - 1].click()
       );
-
-      // Request Faucet
-      const targets = await browser.targets();
-      const extensionTarget = targets.find(
-        (target) => target.type() === "service_worker"
-      );
-      const partialExtensionUrl = extensionTarget.url() || "";
-      const [, , extensionId] = partialExtensionUrl.split("/");
-
-      const extPage = await browser.newPage();
-      const extensionUrl = `chrome-extension://${extensionId}/index.html`;
-      await extPage.goto(extensionUrl, { waitUntil: "domcontentloaded" });
-      await extPage.bringToFront();
-
-      // Login
-      await extPage.waitForSelector('input[type="password"]');
-      await extPage.type('input[type="password"]', "12345678");
-      await extPage.click("button");
-
-      await extPage.waitForFunction(
-        "document.querySelectorAll('button').length === 2"
-      );
-      await extPage.click("button");
-
-      await extPage.waitForFunction(
-        "document.querySelector('h1').innerText.includes('20000')"
-      );
-      const text = await extPage.$eval("h1", (e) => e.innerText);
-      expect(text).toEqual("20000");
     });
 
     it("should connect to the extension", async () => {
@@ -109,6 +80,11 @@ describe("test martian wallet extension", () => {
 
       const popupPage = await popupPagePromise;
       await popupPage.bringToFront();
+
+      // Login
+      await popupPage.waitForSelector('input[type="password"]');
+      await popupPage.type('input[type="password"]', "12345678");
+      await popupPage.click("button");
 
       // Wait until connection modal loaded
       await popupPage.waitForFunction(
@@ -127,6 +103,17 @@ describe("test martian wallet extension", () => {
       expect(address).not.toBe("");
       expect(publicKey).not.toBe("");
       expect(authKey).toBe("");
+    });
+
+    it("should request faucet successfully", async () => {
+      await appPage.bringToFront();
+
+      const faucetBtn = await appPage.$("#faucetBtn");
+      await faucetBtn.click();
+
+      await appPage.waitForSelector(".faucet");
+      const txLength = await appPage.$$eval(".faucet", (ele) => ele.length);
+      expect(txLength).toEqual(1);
     });
 
     it("should transfer token successfully", async () => {
@@ -166,7 +153,7 @@ describe("test martian wallet extension", () => {
         ".connect-btn",
         (ele) => ele.length
       );
-      expect(connectionBtnLength).toEqual(5);
+      expect(connectionBtnLength).toEqual(6);
     });
 
     it("should display user reject connection", async () => {

@@ -24,7 +24,6 @@ const App: React.FC = () => {
       new PontemWalletAdapter(),
       new RiseWalletAdapter(),
       new SpikaWalletAdapter()
-      // new MultiMaskWalletAdapter()
       // new NightlyWalletAdapter()
     ],
     []
@@ -33,6 +32,7 @@ const App: React.FC = () => {
   return (
     <WalletProvider
       wallets={wallets}
+      autoConnect
       onError={(error: Error) => {
         console.log('wallet errors: ', error);
         message.error(error.message);

@@ -1,16 +1,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { TransactionPayload } from 'aptos/dist/generated';
+import { TransactionPayload } from 'aptos/src/generated';
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
-  const [txLoading, setTxLoading] = useState(false);
+  const [txLoading, setTxLoading] = useState({
+    sign: false,
+    transaction: false,
+    faucet: false
+  });
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
+  const [signature, setSignature] = useState<string>('');
   const {
     connect,
     disconnect,
@@ -20,7 +26,9 @@ const MainPage = () => {
     connecting,
     connected,
     disconnecting,
-    wallet: currentWallet
+    wallet: currentWallet,
+    signMessage,
+    signTransaction
   } = useWallet();
 
   const renderWalletConnectorGroup = () => {
@@ -40,9 +48,12 @@ const MainPage = () => {
     });
   };
 
-  const transferToken = async () => {
+  const signTransac = async () => {
     try {
-      setTxLoading(true);
+      setTxLoading({
+        ...txLoading,
+        transaction: true
+      });
       if (account?.address || account?.publicKey) {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
         const demoAccount = new AptosAccount();
@@ -53,15 +64,45 @@ const MainPage = () => {
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
           arguments: [
             demoAccount.address().hex(),
-            // TODO - handle this better, amount argument should be number or bigint for this function
-            currentWallet?.adapter?.name === 'MartianWallet' ||
-            currentWallet?.adapter?.name === 'Rise Wallet'
-              ? 123123
-              : '123123'
+            ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
           ]
         };
-        // const txnRequest = await aptosClient.generateTransaction(addressKey, payload);
-        const transactionRes = await signAndSubmitTransaction(payload);
+        const transactionRes = await signTransaction(payload);
+        console.log('test sign transaction: ', transactionRes);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        transaction: false
+      });
+    }
+  };
+
+  const transferToken = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        transaction: true
+      });
+      const txOptions = {
+        max_gas_amount: '1000',
+        gas_unit_price: '1'
+      };
+      if (account?.address || account?.publicKey) {
+        const demoAccount = new AptosAccount();
+        await faucetClient.fundAccount(demoAccount.address(), 0);
+        const payload: TransactionPayload = {
+          type: 'entry_function_payload',
+          function: '0x1::coin::transfer',
+          type_arguments: ['0x1::aptos_coin::AptosCoin'],
+          arguments: [
+            demoAccount.address().hex(),
+            ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
+          ]
+        };
+        const transactionRes = await signAndSubmitTransaction(payload, txOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);
@@ -69,7 +110,10 @@ const MainPage = () => {
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
-      setTxLoading(false);
+      setTxLoading({
+        ...txLoading,
+        transaction: false
+      });
     }
   };
 
@@ -84,6 +128,66 @@ const MainPage = () => {
     ));
   };
 
+  const renderFaucetTxLinks = () => {
+    return faucetTxLinks.map((link: string, index: number) => (
+      <div className="flex gap-2 faucet" key={link}>
+        <p>{index + 1}.</p>
+        <a href={link} target="_blank" rel="noreferrer" className="underline">
+          {link}
+        </a>
+      </div>
+    ));
+  };
+
+  const messageToSign = useMemo(
+    () =>
+      `Hello from account ${account?.publicKey?.toString() || account?.address?.toString() || ''}`,
+    [account]
+  );
+
+  const signMess = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        sign: true
+      });
+      const signedMessage = await signMessage(messageToSign);
+      setSignature(signedMessage);
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        sign: false
+      });
+    }
+  };
+
+  const fundAccount = async () => {
+    try {
+      setTxLoading({
+        ...txLoading,
+        faucet: true
+      });
+      if (account?.address) {
+        const transactionRes = await faucetClient.fundAccount(account.address, 50000);
+        await aptosClient.waitForTransaction(`0x${transactionRes[0]}` || '');
+        const links = [
+          ...faucetTxLinks,
+          `https://explorer.devnet.aptos.dev/txn/0x${transactionRes[0]}`
+        ];
+        setFaucetTxLinks(links);
+      }
+    } catch (err: any) {
+      console.log('tx error: ', err.msg);
+    } finally {
+      setTxLoading({
+        ...txLoading,
+        faucet: false
+      });
+    }
+  };
+
   const renderContent = () => {
     if (connecting || disconnecting) {
       return <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />;
@@ -91,6 +195,9 @@ const MainPage = () => {
     if (connected && account) {
       return (
         <div className="flex flex-col gap-2">
+          <strong>
+            Wallet: <div id="address">{currentWallet?.adapter.name}</div>
+          </strong>
           <strong>
             Address: <div id="address">{account?.address?.toString()}</div>
           </strong>
@@ -100,13 +207,31 @@ const MainPage = () => {
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
           </strong>
-          <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading}>
+          <strong>Message to Sign : {messageToSign}</strong>
+          {signature ? (
+            <div className="flex gap-2 transaction">
+              <strong>Signature: </strong>
+              <textarea className="w-full" readOnly rows={4} value={signature} />
+            </div>
+          ) : (
+            <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
+              Sign Message
+            </Button>
+          )}
+          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.transaction}>
+            Sign Transaction
+          </Button> */}
+          <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading.transaction}>
             Transfer Token
+          </Button>
+          <Button id="faucetBtn" onClick={() => fundAccount()} loading={txLoading.faucet}>
+            Faucet
           </Button>
           <Button
             id="disconnectBtn"
             onClick={() => {
               setTxLinks([]);
+              setSignature('');
               disconnect();
             }}>
             Disconnect
@@ -114,6 +239,10 @@ const MainPage = () => {
           <div className="mt-4">
             <h4>Transaction History:</h4>
             <div className="flex flex-col gap-2">{renderTxLinks()}</div>
+          </div>
+          <div className="mt-4">
+            <h4>Faucet History:</h4>
+            <div className="flex flex-col gap-2">{renderFaucetTxLinks()}</div>
           </div>
         </div>
       );

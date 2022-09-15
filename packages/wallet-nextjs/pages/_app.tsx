@@ -6,7 +6,9 @@ import {
   MartianWalletAdapter,
   AptosWalletAdapter,
   FewchaWalletAdapter,
-  WalletProvider
+  WalletProvider,
+  PontemWalletAdapter,
+  SpikaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
 import { message } from 'antd';
@@ -18,8 +20,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
-      new FewchaWalletAdapter()
-      // new MultiMaskWalletAdapter()
+      new FewchaWalletAdapter(),
+      new PontemWalletAdapter(),
+      new SpikaWalletAdapter()
       // new NightlyWalletAdapter()
     ],
     []

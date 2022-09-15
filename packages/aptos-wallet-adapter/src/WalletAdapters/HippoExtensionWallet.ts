@@ -1,13 +1,11 @@
 import { MaybeHexString } from 'aptos';
-import {
-  TransactionPayload,
-  SubmitTransactionRequest,
-  HexEncodedBytes
-} from 'aptos/dist/generated';
+import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
   WalletSignTransactionError
 } from '../WalletProviders/errors';
 import {
@@ -28,6 +26,7 @@ interface IHippoWallet {
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<any>;
   signTransaction(transaction: any): Promise<void>;
+  signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
 
@@ -37,7 +36,7 @@ interface HippoWindow extends Window {
 
 declare const window: HippoWindow;
 
-export const HippoExtensionWalletName = 'Hippo Wallet' as WalletName<'Hippo Wallet'>;
+export const HippoExtensionWalletName = 'Hippo' as WalletName<'Hippo'>;
 
 export interface HippoExtensionWalletAdapterConfig {
   provider?: IHippoWallet;
@@ -156,7 +155,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
+  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
@@ -195,10 +194,28 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
         }
       } catch (error: any) {
         // console.log('transact err', error, error.message);
-        throw new WalletSignTransactionError(error.message || error);
+        throw new WalletSignAndSubmitMessageError(error.message || error);
       }
     } catch (error: any) {
       this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.hippoWallet;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
       throw error;
     }
   }
