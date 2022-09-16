@@ -121,10 +121,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.spika;
-      const isConnected = await provider?.isConnected();
-      if (isConnected === true) {
-        await provider?.disconnect();
-      }
+      await provider?.isConnected();
+      // const isConnected = await provider?.isConnected();
+      // if (isConnected === true) {
+      //   await provider?.disconnect();
+      // }
 
       const response = await provider?.connect();
       if (response?.publicKey !== undefined) {
