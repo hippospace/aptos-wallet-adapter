@@ -11,10 +11,15 @@ import { AptosAccount } from 'aptos';
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState({
     sign: false,
+    signTx: false,
     transaction: false,
     faucet: false
   });
+  const queryParams = new URLSearchParams(window.location.search);
+  const autoConnect = queryParams.get('autoConnect')?.toLowerCase() === 'true' ? true : false;
+
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [txSignLinks, setSignLinks] = useState<string[]>([]);
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
   const [signature, setSignature] = useState<string>('');
   const {
@@ -28,8 +33,15 @@ const MainPage = () => {
     disconnecting,
     wallet: currentWallet,
     signMessage,
-    signTransaction
+    signTransaction,
+    select
   } = useWallet();
+
+  useEffect(() => {
+    if (!autoConnect && currentWallet?.adapter) {
+      connect();
+    }
+  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -37,7 +49,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            connect(option.name);
+            select(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
@@ -52,7 +64,7 @@ const MainPage = () => {
     try {
       setTxLoading({
         ...txLoading,
-        transaction: true
+        signTx: true
       });
       if (account?.address || account?.publicKey) {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
@@ -75,7 +87,7 @@ const MainPage = () => {
     } finally {
       setTxLoading({
         ...txLoading,
-        transaction: false
+        signTx: false
       });
     }
   };
@@ -120,6 +132,17 @@ const MainPage = () => {
   const renderTxLinks = () => {
     return txLinks.map((link: string, index: number) => (
       <div className="flex gap-2 transaction" key={link}>
+        <p>{index + 1}.</p>
+        <a href={link} target="_blank" rel="noreferrer" className="underline">
+          {link}
+        </a>
+      </div>
+    ));
+  };
+
+  const renderSignTxLinks = () => {
+    return txSignLinks.map((link: string, index: number) => (
+      <div className="flex gap-2 signedTx" key={link}>
         <p>{index + 1}.</p>
         <a href={link} target="_blank" rel="noreferrer" className="underline">
           {link}
@@ -218,7 +241,7 @@ const MainPage = () => {
               Sign Message
             </Button>
           )}
-          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.transaction}>
+          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.signTx}>
             Sign Transaction
           </Button> */}
           <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading.transaction}>
@@ -240,6 +263,10 @@ const MainPage = () => {
             <h4>Transaction History:</h4>
             <div className="flex flex-col gap-2">{renderTxLinks()}</div>
           </div>
+          {/* <div className="mt-4">
+            <h4>Sign Tx History:</h4>
+            <div className="flex flex-col gap-2">{renderSignTxLinks()}</div>
+          </div> */}
           <div className="mt-4">
             <h4>Faucet History:</h4>
             <div className="flex flex-col gap-2">{renderFaucetTxLinks()}</div>

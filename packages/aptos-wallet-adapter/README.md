@@ -43,7 +43,7 @@ Wallets source code [here](https://github.com/hippospace/aptos-wallet-adapter/tr
 # Use React Provider
 
 ```typescript
-import React from "react";
+import React from 'react';
 import {
   WalletProvider,
   HippoWalletAdapter,
@@ -69,8 +69,9 @@ const App: React.FC = () => {
   return (
     <WalletProvider
       wallets={wallets}
+      autoConnect={true | false} /** allow auto wallet connection or not **/
       onError={(error: Error) => {
-        console.log('Handle Error Message', error)
+        console.log('Handle Error Message', error);
       }}>
       {/* your website */}
     </WalletProvider>
@@ -109,13 +110,21 @@ import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
 ...
 
-const { connect, disconnect, connected } = useWallet();
+const { connect, disconnect, connected, select } = useWallet();
+
+/** If auto-connect is not enabled, you will require to do the connect() manually **/
+useEffect(() => {
+  if (!autoConnect && currentWallet?.adapter) {
+    connect();
+  }
+}, [autoConnect, currentWallet, connect]);
+/** this is only required if you do not want auto connect wallet **/
 
 if (!connected) {
   return (
     <button
       onClick={() => {
-        connect(AptosWalletName); // E.g. connecting to the Aptos official wallet
+        select(); // E.g. connecting to the Aptos official wallet (Breaking Change)
       }}
     >
       Connect
