@@ -7,3 +7,4 @@ export * from './FewchaWallet';
 export * from './PontemWallet';
 // export * from './NightlyWallet';
 export * from './SpikaWallet';
+export * from './HyperPayWallet';
