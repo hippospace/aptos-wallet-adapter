@@ -20,6 +20,7 @@ Supports:
 - [Rise wallet](https://risewallet.io/)
 - [HyperPay wallet](https://www.hyperpay.io/)
 - [Fletch wallet](http://fletchwallet.io/)
+- [Aptos snap](https://chrome.google.com/webstore/detail/metamask-flask-developmen/ljfoeinjpaedjfecbmggjgodbgkmjkjk)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 

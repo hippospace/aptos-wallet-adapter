@@ -9,7 +9,8 @@ import {
   PontemWalletAdapter,
   RiseWalletAdapter,
   SpikaWalletAdapter,
-  FletchWalletAdapter
+  FletchWalletAdapter,
+  AptosSnapAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
 import MainPage from './pages';
@@ -35,7 +36,8 @@ const App: React.FC = () => {
       new PontemWalletAdapter(),
       new RiseWalletAdapter(),
       new SpikaWalletAdapter(),
-      new FletchWalletAdapter()
+      new FletchWalletAdapter(),
+      new AptosSnapAdapter()
       // new NightlyWalletAdapter()
     ],
     []
