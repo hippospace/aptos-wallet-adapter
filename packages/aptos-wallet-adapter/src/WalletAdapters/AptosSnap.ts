@@ -21,7 +21,7 @@ import {
   SignMessagePayload,
   SignMessageResponse
 } from './BaseAdapter';
-import {AptosNetwork, PublicAccount} from '@keystonehq/aptossnap-adapter/build/types';
+import { AptosNetwork, PublicAccount } from '@keystonehq/aptossnap-adapter/build/types';
 import WalletAdapter from '@keystonehq/aptossnap-adapter';
 
 interface IAptosSnap {
