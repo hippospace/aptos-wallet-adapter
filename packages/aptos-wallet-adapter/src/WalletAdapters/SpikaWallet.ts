@@ -44,7 +44,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb';
 
-  icon = 'https://pbs.twimg.com/profile_images/1562544739181887488/vSqEIeyh_400x400.png';
+  icon = 'https://spika.app/assets/logo_400_nb.png';
 
   protected _provider: ISpikaWallet | undefined;
 
