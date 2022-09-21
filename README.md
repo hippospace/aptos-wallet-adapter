@@ -16,7 +16,7 @@ Supports:
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
-- [Spika web wallet](https://spika.app)
+- [Spika wallet](https://spika.app)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
