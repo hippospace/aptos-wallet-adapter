@@ -11,6 +11,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -30,7 +32,7 @@ interface IAptosWallet {
     options?: any
   ): Promise<{ hash: HexEncodedBytes } | IApotsErrorResult>;
   signTransaction(transaction: any, options?: any): Promise<Uint8Array | IApotsErrorResult>;
-  signMessage(message: string): Promise<{ signature: string }>;
+  signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
 }
 
@@ -203,14 +205,17 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
-      if (response?.signature) {
-        return response.signature;
+      if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
+        throw new WalletSignMessageError('Invalid signMessage Payload');
+      }
+      const response = await provider?.signMessage(msgPayload);
+      if (response) {
+        return response;
       } else {
         throw new Error('Sign Message failed');
       }

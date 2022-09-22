@@ -4,7 +4,7 @@ import { Button, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { TransactionPayload } from 'aptos/src/generated';
-import { useWallet } from '@manahippo/aptos-wallet-adapter';
+import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
@@ -21,7 +21,7 @@ const MainPage = () => {
   const [txLinks, setTxLinks] = useState<string[]>([]);
   const [txSignLinks, setSignLinks] = useState<string[]>([]);
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
-  const [signature, setSignature] = useState<string>('');
+  const [signature, setSignature] = useState<string | SignMessageResponse>('');
   const {
     connect,
     disconnect,
@@ -100,7 +100,7 @@ const MainPage = () => {
       });
       const txOptions = {
         max_gas_amount: '1000',
-        gas_unit_price: '1'
+        gas_unit_price: '100'
       };
       if (account?.address || account?.publicKey) {
         const demoAccount = new AptosAccount();
@@ -174,8 +174,18 @@ const MainPage = () => {
         ...txLoading,
         sign: true
       });
-      const signedMessage = await signMessage(messageToSign);
-      setSignature(signedMessage);
+      const nonce = 'random_string';
+      const msgPayload = ['petra', 'martian', 'fewcha'].includes(
+        currentWallet?.adapter?.name?.toLowerCase() || ''
+      )
+        ? {
+            message: messageToSign,
+            nonce
+          }
+        : messageToSign;
+      const signedMessage = await signMessage(msgPayload);
+      const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
+      setSignature(response);
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
@@ -234,7 +244,12 @@ const MainPage = () => {
           {signature ? (
             <div className="flex gap-2 transaction">
               <strong>Signature: </strong>
-              <textarea className="w-full" readOnly rows={4} value={signature} />
+              <textarea
+                className="w-full"
+                readOnly
+                rows={4}
+                value={typeof signature !== 'string' ? signature.address : signature}
+              />
             </div>
           ) : (
             <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
