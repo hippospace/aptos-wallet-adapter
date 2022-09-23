@@ -10,6 +10,7 @@ Supports:
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
+- [Spika wallet](https://spika.app)
 
 Working on (PR welcome):
 
@@ -50,7 +51,8 @@ import {
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
   FewchaWalletAdapter,
-  PontemWalletAdapter
+  PontemWalletAdapter,
+  SpikaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -59,7 +61,8 @@ const wallets = [
   new AptosWalletAdapter(),
   new FewchaWalletAdapter(),
   new HippoExtensionWalletAdapter(),
-  new PontemWalletAdapter()
+  new PontemWalletAdapter(),
+  new SpikaWalletAdapter()
 ];
 
 const App: React.FC = () => {

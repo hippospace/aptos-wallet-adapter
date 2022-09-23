@@ -1,4 +1,4 @@
-export * from './AptosWallet';
+export * from './PetraWallet';
 export * from './BaseAdapter';
 export * from './HippoExtensionWallet';
 export * from './HippoWallet';

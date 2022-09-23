@@ -6,7 +6,7 @@
     "@ant-design/icons": "^4.7.0",
     "@manahippo/aptos-wallet-adapter": "file:../aptos-wallet-adapter",
     "antd": "^4.21.7",
-    "aptos": "^1.3.12",
+    "aptos": "^1.3.14",
     "react": "^18.X.X || 17.X.X",
     "react-dom": "^18.X.X || 17.X.X",
     "react-scripts": "^5.0.1",

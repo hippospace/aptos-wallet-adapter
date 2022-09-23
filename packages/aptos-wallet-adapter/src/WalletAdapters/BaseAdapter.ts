@@ -65,11 +65,32 @@ export interface WalletAdapterProps<Name extends string = string> {
     options?: any
   ): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
-  signMessage(message: string): Promise<string>;
+  signMessage(
+    message: string | SignMessagePayload | Uint8Array
+  ): Promise<string | SignMessageResponse>;
 }
 
 export type WalletAdapter<Name extends string = string> = WalletAdapterProps<Name> &
   EventEmitter<WalletAdapterEvents>;
+
+export interface SignMessagePayload {
+  address?: boolean; // Should we include the address of the account in the message
+  application?: boolean; // Should we include the domain of the dapp
+  chainId?: boolean; // Should we include the current chain id the wallet is connected to
+  message: string; // The message to be signed and displayed to the user
+  nonce: string; // A nonce the dapp should generate
+}
+
+export interface SignMessageResponse {
+  address: string;
+  application: string;
+  chainId: number;
+  fullMessage: string; // The message that was generated to sign
+  message: string; // The message passed in by the user
+  nonce: string;
+  prefix: string; // Should always be APTOS
+  signature: string; // The signed full message
+}
 
 export abstract class BaseWalletAdapter
   extends EventEmitter<WalletAdapterEvents>
@@ -99,7 +120,9 @@ export abstract class BaseWalletAdapter
 
   abstract signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
 
-  abstract signMessage(message: string): Promise<string>;
+  abstract signMessage(
+    message: string | SignMessagePayload | Uint8Array
+  ): Promise<string | SignMessageResponse>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {

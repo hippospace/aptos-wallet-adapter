@@ -9,6 +9,7 @@ import {
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import {
   AccountKeys,
+  SignMessagePayload,
   WalletAdapter,
   WalletName,
   WalletReadyState
@@ -276,10 +277,10 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   );
 
   const signMessage = useCallback(
-    async (message: string) => {
+    async (msgPayload: string | SignMessagePayload | Uint8Array) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signMessage(message);
+      return adapter.signMessage(msgPayload);
     },
     [adapter, handleError, connected]
   );
