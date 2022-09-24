@@ -8,7 +8,8 @@ import {
   FewchaWalletAdapter,
   WalletProvider,
   PontemWalletAdapter,
-  SpikaWalletAdapter
+  SpikaWalletAdapter,
+  FletchWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
 import { message } from 'antd';
@@ -22,7 +23,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       new AptosWalletAdapter(),
       new FewchaWalletAdapter(),
       new PontemWalletAdapter(),
-      new SpikaWalletAdapter()
+      new SpikaWalletAdapter(),
+      new FletchWalletAdapter()
       // new NightlyWalletAdapter()
     ],
     []
