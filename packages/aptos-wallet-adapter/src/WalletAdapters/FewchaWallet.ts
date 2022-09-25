@@ -12,6 +12,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -211,12 +213,12 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.fewcha;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
+      const response = await provider?.signMessage(msgPayload);
       if (response) {
         return response.data;
       } else {

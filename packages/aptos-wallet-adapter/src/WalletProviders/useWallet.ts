@@ -2,6 +2,8 @@ import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
 import { createContext, useContext } from 'react';
 import {
   AccountKeys,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletAdapter,
   WalletName,
   WalletReadyState
@@ -28,7 +30,9 @@ export interface WalletContextState {
     options?: any
   ): Promise<{ hash: HexEncodedBytes }>;
   signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
-  signMessage(message: string): Promise<string>;
+  signMessage(
+    message: string | SignMessagePayload | Uint8Array
+  ): Promise<SignMessageResponse | string>;
 }
 
 const DEFAULT_CONTEXT = {

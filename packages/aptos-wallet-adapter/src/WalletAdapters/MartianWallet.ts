@@ -12,6 +12,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -36,7 +38,7 @@ interface IMartianWallet {
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
   signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
   signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
-  signMessage(message: string): Promise<{ signature: string }>;
+  signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
 }
 
@@ -217,14 +219,17 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
-      if (response?.signature) {
-        return response?.signature;
+      if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
+        throw new WalletSignMessageError('Invalid signMessage Payload');
+      }
+      const response = await provider?.signMessage(msgPayload);
+      if (response) {
+        return response;
       } else {
         throw new Error('Sign Message failed');
       }
