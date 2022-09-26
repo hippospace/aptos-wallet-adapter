@@ -12,6 +12,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -60,6 +62,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     super();
 
     // this._network = network;
+    this._provider = typeof window !== 'undefined' ? new Web3().action : undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -109,7 +112,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
 
       this._connecting = true;
-      const provider = new Web3().action;
+      const provider = this._provider || window.fewcha;
       const isConnected = await provider.isConnected();
       if (isConnected?.data === true) {
         await provider.disconnect();
@@ -162,13 +165,13 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
+      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload, options);
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx.data);
 
@@ -184,14 +187,15 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
+    transaction: TransactionPayload,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload);
+      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload, options);
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx.data);
       if (response.status === 401) {
@@ -209,12 +213,12 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.fewcha;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
+      const response = await provider?.signMessage(msgPayload);
       if (response) {
         return response.data;
       } else {

@@ -32,6 +32,7 @@ interface PontemAccount {
 interface IPontemWallet {
   connect: () => Promise<ConnectPontemAccount>;
   account(): Promise<MaybeHexString>;
+  publicKey(): Promise<MaybeHexString>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmit(
     transaction: TransactionPayload,
@@ -42,6 +43,7 @@ interface IPontemWallet {
       hash: HexEncodedBytes;
     };
   }>;
+  isConnected(): Promise<boolean>;
   signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<{
     success: boolean;
@@ -146,10 +148,10 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.pontem;
-      // const isConnected = await provider?.isConnected();
-      // if (isConnected) {
-      //   await provider?.disconnect();
-      // }
+      const isConnected = await provider?.isConnected();
+      if (isConnected) {
+        await provider?.disconnect();
+      }
       const response = await provider?.connect();
 
       if (!response) {
@@ -157,9 +159,11 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       }
 
       const walletAccount = await provider?.account();
+      const publicKey = await provider?.publicKey();
       if (walletAccount) {
         this._wallet = {
           address: walletAccount,
+          publicKey,
           isConnected: true
         };
       }
@@ -205,7 +209,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
   async signAndSubmitTransaction(
     transactionPyld: TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes; }> {
+  ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;

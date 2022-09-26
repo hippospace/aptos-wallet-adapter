@@ -19,8 +19,8 @@ interface ISpikaWallet {
   connect: () => Promise<{ publicKey: string; account: string; authKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: any): Promise<Uint8Array>;
+  signAndSubmitTransaction(transaction: any, options?: any): Promise<{ hash: HexEncodedBytes }>;
+  signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }
@@ -44,7 +44,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb';
 
-  icon = 'https://pbs.twimg.com/profile_images/1562544739181887488/vSqEIeyh_400x400.png';
+  icon = 'https://spika.app/assets/logo_400_nb.png';
 
   protected _provider: ISpikaWallet | undefined;
 
@@ -121,10 +121,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.spika;
-      const isConnected = await provider?.isConnected();
-      if (isConnected === true) {
-        await provider?.disconnect();
-      }
+      await provider?.isConnected();
+      // const isConnected = await provider?.isConnected();
+      // if (isConnected === true) {
+      //   await provider?.disconnect();
+      // }
 
       const response = await provider?.connect();
       if (response?.publicKey !== undefined) {
@@ -165,13 +166,13 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.spika;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(transaction);
+      const response = await provider?.signTransaction(transaction, options);
       if (response) {
         return response;
       } else {
@@ -185,14 +186,15 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
+    transaction: TransactionPayload,
+    options?: any
   ): Promise<{ hash: HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.spika;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signAndSubmitTransaction(transaction);
+      const response = await provider?.signAndSubmitTransaction(transaction, options);
       if (response) {
         return response;
       } else {

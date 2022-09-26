@@ -25,7 +25,7 @@ interface IHippoWallet {
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<any>;
-  signTransaction(transaction: any): Promise<void>;
+  signTransaction(transaction: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
 }

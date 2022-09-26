@@ -4,19 +4,24 @@ import { Button, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { TransactionPayload } from 'aptos/src/generated';
-import { useWallet } from '@manahippo/aptos-wallet-adapter';
+import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState({
     sign: false,
+    signTx: false,
     transaction: false,
     faucet: false
   });
+  const queryParams = new URLSearchParams(window.location.search);
+  const autoConnect = queryParams.get('autoConnect')?.toLowerCase() === 'true' ? true : false;
+
   const [txLinks, setTxLinks] = useState<string[]>([]);
+  const [txSignLinks, setSignLinks] = useState<string[]>([]);
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
-  const [signature, setSignature] = useState<string>('');
+  const [signature, setSignature] = useState<string | SignMessageResponse>('');
   const {
     connect,
     disconnect,
@@ -28,8 +33,15 @@ const MainPage = () => {
     disconnecting,
     wallet: currentWallet,
     signMessage,
-    signTransaction
+    signTransaction,
+    select
   } = useWallet();
+
+  useEffect(() => {
+    if (!autoConnect && currentWallet?.adapter) {
+      connect();
+    }
+  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -37,7 +49,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            connect(option.name);
+            select(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
@@ -52,7 +64,7 @@ const MainPage = () => {
     try {
       setTxLoading({
         ...txLoading,
-        transaction: true
+        signTx: true
       });
       if (account?.address || account?.publicKey) {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
@@ -75,7 +87,7 @@ const MainPage = () => {
     } finally {
       setTxLoading({
         ...txLoading,
-        transaction: false
+        signTx: false
       });
     }
   };
@@ -86,9 +98,9 @@ const MainPage = () => {
         ...txLoading,
         transaction: true
       });
-      const pontemOptions = {
+      const txOptions = {
         max_gas_amount: '1000',
-        gas_unit_price: '1'
+        gas_unit_price: '100'
       };
       if (account?.address || account?.publicKey) {
         const demoAccount = new AptosAccount();
@@ -102,7 +114,7 @@ const MainPage = () => {
             ['Fewcha'].includes(currentWallet?.adapter?.name || '') ? 717 : '717'
           ]
         };
-        const transactionRes = await signAndSubmitTransaction(payload, pontemOptions);
+        const transactionRes = await signAndSubmitTransaction(payload, txOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
         const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
         setTxLinks(links);
@@ -120,6 +132,17 @@ const MainPage = () => {
   const renderTxLinks = () => {
     return txLinks.map((link: string, index: number) => (
       <div className="flex gap-2 transaction" key={link}>
+        <p>{index + 1}.</p>
+        <a href={link} target="_blank" rel="noreferrer" className="underline">
+          {link}
+        </a>
+      </div>
+    ));
+  };
+
+  const renderSignTxLinks = () => {
+    return txSignLinks.map((link: string, index: number) => (
+      <div className="flex gap-2 signedTx" key={link}>
         <p>{index + 1}.</p>
         <a href={link} target="_blank" rel="noreferrer" className="underline">
           {link}
@@ -151,8 +174,18 @@ const MainPage = () => {
         ...txLoading,
         sign: true
       });
-      const signedMessage = await signMessage(messageToSign);
-      setSignature(signedMessage);
+      const nonce = 'random_string';
+      const msgPayload = ['petra', 'martian', 'fewcha'].includes(
+        currentWallet?.adapter?.name?.toLowerCase() || ''
+      )
+        ? {
+            message: messageToSign,
+            nonce
+          }
+        : messageToSign;
+      const signedMessage = await signMessage(msgPayload);
+      const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
+      setSignature(response);
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
@@ -211,14 +244,19 @@ const MainPage = () => {
           {signature ? (
             <div className="flex gap-2 transaction">
               <strong>Signature: </strong>
-              <textarea className="w-full" readOnly rows={4} value={signature} />
+              <textarea
+                className="w-full"
+                readOnly
+                rows={4}
+                value={typeof signature !== 'string' ? signature.address : signature}
+              />
             </div>
           ) : (
             <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
               Sign Message
             </Button>
           )}
-          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.transaction}>
+          {/* <Button id="signTransacBtn" onClick={() => signTransac()} loading={txLoading.signTx}>
             Sign Transaction
           </Button> */}
           <Button id="transferBtn" onClick={() => transferToken()} loading={txLoading.transaction}>
@@ -240,6 +278,10 @@ const MainPage = () => {
             <h4>Transaction History:</h4>
             <div className="flex flex-col gap-2">{renderTxLinks()}</div>
           </div>
+          {/* <div className="mt-4">
+            <h4>Sign Tx History:</h4>
+            <div className="flex flex-col gap-2">{renderSignTxLinks()}</div>
+          </div> */}
           <div className="mt-4">
             <h4>Faucet History:</h4>
             <div className="flex flex-col gap-2">{renderFaucetTxLinks()}</div>

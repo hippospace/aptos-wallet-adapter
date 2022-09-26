@@ -13,7 +13,7 @@
     "@manahippo/aptos-wallet-adapter": "file:../aptos-wallet-adapter",
     "next": "12.2.5",
     "antd": "^4.21.7",
-    "aptos": "^1.3.11",
+    "aptos": "^1.3.14",
     "react": "^18.X.X || 17.X.X",
     "react-dom": "^18.X.X || 17.X.X"
   },
