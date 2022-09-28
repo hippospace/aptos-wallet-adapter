@@ -10,7 +10,7 @@ React `WalletProvider` supporting loads of aptos wallets.
 
 Supports:
 
-- [Aptos official wallet](https://github.com/aptos-labs/aptos-core/releases/tag/wallet-v0.1.1)
+- [Petra wallet](https://petra.app/)
 - [Martian wallet](https://martianwallet.xyz/)
 - [Fewcha wallet](https://fewcha.app/)
 - [Hippo wallet](https://github.com/hippospace/hippo-wallet)
