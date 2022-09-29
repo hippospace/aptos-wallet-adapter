@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   WalletProvider,
-  // HippoWalletAdapter,
+  HyperPayWalletAdapter,
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
   FewchaWalletAdapter,
   PontemWalletAdapter,
+  RiseWalletAdapter,
   SpikaWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
@@ -25,12 +26,13 @@ const App: React.FC = () => {
 
   const wallets = useMemo(
     () => [
-      // new HippoWalletAdapter(),
+      new HyperPayWalletAdapter(),
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
       new FewchaWalletAdapter(),
       new PontemWalletAdapter(),
+      new RiseWalletAdapter(),
       new SpikaWalletAdapter()
       // new NightlyWalletAdapter()
     ],
