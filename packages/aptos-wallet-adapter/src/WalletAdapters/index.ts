@@ -8,3 +8,4 @@ export * from './PontemWallet';
 // export * from './NightlyWallet';
 export * from './RiseWallet';
 export * from './SpikaWallet';
+export * from './HyperPayWallet';

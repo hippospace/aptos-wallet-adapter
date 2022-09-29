@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   WalletProvider,
-  // HippoWalletAdapter,
+  HyperPayWalletAdapter,
   AptosWalletAdapter,
   HippoExtensionWalletAdapter,
   MartianWalletAdapter,
@@ -26,7 +26,7 @@ const App: React.FC = () => {
 
   const wallets = useMemo(
     () => [
-      // new HippoWalletAdapter(),
+      new HyperPayWalletAdapter(),
       new HippoExtensionWalletAdapter(),
       new MartianWalletAdapter(),
       new AptosWalletAdapter(),
