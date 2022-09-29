@@ -12,7 +12,8 @@ import {
   FletchWalletAdapter,
   AptosSnapAdapter,
   NightlyWalletAdapter,
-  BitkeepWalletAdapter
+  BitkeepWalletAdapter,
+  TokenPocketWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
 import MainPage from './pages';
@@ -41,7 +42,8 @@ const App: React.FC = () => {
       new FletchWalletAdapter(),
       new AptosSnapAdapter(),
       new NightlyWalletAdapter(),
-      new BitkeepWalletAdapter()
+      new BitkeepWalletAdapter(),
+      new TokenPocketWalletAdapter()
     ],
     []
   );

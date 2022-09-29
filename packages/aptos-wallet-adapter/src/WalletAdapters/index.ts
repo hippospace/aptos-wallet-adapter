@@ -12,3 +12,4 @@ export * from './HyperPayWallet';
 export * from './FletchWallet';
 export * from './AptosSnap';
 export * from './BitkeepWallet';
+export * from './TokenPocketWallet';
