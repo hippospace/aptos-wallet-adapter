@@ -18,6 +18,7 @@ Supports:
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
 - [Spika wallet](https://spika.app)
 - [Rise wallet](https://risewallet.io/)
+- [HyperPay wallet](https://www.hyperpay.io/)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
