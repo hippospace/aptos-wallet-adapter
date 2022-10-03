@@ -19,6 +19,7 @@ Supports:
 - [Spika wallet](https://spika.app)
 - [Rise wallet](https://risewallet.io/)
 - [HyperPay wallet](https://www.hyperpay.io/)
+- [Fletch wallet](http://fletchwallet.io/)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 

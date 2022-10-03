@@ -12,6 +12,7 @@ Supports:
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
 - [Spika wallet](https://spika.app)
 - [Rise Wallet](https://rise)
+- [Fletch wallet](http://fletchwallet.io/)
 
 Working on (PR welcome):
 
@@ -54,7 +55,8 @@ import {
   FewchaWalletAdapter,
   PontemWalletAdapter,
   SpikaWalletAdapter,
-  RiseWalletAdapter
+  RiseWalletAdapter,
+  FletchWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -65,7 +67,8 @@ const wallets = [
   new HippoExtensionWalletAdapter(),
   new PontemWalletAdapter(),
   new SpikaWalletAdapter(),
-  new RiseWalletAdapter()
+  new RiseWalletAdapter(),
+  new FletchWalletAdapter()
 ];
 
 const App: React.FC = () => {
