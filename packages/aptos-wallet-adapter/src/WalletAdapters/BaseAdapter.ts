@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import EventEmitter from 'eventemitter3';
 
 declare global {
@@ -61,10 +60,10 @@ export interface WalletAdapterProps<Name extends string = string> {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
+  ): Promise<{ hash: Types.HexEncodedBytes }>;
+  signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array>;
   signMessage(
     message: string | SignMessagePayload | Uint8Array
   ): Promise<string | SignMessageResponse>;
@@ -115,10 +114,10 @@ export abstract class BaseWalletAdapter
   abstract connect(): Promise<void>;
   abstract disconnect(): Promise<void>;
   abstract signAndSubmitTransaction(
-    transaction: TransactionPayload
-  ): Promise<{ hash: HexEncodedBytes }>;
+    transaction: Types.TransactionPayload
+  ): Promise<{ hash: Types.HexEncodedBytes }>;
 
-  abstract signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+  abstract signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
 
   abstract signMessage(
     message: string | SignMessagePayload | Uint8Array

@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -36,8 +35,8 @@ interface IMartianWallet {
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
-  signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
-  signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+
+  signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
 }
@@ -178,7 +177,10 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload, options?: any): Promise<Uint8Array> {
+  async signTransaction(
+    transactionPyld: Types.TransactionPayload,
+    options?: any
+  ): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
@@ -198,9 +200,9 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload,
+    transactionPyld: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
