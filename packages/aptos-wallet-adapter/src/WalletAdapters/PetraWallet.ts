@@ -53,7 +53,8 @@ export interface AptosWalletAdapterConfig {
 export class AptosWalletAdapter extends BaseWalletAdapter {
   name = AptosWalletName;
 
-  url = 'https://aptos.dev/guides/building-wallet-extension';
+  url =
+    'https://chrome.google.com/webstore/detail/petra-aptos-wallet/ejjladinnckdgjemekebdpeokbikhfci';
 
   icon = 'https://miro.medium.com/fit/c/176/176/1*Gf747eyRywU8Img0tK5wvw.png';
 
