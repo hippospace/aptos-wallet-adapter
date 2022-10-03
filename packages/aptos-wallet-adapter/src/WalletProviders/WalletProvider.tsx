@@ -105,6 +105,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   useEffect(() => {
     const selectedWallet = wallets.find((wAdapter) => wAdapter.adapter.name === name);
     if (selectedWallet) {
+      console.log('selectedWallets', selectedWallet);
       setState({
         wallet: selectedWallet,
         adapter: selectedWallet.adapter,
@@ -180,14 +181,20 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
   // If autoConnect is enabled, try to connect when the adapter changes and is ready
   useEffect(() => {
-    if (
-      isConnecting.current ||
-      connected ||
-      !autoConnect ||
-      !adapter ||
-      !(readyState === WalletReadyState.Installed || readyState === WalletReadyState.Loadable)
-    )
+    if (isConnecting.current || connected || !autoConnect || !adapter) return;
+
+    // Handle wallet not installed in Auto-connect mode
+    if (!(readyState === WalletReadyState.Installed || readyState === WalletReadyState.Loadable)) {
+      // Clear the selected wallet
+      setName(null);
+
+      if (typeof window !== 'undefined') {
+        window.open(adapter.url, '_blank');
+      }
+
+      handleError(new WalletNotReadyError());
       return;
+    }
 
     (async function () {
       isConnecting.current = true;

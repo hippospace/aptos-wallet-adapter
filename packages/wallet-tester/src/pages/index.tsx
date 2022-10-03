@@ -175,7 +175,7 @@ const MainPage = () => {
         sign: true
       });
       const nonce = 'random_string';
-      const msgPayload = ['petra', 'martian', 'fewcha'].includes(
+      const msgPayload = ['petra', 'martian', 'fewcha', 'rise wallet', 'snap'].includes(
         currentWallet?.adapter?.name?.toLowerCase() || ''
       )
         ? {

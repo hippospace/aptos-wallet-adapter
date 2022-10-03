@@ -18,6 +18,10 @@ Supports:
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
 - [Spika wallet](https://spika.app)
 - [Rise wallet](https://risewallet.io/)
+- [HyperPay wallet](https://www.hyperpay.io/)
+- [Fletch wallet](http://fletchwallet.io/)
+- [Spika web wallet](https://spika.app)
+- [Aptos snap](https://chrome.google.com/webstore/detail/metamask-flask-developmen/ljfoeinjpaedjfecbmggjgodbgkmjkjk)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
