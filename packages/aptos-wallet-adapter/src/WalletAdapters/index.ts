@@ -9,3 +9,5 @@ export * from './PontemWallet';
 export * from './RiseWallet';
 export * from './SpikaWallet';
 export * from './HyperPayWallet';
+export * from './FletchWallet';
+export * from './AptosSnap';
