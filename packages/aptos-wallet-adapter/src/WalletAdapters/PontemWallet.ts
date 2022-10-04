@@ -12,6 +12,8 @@ import {
   AccountKeys,
   BaseWalletAdapter,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -45,11 +47,9 @@ interface IPontemWallet {
   }>;
   isConnected(): Promise<boolean>;
   signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
-  signMessage(message: string): Promise<{
+  signMessage(message: SignMessagePayload): Promise<{
     success: boolean;
-    result: {
-      hexString: HexEncodedBytes;
-    };
+    result: SignMessageResponse;
   }>;
   disconnect(): Promise<void>;
 }
@@ -221,20 +221,19 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       }
       return { hash: response.result.hash };
     } catch (error: any) {
-      this.emit('error', new WalletSignAndSubmitMessageError(error.error.message));
+      this.emit('error', new WalletSignAndSubmitMessageError(error.message));
       throw error;
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(messagePayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
-      console.log('MEMEM>>>', response);
+      const response = await provider?.signMessage(messagePayload);
       if (response.success) {
-        return response.result.hexString;
+        return response.result;
       } else {
         throw new Error('Sign Message failed');
       }
