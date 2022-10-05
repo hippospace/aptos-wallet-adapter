@@ -1,4 +1,4 @@
-import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
+import { Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -19,7 +19,10 @@ interface ISpikaWallet {
   connect: () => Promise<{ publicKey: string; account: string; authKey: string }>;
   account: () => Promise<string>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any, options?: any): Promise<{ hash: HexEncodedBytes }>;
+  signAndSubmitTransaction(
+    transaction: any,
+    options?: any
+  ): Promise<{ hash: Types.HexEncodedBytes }>;
   signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
   signMessage(message: string): Promise<string>;
   disconnect(): Promise<void>;
@@ -166,7 +169,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array> {
+  async signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.spika;
@@ -186,9 +189,9 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.spika;

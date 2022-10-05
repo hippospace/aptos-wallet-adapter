@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -37,16 +36,16 @@ interface IPontemWallet {
   publicKey(): Promise<MaybeHexString>;
   generateTransaction(sender: MaybeHexString, payload: any): Promise<any>;
   signAndSubmit(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
   ): Promise<{
     success: boolean;
     result: {
-      hash: HexEncodedBytes;
+      hash: Types.HexEncodedBytes;
     };
   }>;
   isConnected(): Promise<boolean>;
-  signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
+  signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array>;
   signMessage(message: SignMessagePayload): Promise<{
     success: boolean;
     result: SignMessageResponse;
@@ -192,7 +191,10 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload, options?: any): Promise<Uint8Array> {
+  async signTransaction(
+    transactionPyld: Types.TransactionPayload,
+    options?: any
+  ): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
@@ -207,9 +209,9 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload,
+    transactionPyld: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
