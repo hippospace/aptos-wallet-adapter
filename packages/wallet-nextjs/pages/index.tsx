@@ -17,6 +17,7 @@ const MainPage = () => {
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
   const [signature, setSignature] = useState<string>('');
   const {
+    autoConnect,
     connect,
     disconnect,
     account,
@@ -26,9 +27,16 @@ const MainPage = () => {
     connected,
     disconnecting,
     wallet: currentWallet,
+    select,
     signMessage,
     signTransaction
   } = useWallet();
+
+  useEffect(() => {
+    if (!autoConnect && currentWallet?.adapter) {
+      connect();
+    }
+  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -36,7 +44,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            connect(option.name);
+            select(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
