@@ -35,7 +35,7 @@ interface IMartianWallet {
   account(): Promise<MartianAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
-
+  signAndSubmitTransaction(transaction: Types.TransactionPayload): Promise<Types.HexEncodedBytes>;
   signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;

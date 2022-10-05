@@ -40,7 +40,9 @@ interface IPontemWallet {
     options?: any
   ): Promise<{
     success: boolean;
-    result: {};
+    result: {
+      hash: Types.HexEncodedBytes;
+    };
   }>;
   isConnected(): Promise<boolean>;
   signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array>;
