@@ -25,6 +25,8 @@ export interface WalletAdapterEvents {
   error(error: any): void;
   success(value: any): void;
   readyStateChange(readyState: WalletReadyState): void;
+  networkChange(network: WalletAdapterNetwork): void;
+  accountChange(account: string): void;
 }
 
 export enum WalletReadyState {
@@ -49,6 +51,18 @@ export enum WalletReadyState {
 
 export type WalletName<T extends string = string> = T & { __brand__: 'WalletName' };
 
+export type NetworkInfo = {
+  api?: string;
+  chainId?: string;
+  name: WalletAdapterNetwork;
+};
+
+export enum WalletAdapterNetwork {
+  Mainnet = 'mainnet',
+  Testnet = 'testnet',
+  Devnet = 'devnet'
+}
+
 export interface WalletAdapterProps<Name extends string = string> {
   name: WalletName<Name>;
   url: string;
@@ -57,6 +71,9 @@ export interface WalletAdapterProps<Name extends string = string> {
   connecting: boolean;
   connected: boolean;
   publicAccount: AccountKeys;
+  network: NetworkInfo;
+  onAccountChange?(): Promise<void>;
+  onNetworkChange?(): Promise<void>;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
@@ -104,6 +121,8 @@ export abstract class BaseWalletAdapter
   abstract get readyState(): WalletReadyState;
 
   abstract get publicAccount(): AccountKeys;
+
+  abstract get network(): NetworkInfo;
 
   abstract get connecting(): boolean;
 

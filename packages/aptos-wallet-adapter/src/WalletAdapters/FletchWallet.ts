@@ -10,9 +10,11 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
+  NetworkInfo,
   scopePollingDetectionStrategy,
   SignMessagePayload,
   SignMessageResponse,
+  WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -39,7 +41,7 @@ export const FletchWalletName = 'Fletch' as WalletName<'Fletch'>;
 
 export interface FletchWalletAdapterConfig {
   provider?: IFletchWallet;
-  // network?: WalletAdapterNetwork;
+  network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -52,7 +54,12 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IFletchWallet;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -66,13 +73,13 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    // network = WalletAdapterNetwork.Mainnet,
+    network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: FletchWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.fletch : undefined;
-    // this._network = network;
+    this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -94,6 +101,14 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 

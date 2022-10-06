@@ -10,7 +10,9 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
+  NetworkInfo,
   scopePollingDetectionStrategy,
+  WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -49,7 +51,7 @@ export const HyperPayWalletName = 'HyperPay' as WalletName<'HyperPay'>;
 
 export interface HyperPayWalletAdapterConfig {
   provider?: IHyperPayWallet;
-  // network?: WalletAdapterNetwork;
+  network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -63,7 +65,12 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IHyperPayWallet | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -105,6 +112,14 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 

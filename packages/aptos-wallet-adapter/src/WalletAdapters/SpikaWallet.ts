@@ -10,7 +10,9 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
+  NetworkInfo,
   scopePollingDetectionStrategy,
+  WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -38,7 +40,7 @@ export const SpikaWalletName = 'Spika' as WalletName<'Spika'>;
 
 export interface SpikaWalletAdapterConfig {
   provider?: ISpikaWallet;
-  // network?: WalletAdapterNetwork;
+  network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -51,7 +53,12 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: ISpikaWallet | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -65,13 +72,13 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    // network = WalletAdapterNetwork.Mainnet,
+    network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: SpikaWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.spika : undefined;
-    // this._network = network;
+    this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -93,6 +100,14 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 

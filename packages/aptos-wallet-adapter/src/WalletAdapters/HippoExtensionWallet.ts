@@ -10,7 +10,9 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
+  NetworkInfo,
   scopePollingDetectionStrategy,
+  WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -39,7 +41,7 @@ export const HippoExtensionWalletName = 'Hippo' as WalletName<'Hippo'>;
 
 export interface HippoExtensionWalletAdapterConfig {
   provider?: IHippoWallet;
-  // network?: WalletAdapterNetwork;
+  network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -52,7 +54,12 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IHippoWallet | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -66,13 +73,13 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    // network = WalletAdapterNetwork.Mainnet,
+    network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: HippoExtensionWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.hippoWallet : undefined;
-    // this._network = network;
+    this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -94,6 +101,14 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 

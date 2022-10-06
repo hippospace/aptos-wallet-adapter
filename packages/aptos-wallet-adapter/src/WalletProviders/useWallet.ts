@@ -2,6 +2,7 @@ import { Types } from 'aptos';
 import { createContext, useContext } from 'react';
 import {
   AccountKeys,
+  NetworkInfo,
   SignMessagePayload,
   SignMessageResponse,
   WalletAdapter,
@@ -22,6 +23,7 @@ export interface WalletContextState {
   connecting: boolean;
   connected: boolean;
   disconnecting: boolean;
+  network: NetworkInfo;
   select(walletName: WalletName): void;
   connect(): Promise<void>;
   disconnect(): Promise<void>;

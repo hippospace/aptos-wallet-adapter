@@ -14,9 +14,11 @@ import {
   WalletName,
   WalletReadyState,
   SignMessagePayload,
-  SignMessageResponse
+  SignMessageResponse,
+  NetworkInfo,
+  WalletAdapterNetwork
 } from './BaseAdapter';
-import { AptosNetwork, PublicAccount } from '@keystonehq/aptossnap-adapter/build/types';
+import { PublicAccount } from '@keystonehq/aptossnap-adapter/build/types';
 import WalletAdapter from '@keystonehq/aptossnap-adapter';
 
 interface IAptosSnap {
@@ -42,7 +44,7 @@ export const AptosSnapName = 'Snap' as WalletName<'Snap'>;
 
 export interface AptosSnapAdapterConfig {
   provider?: IAptosSnap;
-  network: AptosNetwork;
+  network: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -56,7 +58,12 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
 
   protected _provider: IAptosSnap | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -73,12 +80,12 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       // provider,
       network,
       timeout = 10000
-    }: AptosSnapAdapterConfig = { network: 'devnet' }
+    }: AptosSnapAdapterConfig = { network: WalletAdapterNetwork.Devnet }
   ) {
     super();
     //@ts-ignore
     this._provider = new WalletAdapter({ network }, 'npm:@keystonehq/aptossnap');
-    // this._network = network;
+    this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -98,6 +105,14 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 
