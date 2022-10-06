@@ -17,7 +17,7 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { TransactionPayload, HexEncodedBytes, EntryFunctionPayload } from 'aptos/src/generated';
+import { Types } from 'aptos';
 
 export const FewchaWalletName = 'Fewcha' as WalletName<'Fewcha'>;
 
@@ -165,13 +165,16 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array> {
+  async signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload, options);
+      const tx = await provider.generateTransaction(
+        transaction as Types.EntryFunctionPayload,
+        options
+      );
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signTransaction(tx.data);
 
@@ -187,15 +190,18 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       const provider = this._provider || window.fewcha;
-      const tx = await provider.generateTransaction(transaction as EntryFunctionPayload, options);
+      const tx = await provider.generateTransaction(
+        transaction as Types.EntryFunctionPayload,
+        options
+      );
       if (!tx) throw new Error('Cannot generate transaction');
       const response = await provider?.signAndSubmitTransaction(tx.data);
       if (response.status === 401) {

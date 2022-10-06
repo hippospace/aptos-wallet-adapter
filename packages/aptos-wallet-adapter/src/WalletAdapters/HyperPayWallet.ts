@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -34,8 +33,8 @@ interface IHyperPayWallet {
   account(): Promise<HyperPayAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
-  signAndSubmitTransaction(transaction: TransactionPayload): Promise<HexEncodedBytes>;
-  signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+  signAndSubmitTransaction(transaction: Types.TransactionPayload): Promise<Types.HexEncodedBytes>;
+  signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
   signMessage(message: string): Promise<{ signature: string }>;
   disconnect(): Promise<void>;
 }
@@ -176,7 +175,10 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transactionPyld: TransactionPayload, options?: any): Promise<Uint8Array> {
+  async signTransaction(
+    transactionPyld: Types.TransactionPayload,
+    options?: any
+  ): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.hyperpay;
@@ -196,9 +198,9 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transactionPyld: TransactionPayload,
+    transactionPyld: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.hyperpay;

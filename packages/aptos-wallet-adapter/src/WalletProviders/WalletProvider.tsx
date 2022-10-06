@@ -1,5 +1,5 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { TransactionPayload } from 'aptos/src/generated';
+import { Types } from 'aptos';
 import {
   WalletError,
   WalletNotConnectedError,
@@ -265,7 +265,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
   // Send a transaction using the provided connection
   const signAndSubmitTransaction = useCallback(
-    async (transaction: TransactionPayload, option?: any) => {
+    async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
       const response = await adapter.signAndSubmitTransaction(transaction, option);
@@ -275,7 +275,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   );
 
   const signTransaction = useCallback(
-    async (transaction: TransactionPayload, option?: any) => {
+    async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
       return adapter.signTransaction(transaction, option);

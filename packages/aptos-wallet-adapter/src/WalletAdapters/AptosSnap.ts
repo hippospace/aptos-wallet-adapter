@@ -1,9 +1,4 @@
-import {
-  TransactionPayload,
-  HexEncodedBytes,
-  EntryFunctionPayload,
-  PendingTransaction
-} from 'aptos/src/generated';
+import { Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -29,12 +24,12 @@ interface IAptosSnap {
   account: () => Promise<PublicAccount>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(
-    transaction: EntryFunctionPayload,
+    transaction: Types.EntryFunctionPayload,
     options?: any
-  ): Promise<PendingTransaction>;
+  ): Promise<Types.PendingTransaction>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
-  signTransaction(transaction: EntryFunctionPayload): Promise<Uint8Array>;
+  signTransaction(transaction: Types.EntryFunctionPayload): Promise<Uint8Array>;
 }
 
 interface SnapWindow extends Window {
@@ -164,14 +159,14 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
         const provider = this._provider;
-        const response = await provider?.signTransaction(transaction as EntryFunctionPayload);
+        const response = await provider?.signTransaction(transaction as Types.EntryFunctionPayload);
         if (response) {
           return new Uint8Array([]);
         } else {
@@ -187,9 +182,9 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
@@ -197,7 +192,7 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       try {
         const provider = this._provider;
         const response = await provider?.signAndSubmitTransaction(
-          transaction as EntryFunctionPayload,
+          transaction as Types.EntryFunctionPayload,
           options
         );
         if (response) {

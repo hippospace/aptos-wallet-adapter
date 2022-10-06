@@ -1,4 +1,4 @@
-import { HexEncodedBytes, TransactionPayload } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import {
   WalletDisconnectionError,
   WalletNotConnectedError,
@@ -15,7 +15,6 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { MaybeHexString } from 'aptos';
 
 interface RiseAccount {
   address: MaybeHexString;
@@ -28,7 +27,7 @@ interface IRiseWallet {
   connect: () => Promise<{ address: string }>;
   account(): Promise<RiseAccount>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<{ hash: HexEncodedBytes }>;
+  signAndSubmitTransaction(transaction: any): Promise<{ hash: Types.HexEncodedBytes }>;
   signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
@@ -175,7 +174,7 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
@@ -195,8 +194,8 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload
-  ): Promise<{ hash: HexEncodedBytes }> {
+    transaction: Types.TransactionPayload
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
