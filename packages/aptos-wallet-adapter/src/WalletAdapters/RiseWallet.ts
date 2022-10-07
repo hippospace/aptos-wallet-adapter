@@ -2,6 +2,7 @@ import { MaybeHexString, Types } from 'aptos';
 import {
   WalletAccountChangeError,
   WalletDisconnectionError,
+  WalletGetNetworkError,
   WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
@@ -35,6 +36,7 @@ interface IRiseWallet {
   signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
+  network(): Promise<NetworkInfo>;
 }
 
 interface RiseWindow extends Window {
@@ -152,6 +154,22 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
 
       if (!response) {
         throw new WalletNotConnectedError('User has rejected the request');
+      }
+
+      // TODO - remove this check in the future
+      //  provider.network is still not live and we want smooth transition
+      if (provider?.network) {
+        try {
+          const { chainId, api, name } = await provider.network();
+
+          this._network = name;
+          this._chainId = chainId;
+          this._api = api;
+        } catch (error: any) {
+          const errMsg = error.message;
+          this.emit('error', new WalletGetNetworkError(errMsg));
+          throw error;
+        }
       }
 
       const account = await provider?.account();
