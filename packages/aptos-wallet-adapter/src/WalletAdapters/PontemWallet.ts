@@ -300,7 +300,7 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async onNetworkChange?(): Promise<void> {
+  async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;

@@ -1,6 +1,8 @@
 import { MaybeHexString, Types } from 'aptos';
 import {
+  WalletAccountChangeError,
   WalletDisconnectionError,
+  WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
   WalletSignMessageError,
@@ -246,6 +248,32 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.rise;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.rise;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }

@@ -1,6 +1,8 @@
 import { MaybeHexString, Types } from 'aptos';
 import { WEBWALLET_URL } from '../config/aptosConstants';
 import {
+  WalletAccountChangeError,
+  WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
   WalletSignAndSubmitMessageError
@@ -233,6 +235,26 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
       return promise as string;
     } catch (error: any) {
       this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }

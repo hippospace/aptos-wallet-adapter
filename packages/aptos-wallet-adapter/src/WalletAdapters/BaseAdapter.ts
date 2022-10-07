@@ -72,8 +72,8 @@ export interface WalletAdapterProps<Name extends string = string> {
   connected: boolean;
   publicAccount: AccountKeys;
   network: NetworkInfo;
-  onAccountChange?(): Promise<void>;
-  onNetworkChange?(): Promise<void>;
+  onAccountChange(): Promise<void>;
+  onNetworkChange(): Promise<void>;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
@@ -141,6 +141,9 @@ export abstract class BaseWalletAdapter
   abstract signMessage(
     message: string | SignMessagePayload | Uint8Array
   ): Promise<string | SignMessageResponse>;
+
+  abstract onAccountChange(): Promise<void>;
+  abstract onNetworkChange(): Promise<void>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {

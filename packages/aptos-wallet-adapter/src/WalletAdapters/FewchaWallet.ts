@@ -1,7 +1,9 @@
 import {
+  WalletAccountChangeError,
   WalletConnectionError,
   WalletDisconnectionError,
   WalletGetNetworkError,
+  WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
   WalletSignAndSubmitMessageError,
@@ -261,6 +263,32 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.fewcha;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.fewcha;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }
