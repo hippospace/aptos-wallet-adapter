@@ -75,7 +75,7 @@ export const NightlyWalletName = 'Nightly' as WalletName<'Nightly'>;
 
 export interface NightlyWalletAdapterConfig {
   provider?: AptosNightly;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -114,13 +114,13 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: NightlyWalletAdapterConfig = {}) {
     super();
 
     this._provider = window.nightly?.aptos;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

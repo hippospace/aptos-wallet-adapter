@@ -18,7 +18,7 @@ export const HippoWalletName = 'Hippo Web' as WalletName<'Hippo Web'>;
 
 export interface HippoWalletAdapterConfig {
   provider?: string;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -47,13 +47,13 @@ export class HippoWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider = WEBWALLET_URL,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: HippoWalletAdapterConfig = {}) {
     super();
 
     this._provider = WEBWALLET_URL || 'https://hippo-wallet-test.web.app';
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

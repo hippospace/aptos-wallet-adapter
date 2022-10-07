@@ -71,7 +71,7 @@ export const PontemWalletName = 'Pontem' as WalletName<'Pontem'>;
 
 export interface PontemWalletAdapterConfig {
   provider?: IPontemWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -104,13 +104,13 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: PontemWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.pontem : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

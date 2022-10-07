@@ -60,7 +60,7 @@ export const MartianWalletName = 'Martian' as WalletName<'Martian'>;
 
 export interface MartianWalletAdapterConfig {
   provider?: IMartianWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -93,13 +93,13 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: MartianWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.martian : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

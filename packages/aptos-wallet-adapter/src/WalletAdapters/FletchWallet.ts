@@ -41,7 +41,7 @@ export const FletchWalletName = 'Fletch' as WalletName<'Fletch'>;
 
 export interface FletchWalletAdapterConfig {
   provider?: IFletchWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -73,13 +73,13 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: FletchWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.fletch : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

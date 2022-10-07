@@ -57,7 +57,7 @@ export const AptosWalletName = 'Petra' as WalletName<'Petra'>;
 
 export interface AptosWalletAdapterConfig {
   provider?: IAptosWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -90,13 +90,13 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: AptosWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.aptos : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

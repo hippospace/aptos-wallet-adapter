@@ -41,7 +41,7 @@ export const HippoExtensionWalletName = 'Hippo' as WalletName<'Hippo'>;
 
 export interface HippoExtensionWalletAdapterConfig {
   provider?: IHippoWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -73,13 +73,13 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: HippoExtensionWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.hippoWallet : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

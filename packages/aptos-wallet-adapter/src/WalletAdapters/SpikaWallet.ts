@@ -40,7 +40,7 @@ export const SpikaWalletName = 'Spika' as WalletName<'Spika'>;
 
 export interface SpikaWalletAdapterConfig {
   provider?: ISpikaWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -72,13 +72,13 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: SpikaWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.spika : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;

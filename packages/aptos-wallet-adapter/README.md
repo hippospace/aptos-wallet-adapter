@@ -92,14 +92,16 @@ export default App;
 ```typescript
 import { useWallet } from '@manahippo/aptos-wallet-adapter';
 
-const { connected, account, ...rest } = useWallet();
+const { connected, account, network, ...rest } = useWallet();
 
 /*
   ** Properties available: **
 
   wallets: Wallet[]; - Array of wallets
   wallet: Wallet | null; - Selected wallet
-  account(): AccountKeys | null; - Wallet info: address, publicKey, authKey
+  account: AccountKeys | null; - Wallet info: address, 
+  network: NetworkInfo - { name, chainId, api }
+  publicKey, authKey
   connected: boolean; - check the website is connected yet
   connect(walletName: string): Promise<void>; - trigger connect popup
   disconnect(): Promise<void>; - trigger disconnect action

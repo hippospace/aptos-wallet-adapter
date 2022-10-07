@@ -32,7 +32,7 @@ declare const window: FewchaWindow;
 
 export interface FewchaAdapterConfig {
   provider?: string;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -64,12 +64,12 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider = WEBWALLET_URL,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: FewchaAdapterConfig = {}) {
     super();
 
-    this._network = network;
+    this._network = undefined;
     this._provider = typeof window !== 'undefined' ? new Web3().action : undefined;
     this._timeout = timeout;
     this._connecting = false;

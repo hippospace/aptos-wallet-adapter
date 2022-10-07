@@ -51,7 +51,7 @@ export const HyperPayWalletName = 'HyperPay' as WalletName<'HyperPay'>;
 
 export interface HyperPayWalletAdapterConfig {
   provider?: IHyperPayWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 

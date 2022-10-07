@@ -45,7 +45,7 @@ export const RiseWalletName = 'Rise Wallet' as WalletName<'Rise Wallet'>;
 
 export interface RiseWalletAdapterConfig {
   provider?: IRiseWallet;
-  network?: WalletAdapterNetwork;
+  // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -77,13 +77,13 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Testnet,
+    // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
   }: RiseWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.rise : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
