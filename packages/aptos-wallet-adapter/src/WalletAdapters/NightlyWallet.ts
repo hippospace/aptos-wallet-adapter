@@ -2,7 +2,6 @@ export const NightlyWallet = () => {};
 
 import { PendingTransaction, TransactionPayload } from 'aptos/src/generated';
 import * as SHA3 from 'js-sha3';
-import { aptosClient } from '../config/aptosConstants';
 import {
   WalletAccountChangeError,
   WalletDisconnectionError,
@@ -61,7 +60,10 @@ interface AptosNightly {
   constructor(eventMap: Map<string, (data: any) => any>);
   connect(onDisconnect?: () => void, eagerConnect?: boolean): Promise<AptosPublicKey>;
   disconnect(): Promise<void>;
-  signTransaction: (transaction: TransactionPayload) => Promise<Uint8Array>;
+  signTransaction: (
+    transaction: TransactionPayload,
+    submit: boolean
+  ) => Promise<Uint8Array | PendingTransaction>;
   signAllTransactions: (transaction: TransactionPayload[]) => Promise<Uint8Array[]>;
   signMessage(msg: string): Promise<Uint8Array>;
 }
@@ -222,9 +224,9 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
 
       try {
         const provider = this._provider || window.nightly?.aptos;
-        const response = await provider?.signTransaction(payload);
+        const response = await provider?.signTransaction(payload, false);
         if (response) {
-          return response;
+          return response as Uint8Array;
         } else {
           throw new Error('Transaction failed');
         }
@@ -266,10 +268,9 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
 
       try {
         const provider = this._provider || window.nightly?.aptos;
-        const response = await provider?.signTransaction(tx);
-        const result = await aptosClient.submitSignedBCSTransaction(response);
+        const response = await provider?.signTransaction(tx, true);
         if (response) {
-          return result;
+          return response as PendingTransaction;
         } else {
           throw new Error('Transaction failed');
         }
