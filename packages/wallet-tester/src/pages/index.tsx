@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Types } from 'aptos';
 import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
@@ -34,7 +34,8 @@ const MainPage = () => {
     wallet: currentWallet,
     signMessage,
     signTransaction,
-    select
+    select,
+    network
   } = useWallet();
 
   useEffect(() => {
@@ -239,6 +240,15 @@ const MainPage = () => {
           </strong>
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
+          </strong>
+          <strong>
+            Network: <div id="network">{network.name}</div>
+          </strong>
+          <strong>
+            ChainId: <div id="chainId">{network.chainId}</div>
+          </strong>
+          <strong>
+            API: <div id="api">{network.api}</div>
           </strong>
           <strong>Message to Sign : {messageToSign}</strong>
           {signature ? (

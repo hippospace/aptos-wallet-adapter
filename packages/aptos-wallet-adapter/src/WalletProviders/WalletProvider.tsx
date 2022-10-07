@@ -9,6 +9,7 @@ import {
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import {
   AccountKeys,
+  NetworkInfo,
   SignMessagePayload,
   WalletAdapter,
   WalletName,
@@ -29,11 +30,13 @@ const initialState: {
   adapter: WalletAdapter | null;
   account: AccountKeys | null;
   connected: boolean;
+  network: NetworkInfo | null;
 } = {
   wallet: null,
   adapter: null,
   account: null,
-  connected: false
+  connected: false,
+  network: null
 };
 
 export const WalletProvider: FC<WalletProviderProps> = ({
@@ -44,7 +47,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   localStorageKey = 'walletName'
 }) => {
   const [name, setName] = useLocalStorage<WalletName | null>(localStorageKey, null);
-  const [{ wallet, adapter, account, connected }, setState] = useState(initialState);
+  const [{ wallet, adapter, account, connected, network }, setState] = useState(initialState);
   const readyState = adapter?.readyState || WalletReadyState.Unsupported;
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -110,7 +113,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         wallet: selectedWallet,
         adapter: selectedWallet.adapter,
         connected: selectedWallet.adapter.connected,
-        account: selectedWallet.adapter.publicAccount
+        account: selectedWallet.adapter.publicAccount,
+        network: selectedWallet.adapter.network
       });
     } else {
       setState(initialState);
@@ -137,6 +141,31 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       return {
         ...state,
         connected: adapter.connected,
+        account: adapter.publicAccount,
+        network: adapter.network
+      };
+    });
+  }, [adapter]);
+
+  // Handle the adapter's network event
+  const handleNetworkChange = useCallback(() => {
+    if (!adapter) return;
+    console.log('adapter: handleNetworkChange', adapter.network);
+    setState((state) => {
+      return {
+        ...state,
+        network: adapter.network
+      };
+    });
+  }, [adapter]);
+
+  // Handle the adapter's account event
+  const handleAccountChange = useCallback(() => {
+    if (!adapter) return;
+    console.log('adapter: handleAccountChange', adapter.publicAccount);
+    setState((state) => {
+      return {
+        ...state,
         account: adapter.publicAccount
       };
     });
@@ -158,19 +187,38 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     [isUnloading, onError]
   );
 
+  // Listen on the adapter's network/account changes
+  useEffect(() => {
+    if (adapter && connected) {
+      adapter.onAccountChange();
+      adapter.onNetworkChange();
+    }
+  }, [adapter, connected]);
+
   // Setup and teardown event listeners when the adapter changes
   useEffect(() => {
     if (adapter) {
       adapter.on('connect', handleConnect);
+      adapter.on('networkChange', handleNetworkChange);
+      adapter.on('accountChange', handleAccountChange);
       adapter.on('disconnect', handleDisconnect);
       adapter.on('error', handleError);
       return () => {
         adapter.off('connect', handleConnect);
+        adapter.off('networkChange', handleNetworkChange);
+        adapter.off('accountChange', handleAccountChange);
         adapter.off('disconnect', handleDisconnect);
         adapter.off('error', handleError);
       };
     }
-  }, [adapter, handleConnect, handleDisconnect, handleError]);
+  }, [
+    adapter,
+    handleAccountChange,
+    handleConnect,
+    handleDisconnect,
+    handleError,
+    handleNetworkChange
+  ]);
 
   // When the adapter changes, disconnect the old one
   useEffect(() => {
@@ -307,7 +355,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         disconnect,
         signAndSubmitTransaction,
         signTransaction,
-        signMessage
+        signMessage,
+        network
       }}>
       {children}
     </WalletContext.Provider>
