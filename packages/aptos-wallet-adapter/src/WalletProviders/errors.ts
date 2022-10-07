@@ -39,6 +39,17 @@ export class WalletDisconnectionError extends WalletError {
 export class WalletAccountError extends WalletError {
   name = 'WalletAccountError';
 }
+export class WalletGetNetworkError extends WalletError {
+  name = 'WalletGetNetworkError';
+}
+
+export class WalletAccountChangeError extends WalletError {
+  name = 'WalletAccountChangeError';
+}
+
+export class WalletNetworkChangeError extends WalletError {
+  name = 'WalletNetworkChangeError';
+}
 
 export class WalletPublicKeyError extends WalletError {
   name = 'WalletPublicKeyError';

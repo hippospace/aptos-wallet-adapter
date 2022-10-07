@@ -1,6 +1,8 @@
 import { MaybeHexString, Types } from 'aptos';
 import {
+  WalletAccountChangeError,
   WalletDisconnectionError,
+  WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
   WalletSignAndSubmitMessageError,
@@ -10,7 +12,9 @@ import {
 import {
   AccountKeys,
   BaseWalletAdapter,
+  NetworkInfo,
   scopePollingDetectionStrategy,
+  WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
@@ -63,7 +67,12 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IHyperPayWallet | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -105,6 +114,14 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 
@@ -233,6 +250,32 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.hyperpay;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.hyperpay;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }
