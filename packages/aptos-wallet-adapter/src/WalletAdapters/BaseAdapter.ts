@@ -1,5 +1,4 @@
-import { MaybeHexString } from 'aptos';
-import { TransactionPayload, HexEncodedBytes } from 'aptos/src/generated';
+import { MaybeHexString, Types } from 'aptos';
 import EventEmitter from 'eventemitter3';
 
 declare global {
@@ -26,6 +25,8 @@ export interface WalletAdapterEvents {
   error(error: any): void;
   success(value: any): void;
   readyStateChange(readyState: WalletReadyState): void;
+  networkChange(network: WalletAdapterNetwork): void;
+  accountChange(account: string): void;
 }
 
 export enum WalletReadyState {
@@ -50,6 +51,18 @@ export enum WalletReadyState {
 
 export type WalletName<T extends string = string> = T & { __brand__: 'WalletName' };
 
+export type NetworkInfo = {
+  api?: string;
+  chainId?: string;
+  name: WalletAdapterNetwork | undefined;
+};
+
+export enum WalletAdapterNetwork {
+  Mainnet = 'mainnet',
+  Testnet = 'testnet',
+  Devnet = 'devnet'
+}
+
 export interface WalletAdapterProps<Name extends string = string> {
   name: WalletName<Name>;
   url: string;
@@ -58,13 +71,16 @@ export interface WalletAdapterProps<Name extends string = string> {
   connecting: boolean;
   connected: boolean;
   publicAccount: AccountKeys;
+  network: NetworkInfo;
+  onAccountChange(): Promise<void>;
+  onNetworkChange(): Promise<void>;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }>;
-  signTransaction(transaction: TransactionPayload, options?: any): Promise<Uint8Array>;
+  ): Promise<{ hash: Types.HexEncodedBytes }>;
+  signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array>;
   signMessage(
     message: string | SignMessagePayload | Uint8Array
   ): Promise<string | SignMessageResponse>;
@@ -106,6 +122,8 @@ export abstract class BaseWalletAdapter
 
   abstract get publicAccount(): AccountKeys;
 
+  abstract get network(): NetworkInfo;
+
   abstract get connecting(): boolean;
 
   get connected(): boolean {
@@ -115,14 +133,17 @@ export abstract class BaseWalletAdapter
   abstract connect(): Promise<void>;
   abstract disconnect(): Promise<void>;
   abstract signAndSubmitTransaction(
-    transaction: TransactionPayload
-  ): Promise<{ hash: HexEncodedBytes }>;
+    transaction: Types.TransactionPayload
+  ): Promise<{ hash: Types.HexEncodedBytes }>;
 
-  abstract signTransaction(transaction: TransactionPayload): Promise<Uint8Array>;
+  abstract signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
 
   abstract signMessage(
     message: string | SignMessagePayload | Uint8Array
   ): Promise<string | SignMessageResponse>;
+
+  abstract onAccountChange(): Promise<void>;
+  abstract onNetworkChange(): Promise<void>;
 }
 
 export function scopePollingDetectionStrategy(detect: () => boolean): void {
