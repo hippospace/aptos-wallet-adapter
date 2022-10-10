@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { TransactionPayload } from 'aptos/src/generated';
+import { Types } from 'aptos';
 import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
@@ -34,7 +34,8 @@ const MainPage = () => {
     wallet: currentWallet,
     signMessage,
     signTransaction,
-    select
+    select,
+    network
   } = useWallet();
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const MainPage = () => {
         const addressKey = account?.address?.toString() || account?.publicKey?.toString() || '';
         const demoAccount = new AptosAccount();
         await faucetClient.fundAccount(demoAccount.address(), 0);
-        const payload: TransactionPayload = {
+        const payload: Types.TransactionPayload = {
           type: 'entry_function_payload',
           function: '0x1::coin::transfer',
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
@@ -105,7 +106,7 @@ const MainPage = () => {
       if (account?.address || account?.publicKey) {
         const demoAccount = new AptosAccount();
         await faucetClient.fundAccount(demoAccount.address(), 0);
-        const payload: TransactionPayload = {
+        const payload: Types.TransactionPayload = {
           type: 'entry_function_payload',
           function: '0x1::coin::transfer',
           type_arguments: ['0x1::aptos_coin::AptosCoin'],
@@ -239,6 +240,15 @@ const MainPage = () => {
           </strong>
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
+          </strong>
+          <strong>
+            Network: <div id="network">{network.name}</div>
+          </strong>
+          <strong>
+            ChainId: <div id="chainId">{network.chainId}</div>
+          </strong>
+          <strong>
+            API: <div id="api">{network.api}</div>
           </strong>
           <strong>Message to Sign : {messageToSign}</strong>
           {signature ? (

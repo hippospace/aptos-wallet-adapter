@@ -1,11 +1,8 @@
+import { Types } from 'aptos';
 import {
-  TransactionPayload,
-  HexEncodedBytes,
-  EntryFunctionPayload,
-  PendingTransaction
-} from 'aptos/src/generated';
-import {
+  WalletAccountChangeError,
   WalletDisconnectionError,
+  WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
   WalletSignAndSubmitMessageError,
@@ -19,9 +16,11 @@ import {
   WalletName,
   WalletReadyState,
   SignMessagePayload,
-  SignMessageResponse
+  SignMessageResponse,
+  NetworkInfo,
+  WalletAdapterNetwork
 } from './BaseAdapter';
-import { AptosNetwork, PublicAccount } from '@keystonehq/aptossnap-adapter/build/types';
+import { PublicAccount } from '@keystonehq/aptossnap-adapter/build/types';
 import WalletAdapter from '@keystonehq/aptossnap-adapter';
 
 interface IAptosSnap {
@@ -29,12 +28,12 @@ interface IAptosSnap {
   account: () => Promise<PublicAccount>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(
-    transaction: EntryFunctionPayload,
+    transaction: Types.EntryFunctionPayload,
     options?: any
-  ): Promise<PendingTransaction>;
+  ): Promise<Types.PendingTransaction>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
-  signTransaction(transaction: EntryFunctionPayload): Promise<Uint8Array>;
+  signTransaction(transaction: Types.EntryFunctionPayload): Promise<Uint8Array>;
 }
 
 interface SnapWindow extends Window {
@@ -47,7 +46,7 @@ export const AptosSnapName = 'Snap' as WalletName<'Snap'>;
 
 export interface AptosSnapAdapterConfig {
   provider?: IAptosSnap;
-  network: AptosNetwork;
+  network: WalletAdapterNetwork;
   timeout?: number;
 }
 
@@ -61,7 +60,12 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
 
   protected _provider: IAptosSnap | undefined;
 
-  // protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork;
+
+  protected _chainId: string;
+
+  protected _api: string;
+
   protected _timeout: number;
 
   protected _readyState: WalletReadyState =
@@ -78,12 +82,12 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       // provider,
       network,
       timeout = 10000
-    }: AptosSnapAdapterConfig = { network: 'devnet' }
+    }: AptosSnapAdapterConfig = { network: WalletAdapterNetwork.Devnet }
   ) {
     super();
     //@ts-ignore
     this._provider = new WalletAdapter({ network }, 'npm:@keystonehq/aptossnap');
-    // this._network = network;
+    this._network = network;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
@@ -103,6 +107,14 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       publicKey: this._wallet?.publicKey || null,
       address: this._wallet?.address || null,
       authKey: this._wallet?.authKey || null
+    };
+  }
+
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
     };
   }
 
@@ -164,14 +176,14 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
     this.emit('disconnect');
   }
 
-  async signTransaction(transaction: TransactionPayload): Promise<Uint8Array> {
+  async signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
 
       try {
         const provider = this._provider;
-        const response = await provider?.signTransaction(transaction as EntryFunctionPayload);
+        const response = await provider?.signTransaction(transaction as Types.EntryFunctionPayload);
         if (response) {
           return new Uint8Array([]);
         } else {
@@ -187,9 +199,9 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: TransactionPayload,
+    transaction: Types.TransactionPayload,
     options?: any
-  ): Promise<{ hash: HexEncodedBytes }> {
+  ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
       if (!wallet) throw new WalletNotConnectedError();
@@ -197,7 +209,7 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
       try {
         const provider = this._provider;
         const response = await provider?.signAndSubmitTransaction(
-          transaction as EntryFunctionPayload,
+          transaction as Types.EntryFunctionPayload,
           options
         );
         if (response) {
@@ -229,6 +241,32 @@ export class AptosSnapAdapter extends BaseWalletAdapter {
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }

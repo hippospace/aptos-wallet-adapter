@@ -1,261 +1,330 @@
 export const NightlyWallet = () => {};
-// import { TxnBuilderTypes, BCS } from 'aptos';
-// import {
-//   PendingTransaction,
-//   ScriptFunctionPayload,
-//   SubmitTransactionRequest,
-//   TransactionPayload
-// } from 'aptos/dist/api/data-contracts';
-// import {
-//   ScriptFunction,
-//   StructTag,
-//   TransactionPayloadScriptFunction,
-//   TypeTagStruct
-// } from 'aptos/dist/transaction_builder/aptos_types';
-// import { bcsSerializeUint64, bcsToBytes, Seq } from 'aptos/dist/transaction_builder/bcs';
-// import { aptosClient } from '../config/aptosConstants';
-// import {
-//   WalletDisconnectionError,
-//   WalletNotConnectedError,
-//   WalletNotReadyError,
-//   WalletSignTransactionError
-// } from '../WalletProviders/errors';
-// import {
-//   AccountKeys,
-//   Address,
-//   AuthKey,
-//   BaseWalletAdapter,
-//   PublicKey,
-//   scopePollingDetectionStrategy,
-//   WalletName,
-//   WalletReadyState
-// } from './BaseAdapter';
 
-// interface INightlyWallet {
-//   requestId: number;
-//   connect: (onDisconnect?: () => void, eager?: boolean) => Promise<any>;
-//   account: () => Promise<string>;
-//   isConnected: () => Promise<boolean>;
-//   signAndSubmitTransaction(transaction: any): Promise<void>;
-//   signTransaction(transaction: any): Promise<any>;
-//   disconnect(): Promise<void>;
-// }
+import { PendingTransaction, TransactionPayload } from 'aptos/src/generated';
+import * as SHA3 from 'js-sha3';
+import {
+  WalletAccountChangeError,
+  WalletDisconnectionError,
+  WalletNetworkChangeError,
+  WalletNotConnectedError,
+  WalletNotReadyError,
+  WalletSignMessageError,
+  WalletSignTransactionError
+} from '../WalletProviders/errors';
+import {
+  AccountKeys,
+  BaseWalletAdapter,
+  NetworkInfo,
+  scopePollingDetectionStrategy,
+  WalletAdapterNetwork,
+  WalletName,
+  WalletReadyState
+} from './BaseAdapter';
 
-// interface NightlyWindow extends Window {
-//   nightly?: {
-//     aptos: INightlyWallet;
-//   };
-// }
+export class AptosPublicKey {
+  private readonly hexString: string;
 
-// declare const window: NightlyWindow;
+  static default() {
+    return new AptosPublicKey('0'.repeat(64));
+  }
 
-// export const NightlyWalletName = 'Nightly Wallet' as WalletName<'Nightly Wallet'>;
+  address() {
+    const hash = SHA3.sha3_256.create();
+    hash.update(Buffer.from(this.asPureHex(), 'hex'));
+    hash.update('\x00');
+    return '0x' + hash.hex();
+  }
 
-// export interface NightlyWalletAdapterConfig {
-//   provider?: INightlyWallet;
-//   // network?: WalletAdapterNetwork;
-//   timeout?: number;
-// }
+  asUint8Array() {
+    return new Uint8Array(Buffer.from(this.asPureHex(), 'hex'));
+  }
 
-// export class NightlyWalletAdapter extends BaseWalletAdapter {
-//   name = NightlyWalletName;
+  asString() {
+    return this.hexString;
+  }
 
-//   url =
-//     'https://chrome.google.com/webstore/detail/nightly/injggoambcadlfkkjcgdfbejanmgfgfm/related?hl=en&authuser=0';
+  asPureHex() {
+    return this.hexString.substr(2);
+  }
 
-//   icon =
-//     'https://lh3.googleusercontent.com/Ha38j09tA-70EiZ17pculpj1KUKDP07ytX4DJx_fumDfod_X2nRTiUg2Y9tDwRBs5jDj-gu52hwaPYVPgq1xAuFA1Q=w128-h128-e365-rj-sc0x00ffffff';
+  constructor(hexString: string) {
+    if (hexString.startsWith('0x')) {
+      this.hexString = hexString;
+    } else {
+      this.hexString = `0x${hexString}`;
+    }
+  }
+}
+interface AptosNightly {
+  publicKey: AptosPublicKey;
+  constructor(eventMap: Map<string, (data: any) => any>);
+  connect(onDisconnect?: () => void, eagerConnect?: boolean): Promise<AptosPublicKey>;
+  disconnect(): Promise<void>;
+  signTransaction: (
+    transaction: TransactionPayload,
+    submit: boolean
+  ) => Promise<Uint8Array | PendingTransaction>;
+  signAllTransactions: (transaction: TransactionPayload[]) => Promise<Uint8Array[]>;
+  signMessage(msg: string): Promise<Uint8Array>;
+}
+interface NightlyWindow extends Window {
+  nightly?: {
+    aptos: AptosNightly;
+  };
+}
 
-//   protected _provider: INightlyWallet | undefined;
+declare const window: NightlyWindow;
 
-//   // protected _network: WalletAdapterNetwork;
-//   protected _timeout: number;
+export const NightlyWalletName = 'Nightly' as WalletName<'Nightly'>;
 
-//   protected _readyState: WalletReadyState =
-//     typeof window === 'undefined' || typeof document === 'undefined'
-//       ? WalletReadyState.Unsupported
-//       : WalletReadyState.NotDetected;
+export interface NightlyWalletAdapterConfig {
+  provider?: AptosNightly;
+  // network?: WalletAdapterNetwork;
+  timeout?: number;
+}
 
-//   protected _connecting: boolean;
+export class NightlyWalletAdapter extends BaseWalletAdapter {
+  name = NightlyWalletName;
 
-//   protected _wallet: {
-//     publicKey?: string;
-//     address?: string;
-//     authKey?: string;
-//     isConnected: boolean;
-//   } | null;
+  url =
+    'https://chrome.google.com/webstore/detail/nightly/fiikommddbeccaoicoejoniammnalkfa/related?hl=en&authuser=0';
 
-//   constructor({
-//     // provider,
-//     // network = WalletAdapterNetwork.Mainnet,
-//     timeout = 10000
-//   }: NightlyWalletAdapterConfig = {}) {
-//     super();
+  icon =
+    'https://lh3.googleusercontent.com/_feXM9qulMM5w9BYMLzMpZrxW2WlBmdyg3SbETIoRsHdAD9PANnLCEPabC7lzEK0N8fOyyvFkY3746jk8l73zUErxhU=w128-h128-e365-rj-sc0x00ffffff';
 
-//     this._provider = window.nightly?.aptos;
-//     // this._network = network;
-//     this._timeout = timeout;
-//     this._connecting = false;
-//     this._wallet = null;
+  protected _provider: AptosNightly | undefined;
 
-//     if (this._readyState !== WalletReadyState.Unsupported) {
-//       scopePollingDetectionStrategy(() => {
-//         if (window.nightly?.aptos) {
-//           this._readyState = WalletReadyState.Installed;
-//           this.emit('readyStateChange', this._readyState);
-//           return true;
-//         }
-//         return false;
-//       });
-//     }
-//   }
+  protected _network: WalletAdapterNetwork;
 
-//   get publicAccount(): AccountKeys {
-//     return {
-//       publicKey: this._wallet?.publicKey || null,
-//       address: this._wallet?.address || null,
-//       authKey: this._wallet?.authKey || null
-//     };
-//   }
+  protected _chainId: string;
 
-//   get connecting(): boolean {
-//     return this._connecting;
-//   }
+  protected _api: string;
 
-//   get connected(): boolean {
-//     return !!this._wallet?.isConnected;
-//   }
+  protected _timeout: number;
 
-//   get readyState(): WalletReadyState {
-//     return this._readyState;
-//   }
+  protected _readyState: WalletReadyState =
+    typeof window === 'undefined' || typeof document === 'undefined'
+      ? WalletReadyState.Unsupported
+      : WalletReadyState.NotDetected;
 
-//   async connect(): Promise<void> {
-//     try {
-//       if (this.connected || this.connecting) return;
-//       if (
-//         !(
-//           this._readyState === WalletReadyState.Loadable ||
-//           this._readyState === WalletReadyState.Installed
-//         )
-//       )
-//         throw new WalletNotReadyError();
-//       this._connecting = true;
+  protected _connecting: boolean;
 
-//       const provider = this._provider || window.nightly?.aptos;
-//       const publicKey = await provider?.connect(() => {
-//         console.log('Trigger disconnect Aptos');
-//       });
-//       this._wallet = {
-//         publicKey: publicKey?.asString(),
-//         address: publicKey?.address(),
-//         isConnected: true
-//       };
+  protected _wallet: {
+    publicKey?: string;
+    address?: string;
+    authKey?: string;
+    isConnected: boolean;
+  } | null;
 
-//       this.emit('connect', this._wallet.publicKey || '');
-//     } catch (error: any) {
-//       this.emit('error', error);
-//       throw error;
-//     } finally {
-//       this._connecting = false;
-//     }
-//   }
+  constructor({
+    // provider,
+    // network = WalletAdapterNetwork.Testnet,
+    timeout = 10000
+  }: NightlyWalletAdapterConfig = {}) {
+    super();
 
-//   async disconnect(): Promise<void> {
-//     const wallet = this._wallet;
-//     if (wallet) {
-//       this._wallet = null;
+    this._provider = window.nightly?.aptos;
+    this._network = undefined;
+    this._timeout = timeout;
+    this._connecting = false;
+    this._wallet = null;
 
-//       try {
-//         const provider = this._provider || window.nightly?.aptos;
-//         await provider?.disconnect();
-//       } catch (error: any) {
-//         this.emit('error', new WalletDisconnectionError(error?.message, error));
-//       }
-//     }
+    if (this._readyState !== WalletReadyState.Unsupported) {
+      scopePollingDetectionStrategy(() => {
+        if (window.nightly?.aptos) {
+          this._readyState = WalletReadyState.Installed;
+          this.emit('readyStateChange', this._readyState);
+          return true;
+        }
+        return false;
+      });
+    }
+  }
 
-//     this.emit('disconnect');
-//   }
+  get publicAccount(): AccountKeys {
+    return {
+      publicKey: this._wallet?.publicKey || null,
+      address: this._wallet?.address || null,
+      authKey: this._wallet?.authKey || null
+    };
+  }
 
-//   async signTransaction(transaction: TransactionPayload): Promise<SubmitTransactionRequest> {
-//     try {
-//       const wallet = this._wallet;
-//       if (!wallet) throw new WalletNotConnectedError();
+  get network(): NetworkInfo {
+    return {
+      name: this._network,
+      api: this._api,
+      chainId: this._chainId
+    };
+  }
 
-//       try {
-//         const provider = this._provider || window.nightly?.aptos;
-//         const response = await provider?.signTransaction(transaction);
-//         if (response) {
-//           return response;
-//         } else {
-//           throw new Error('Transaction failed');
-//         }
-//       } catch (error: any) {
-//         throw new WalletSignTransactionError(error?.message, error);
-//       }
-//     } catch (error: any) {
-//       this.emit('error', error);
-//       throw error;
-//     }
-//   }
+  get connecting(): boolean {
+    return this._connecting;
+  }
 
-//   async signAndSubmitTransaction(tempTransaction: TransactionPayload): Promise<PendingTransaction> {
-//     try {
-//       const wallet = this._wallet;
-//       if (!wallet) throw new WalletNotConnectedError();
+  get connected(): boolean {
+    return !!this._wallet?.isConnected;
+  }
 
-//       try {
-//         const provider = this._provider || window.nightly?.aptos;
-//         const client = aptosClient;
-//         const [{ sequence_number: sequnceNumber }, chainId] = await Promise.all([
-//           client.getAccount(wallet.address || ''),
-//           client.getChainId()
-//         ]);
-//         const transaction = tempTransaction as ScriptFunctionPayload;
-//         const [txAddress, module, funcName] = transaction.function.split('::');
-//         const token = new TypeTagStruct(StructTag.fromString(transaction.type_arguments[0]));
-//         const argts = transaction.arguments.map((arg) => {
-//           if (typeof arg === 'string') {
-//             return bcsSerializeUint64(parseInt(arg));
-//           } else if (typeof arg === 'boolean') {
-//             const serializer = new BCS.Serializer();
-//             serializer.serializeBool(arg);
-//             return serializer.getBytes();
-//           } else if (typeof arg === 'number') {
-//             return bcsSerializeUint64(arg);
-//           } else {
-//             return arg;
-//           }
-//         });
-//         console.log('txnpayload>>', transaction.arguments, argts);
-//         const txnPayload = new TransactionPayloadScriptFunction(
-//           ScriptFunction.natural(`${txAddress}::${module}`, funcName, [token], [...argts])
-//         );
+  get readyState(): WalletReadyState {
+    return this._readyState;
+  }
 
-//         const rawTxn = new TxnBuilderTypes.RawTransaction(
-//           TxnBuilderTypes.AccountAddress.fromHex(wallet.address || ''),
-//           BigInt(sequnceNumber),
-//           txnPayload,
-//           BigInt(1000),
-//           BigInt(1),
-//           BigInt(Math.floor(Date.now() / 1000) + 10),
-//           new TxnBuilderTypes.ChainId(chainId)
-//         );
-//         const bcsTxn = await provider?.signTransaction(rawTxn);
-//         const response = await aptosClient.submitSignedBCSTransaction(bcsTxn);
-//         if (response) {
-//           console.log('tx response>>>', response);
-//           return response;
-//         } else {
-//           throw new Error('Transaction failed');
-//         }
-//       } catch (error: any) {
-//         const errMsg = error instanceof Error ? error.message : error.response.data.message;
-//         throw new WalletSignTransactionError(errMsg);
-//       }
-//     } catch (error: any) {
-//       this.emit('error', error);
-//       throw error;
-//     }
-//   }
-// }
+  async connect(): Promise<void> {
+    try {
+      if (this.connected || this.connecting) return;
+      if (
+        !(
+          this._readyState === WalletReadyState.Loadable ||
+          this._readyState === WalletReadyState.Installed
+        )
+      )
+        throw new WalletNotReadyError();
+      this._connecting = true;
+
+      const provider = this._provider || window.nightly?.aptos;
+      const publicKey = await provider?.connect(() => {
+        this._wallet = null;
+        this.emit('disconnect');
+      });
+      this._wallet = {
+        publicKey: publicKey?.asString(),
+        address: publicKey?.address(),
+        isConnected: true
+      };
+
+      this.emit('connect', this._wallet.publicKey || '');
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    } finally {
+      this._connecting = false;
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    const wallet = this._wallet;
+    if (wallet) {
+      this._wallet = null;
+
+      try {
+        const provider = this._provider || window.nightly?.aptos;
+        await provider?.disconnect();
+      } catch (error: any) {
+        this.emit('error', new WalletDisconnectionError(error?.message, error));
+      }
+    }
+
+    this.emit('disconnect');
+  }
+
+  async signTransaction(payload: TransactionPayload): Promise<Uint8Array> {
+    try {
+      const wallet = this._wallet;
+      if (!wallet) throw new WalletNotConnectedError();
+
+      try {
+        const provider = this._provider || window.nightly?.aptos;
+        const response = await provider?.signTransaction(payload, false);
+        if (response) {
+          return response as Uint8Array;
+        } else {
+          throw new Error('Transaction failed');
+        }
+      } catch (error: any) {
+        throw new WalletSignTransactionError(error?.message, error);
+      }
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signAllTransaction(payload: TransactionPayload[]): Promise<Uint8Array[]> {
+    try {
+      const wallet = this._wallet;
+      if (!wallet) throw new WalletNotConnectedError();
+
+      try {
+        const provider = this._provider || window.nightly?.aptos;
+        const response = await provider?.signAllTransactions(payload);
+        if (response) {
+          return response;
+        } else {
+          throw new Error('Transaction failed');
+        }
+      } catch (error: any) {
+        throw new WalletSignTransactionError(error?.message, error);
+      }
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signAndSubmitTransaction(tx: TransactionPayload): Promise<PendingTransaction> {
+    try {
+      const wallet = this._wallet;
+      if (!wallet) throw new WalletNotConnectedError();
+
+      try {
+        const provider = this._provider || window.nightly?.aptos;
+        const response = await provider?.signTransaction(tx, true);
+        if (response) {
+          return response as PendingTransaction;
+        } else {
+          throw new Error('Transaction failed');
+        }
+      } catch (error: any) {
+        const errMsg = error instanceof Error ? error.message : error.response.data.message;
+        throw new WalletSignTransactionError(errMsg);
+      }
+    } catch (error: any) {
+      this.emit('error', error);
+      throw error;
+    }
+  }
+
+  async signMessage(message: string): Promise<string> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.nightly.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      const response = await provider?.signMessage(message);
+      if (response) {
+        return Buffer.from(response).toString('hex');
+      } else {
+        throw new Error('Sign Message failed');
+      }
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletSignMessageError(errMsg));
+      throw error;
+    }
+  }
+
+  async onAccountChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.nightly.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletAccountChangeError(errMsg));
+      throw error;
+    }
+  }
+
+  async onNetworkChange(): Promise<void> {
+    try {
+      const wallet = this._wallet;
+      const provider = this._provider || window.nightly.aptos;
+      if (!wallet || !provider) throw new WalletNotConnectedError();
+      //To be implemented
+    } catch (error: any) {
+      const errMsg = error.message;
+      this.emit('error', new WalletNetworkChangeError(errMsg));
+      throw error;
+    }
+  }
+}
