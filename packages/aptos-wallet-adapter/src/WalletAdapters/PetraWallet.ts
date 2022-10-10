@@ -154,11 +154,6 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.aptos;
-      const isConnected = await this._provider?.isConnected();
-      if (isConnected === true) {
-        await provider?.disconnect();
-      }
-
       const response = await provider?.connect();
       this._wallet = {
         address: response?.address,
