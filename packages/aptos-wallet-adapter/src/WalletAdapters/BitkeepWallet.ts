@@ -49,7 +49,7 @@ interface IBitkeepWallet {
 
 interface BitkeepWindow extends Window {
   bitkeep?: {
-    aptos?: IBitkeepWallet;
+    aptos: IBitkeepWallet;
   };
 }
 
