@@ -314,7 +314,6 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-
       const handleNetworkChange = (network: NetworkInfo) => {
         this._network = network.name;
         this._api = network.api;

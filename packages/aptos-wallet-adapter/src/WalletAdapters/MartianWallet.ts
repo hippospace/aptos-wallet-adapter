@@ -283,7 +283,6 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       await provider?.onAccountChange((newAccount: string) => {
-        console.log('account Changed >>>', newAccount);
         this._wallet = {
           ...this._wallet,
           address: newAccount
@@ -303,7 +302,6 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (newNetwork: WalletAdapterNetwork) => {
-        console.log('network Changed >>>', newNetwork);
         this._network = newNetwork;
         this.emit('networkChange', this._network);
       };
