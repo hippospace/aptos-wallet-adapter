@@ -285,7 +285,6 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleAccountChange = async (newAccount: string) => {
-        console.log('account Changed >>>', newAccount);
         this._wallet = {
           ...this._wallet,
           address: newAccount || this._wallet?.address
@@ -306,7 +305,6 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.pontem;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (network: NetworkInfo) => {
-        console.log('network Changed >>>', network);
         this._network = network.name;
         this._api = network.api;
         this._chainId = network.chainId;

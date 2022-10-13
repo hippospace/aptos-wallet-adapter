@@ -266,14 +266,22 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleAccountChange = async (newAccount: AddressInfo) => {
-        console.log('account Changed >>>', newAccount);
-        // Petra extension currently didn't return the new Account
-        this._wallet = {
-          ...this._wallet,
-          publicKey: newAccount.publicKey || this._wallet?.publicKey,
-          authKey: newAccount.authKey || this._wallet?.authKey,
-          address: newAccount.address || this._wallet?.address
-        };
+        if (newAccount?.publicKey) {
+          this._wallet = {
+            ...this._wallet,
+            publicKey: newAccount.publicKey || this._wallet?.publicKey,
+            authKey: newAccount.authKey || this._wallet?.authKey,
+            address: newAccount.address || this._wallet?.address
+          };
+        } else {
+          const response = await provider?.connect();
+          this._wallet = {
+            ...this._wallet,
+            authKey: response?.authKey || this._wallet?.authKey,
+            address: response?.address || this._wallet?.address,
+            publicKey: response?.publicKey || this._wallet?.publicKey
+          };
+        }
         this.emit('accountChange', newAccount.publicKey);
       };
       await provider?.onAccountChange(handleAccountChange);
@@ -290,7 +298,6 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
       const provider = this._provider || window.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (newNetwork: { networkName: WalletAdapterNetwork }) => {
-        console.log('network Changed >>>', newNetwork);
         this._network = newNetwork.networkName;
         this.emit('networkChange', this._network);
       };
