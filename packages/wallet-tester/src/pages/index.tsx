@@ -176,9 +176,15 @@ const MainPage = () => {
         sign: true
       });
       const nonce = 'random_string';
-      const msgPayload = ['pontem', 'petra', 'martian', 'fewcha', 'rise wallet', 'snap'].includes(
-        currentWallet?.adapter?.name?.toLowerCase() || ''
-      )
+      const msgPayload = [
+        'pontem',
+        'petra',
+        'martian',
+        'fewcha',
+        'rise wallet',
+        'snap',
+        'bitkeep'
+      ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
             message: messageToSign,
             nonce
