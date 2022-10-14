@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Types } from 'aptos';
 import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
+import nacl from 'tweetnacl';
 
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState({
@@ -22,6 +23,7 @@ const MainPage = () => {
   const [txSignLinks, setSignLinks] = useState<string[]>([]);
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
   const [signature, setSignature] = useState<string | SignMessageResponse>('');
+  const [verified, setverified] = useState<boolean>(false);
   const {
     connect,
     disconnect,
@@ -187,6 +189,17 @@ const MainPage = () => {
       const signedMessage = await signMessage(msgPayload);
       const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
       setSignature(response);
+      if (typeof signedMessage !== 'string') {
+        const { publicKey } = account;
+        const key = publicKey!.toString().slice(2, 66);
+        setverified(
+          nacl.sign.detached.verify(
+            Buffer.from(signedMessage.fullMessage),
+            Buffer.from(signedMessage.signature, 'hex'),
+            Buffer.from(key, 'hex')
+          )
+        );
+      }
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
@@ -252,15 +265,21 @@ const MainPage = () => {
           </strong>
           <strong>Message to Sign : {messageToSign}</strong>
           {signature ? (
-            <div className="flex gap-2 transaction">
-              <strong>Signature: </strong>
-              <textarea
-                className="w-full"
-                readOnly
-                rows={4}
-                value={typeof signature !== 'string' ? signature.address : signature}
-              />
-            </div>
+            <Fragment>
+              <div className="flex gap-2 transaction">
+                <strong>Signature: </strong>
+                <textarea
+                  className="w-full"
+                  readOnly
+                  rows={4}
+                  value={typeof signature !== 'string' ? signature.address : signature}
+                />
+              </div>
+              <div className="flex gap-2 transaction">
+                <strong>Verified: </strong>
+                <input className="w-full" readOnly value={`${verified}`} />
+              </div>
+            </Fragment>
           ) : (
             <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
               Sign Message
