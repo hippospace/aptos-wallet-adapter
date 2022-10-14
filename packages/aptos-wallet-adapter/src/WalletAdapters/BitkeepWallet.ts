@@ -55,7 +55,7 @@ interface BitkeepWindow extends Window {
 
 declare const window: BitkeepWindow;
 
-export const BitkeepWalletName = 'Bitkeep' as WalletName<'Bitkeep'>;
+export const BitkeepWalletName = 'BitKeep' as WalletName<'BitKeep'>;
 
 export interface BitkeepWalletAdapterConfig {
   provider?: IBitkeepWallet;
