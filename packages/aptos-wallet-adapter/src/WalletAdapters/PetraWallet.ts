@@ -67,7 +67,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   url =
     'https://chrome.google.com/webstore/detail/petra-aptos-wallet/ejjladinnckdgjemekebdpeokbikhfci';
 
-  icon = 'https://miro.medium.com/fit/c/176/176/1*Gf747eyRywU8Img0tK5wvw.png';
+  icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/petra.png';
 
   protected _provider: IAptosWallet | undefined;
 
