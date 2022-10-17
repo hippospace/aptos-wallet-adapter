@@ -56,7 +56,7 @@ export interface RiseWalletAdapterConfig {
 export class RiseWalletAdapter extends BaseWalletAdapter {
   name = RiseWalletName;
 
-  url = 'https://chrome.google.com/webstore/detail/hbbgbephgojikajhfbomhlmmollphcad';
+  url = 'https://risewallet.io';
 
   icon = 'https://static.risewallet.io/logo.png';
 

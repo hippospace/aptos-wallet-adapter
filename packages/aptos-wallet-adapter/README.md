@@ -11,7 +11,7 @@ Supports:
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
 - [Spika wallet](https://spika.app)
-- [Rise Wallet](https://rise)
+- [Rise Wallet](https://risewallet.io/)
 - [Fletch wallet](http://fletchwallet.io/)
 - [TokenPocket Wallet](https://tokenpocket.pro)
 
