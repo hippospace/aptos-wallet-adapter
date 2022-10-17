@@ -229,20 +229,14 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
   // If autoConnect is enabled, try to connect when the adapter changes and is ready
   useEffect(() => {
-    if (isConnecting.current || connected || !autoConnect || !adapter) return;
-
-    // Handle wallet not installed in Auto-connect mode
-    if (!(readyState === WalletReadyState.Installed || readyState === WalletReadyState.Loadable)) {
-      // Clear the selected wallet
-      setName(null);
-
-      if (typeof window !== 'undefined') {
-        window.open(adapter.url, '_blank');
-      }
-
-      handleError(new WalletNotReadyError());
+    if (
+      isConnecting.current ||
+      connected ||
+      !autoConnect ||
+      !adapter ||
+      !(readyState === WalletReadyState.Installed || readyState === WalletReadyState.Loadable)
+    )
       return;
-    }
 
     (async function () {
       isConnecting.current = true;
@@ -274,7 +268,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         window.open(adapter.url, '_blank');
       }
 
-      throw handleError(new WalletNotReadyError());
+      throw handleError(new WalletNotReadyError('Wallet Not Ready'));
     }
     isConnecting.current = true;
     setConnecting(true);
