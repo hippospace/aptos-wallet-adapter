@@ -20,6 +20,7 @@ Supports:
 - [Fletch wallet](http://fletchwallet.io/)
 - [Spika web wallet](https://spika.app)
 - [Aptos snap](https://chrome.google.com/webstore/detail/metamask-flask-developmen/ljfoeinjpaedjfecbmggjgodbgkmjkjk)
+- [Bitkeep wallet](https://bitkeep.com/)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 

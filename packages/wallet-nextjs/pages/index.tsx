@@ -158,8 +158,24 @@ const MainPage = () => {
         ...txLoading,
         sign: true
       });
-      const signedMessage = await signMessage(messageToSign);
-      setSignature(signedMessage);
+      const nonce = 'random_string';
+      const msgPayload = [
+        'pontem',
+        'petra',
+        'martian',
+        'fewcha',
+        'rise wallet',
+        'snap',
+        'bitkeep'
+      ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
+        ? {
+            message: messageToSign,
+            nonce
+          }
+        : messageToSign;
+      const signedMessage = await signMessage(msgPayload);
+      const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
+      setSignature(response);
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
