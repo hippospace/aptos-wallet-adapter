@@ -219,7 +219,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const connect = useCallback(
     async (walletName?) => {
       if (isConnecting.current || isDisconnecting.current || connected || !walletName) return;
-      console.log('connectttt');
       let walletToConnect = initialState;
       if (!adapter || walletName !== adapter?.name) {
         const selectedWallet = wallets.find((wAdapter) => wAdapter.adapter.name === walletName);
