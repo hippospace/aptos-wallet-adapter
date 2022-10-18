@@ -15,6 +15,7 @@ Supports:
 - [Fletch wallet](http://fletchwallet.io/)
 - [TokenPocket Wallet](https://tokenpocket.pro)
 - [ONTO Wallet](https://onto.app)
+- [Blocto wallet](https://portto.com/download)
 
 Working on (PR welcome):
 
@@ -60,7 +61,8 @@ import {
   RiseWalletAdapter,
   FletchWalletAdapter,
   TokenPocketWalletAdapter,
-  ONTOWalletAdapter
+  ONTOWalletAdapter,
+  BloctoWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -74,7 +76,8 @@ const wallets = [
   new RiseWalletAdapter(),
   new FletchWalletAdapter(),
   new TokenPocketWalletAdapter(),
-  new ONTOWalletAdapter()
+  new ONTOWalletAdapter(),
+  new BloctoWalletAdapter()
 ];
 
 const App: React.FC = () => {
