@@ -11,8 +11,11 @@ Supports:
 - [Hippo web wallet](https://hippo-wallet-test.web.app/)
 - [Pontem Wallet](https://pontem.network/pontem-wallet)
 - [Spika wallet](https://spika.app)
-- [Rise Wallet](https://rise)
+- [Rise Wallet](https://risewallet.io/)
 - [Fletch wallet](http://fletchwallet.io/)
+- [TokenPocket Wallet](https://tokenpocket.pro)
+- [ONTO Wallet](https://onto.app)
+- [Blocto wallet](https://portto.com/download)
 
 Working on (PR welcome):
 
@@ -56,7 +59,10 @@ import {
   PontemWalletAdapter,
   SpikaWalletAdapter,
   RiseWalletAdapter,
-  FletchWalletAdapter
+  FletchWalletAdapter,
+  TokenPocketWalletAdapter,
+  ONTOWalletAdapter,
+  BloctoWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -68,7 +74,10 @@ const wallets = [
   new PontemWalletAdapter(),
   new SpikaWalletAdapter(),
   new RiseWalletAdapter(),
-  new FletchWalletAdapter()
+  new FletchWalletAdapter(),
+  new TokenPocketWalletAdapter(),
+  new ONTOWalletAdapter(),
+  new BloctoWalletAdapter()
 ];
 
 const App: React.FC = () => {
@@ -111,28 +120,22 @@ const { connected, account, network, ...rest } = useWallet();
 */
 ```
 
-# Connect & Disconnect
+# Connect & Disconnect (updated @ 18/10/2022)
 
 ```typescript
 import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
 ...
 
-const { connect, disconnect, connected, select } = useWallet();
+const { connect, disconnect, connected } = useWallet();
 
-/** If auto-connect is not enabled, you will require to do the connect() manually **/
-useEffect(() => {
-  if (!autoConnect && currentWallet?.adapter) {
-    connect();
-  }
-}, [autoConnect, currentWallet, connect]);
-/** this is only required if you do not want auto connect wallet **/
+/* No more manual connection required if you disable auto-connect mode while the previous select + connect will still work */
 
 if (!connected) {
   return (
     <button
       onClick={() => {
-        select(); // E.g. connecting to the Aptos official wallet (Breaking Change)
+        connect(walletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect
