@@ -27,16 +27,9 @@ const MainPage = () => {
     connected,
     disconnecting,
     wallet: currentWallet,
-    select,
     signMessage,
     signTransaction
   } = useWallet();
-
-  useEffect(() => {
-    if (!autoConnect && currentWallet?.adapter) {
-      connect();
-    }
-  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -44,7 +37,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            select(option.name);
+            connect(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
