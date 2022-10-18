@@ -14,6 +14,7 @@ Supports:
 - [Rise Wallet](https://risewallet.io/)
 - [Fletch wallet](http://fletchwallet.io/)
 - [TokenPocket Wallet](https://tokenpocket.pro)
+- [ONTO Wallet](https://onto.app)
 
 Working on (PR welcome):
 
@@ -57,8 +58,9 @@ import {
   PontemWalletAdapter,
   SpikaWalletAdapter,
   RiseWalletAdapter,
-  FletchWalletAdapter
-  TokenPocketWalletAdapter
+  FletchWalletAdapter,
+  TokenPocketWalletAdapter,
+  ONTOWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -70,8 +72,9 @@ const wallets = [
   new PontemWalletAdapter(),
   new SpikaWalletAdapter(),
   new RiseWalletAdapter(),
-  new FletchWalletAdapter()
-  new TokenPocketWalletAdapter()
+  new FletchWalletAdapter(),
+  new TokenPocketWalletAdapter(),
+  new ONTOWalletAdapter()
 ];
 
 const App: React.FC = () => {
