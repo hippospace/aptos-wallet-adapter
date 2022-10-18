@@ -114,28 +114,22 @@ const { connected, account, network, ...rest } = useWallet();
 */
 ```
 
-# Connect & Disconnect
+# Connect & Disconnect (updated @ 18/10/2022)
 
 ```typescript
 import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
 ...
 
-const { connect, disconnect, connected, select } = useWallet();
+const { connect, disconnect, connected } = useWallet();
 
-/** If auto-connect is not enabled, you will require to do the connect() manually **/
-useEffect(() => {
-  if (!autoConnect && currentWallet?.adapter) {
-    connect();
-  }
-}, [autoConnect, currentWallet, connect]);
-/** this is only required if you do not want auto connect wallet **/
+/* No more manual connection required if you disable auto-connect mode while the previous select + connect will still work */
 
 if (!connected) {
   return (
     <button
       onClick={() => {
-        select(); // E.g. connecting to the Aptos official wallet (Breaking Change)
+        connect(walletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect
