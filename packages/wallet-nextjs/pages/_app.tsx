@@ -13,7 +13,9 @@ import {
   AptosSnapAdapter,
   NightlyWalletAdapter,
   BitkeepWalletAdapter,
-  TokenPocketWalletAdapter
+  TokenPocketWalletAdapter,
+  BloctoWalletAdapter,
+  WalletAdapterNetwork
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
 import { message } from 'antd';
@@ -32,7 +34,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       new AptosSnapAdapter(),
       new NightlyWalletAdapter(),
       new BitkeepWalletAdapter(),
-      new TokenPocketWalletAdapter()
+      new TokenPocketWalletAdapter(),
+      new BloctoWalletAdapter({ network:WalletAdapterNetwork.Testnet })
     ],
     []
   );
