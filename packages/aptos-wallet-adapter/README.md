@@ -123,13 +123,13 @@ import { AptosWalletName, useWallet } from "@manahippo/aptos-wallet-adapter"
 
 const { connect, disconnect, connected } = useWallet();
 
-/* No more manual connection required if you disable auto-connect mode */
+/* No more manual connection required if you disable auto-connect mode while the previous select + connect will still work */
 
 if (!connected) {
   return (
     <button
       onClick={() => {
-        connect(walletName); // E.g. connecting to the Aptos official wallet (Breaking Change)
+        connect(walletName); // E.g. connecting to the Aptos official wallet
       }}
     >
       Connect

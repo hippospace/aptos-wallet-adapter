@@ -24,7 +24,8 @@ export interface WalletContextState {
   connected: boolean;
   disconnecting: boolean;
   network: NetworkInfo;
-  connect(walletName: WalletName): Promise<void>;
+  select(walletName?: WalletName): Promise<void>;
+  connect(walletName?: WalletName): Promise<void>;
   disconnect(): Promise<void>;
   signAndSubmitTransaction(
     transaction: Types.TransactionPayload,
