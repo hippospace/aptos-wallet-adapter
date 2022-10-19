@@ -66,6 +66,7 @@ interface AptosNightly {
   ) => Promise<Uint8Array | PendingTransaction>;
   signAllTransactions: (transaction: TransactionPayload[]) => Promise<Uint8Array[]>;
   signMessage(msg: string): Promise<Uint8Array>;
+  network(): Promise<{ api: string; chainId: number; network: string }>;
 }
 interface NightlyWindow extends Window {
   nightly?: {
@@ -193,6 +194,10 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
       };
 
       this.emit('connect', this._wallet.publicKey || '');
+      const networkData = await provider?.network();
+      this._chainId = networkData?.chainId.toString();
+      this._api = networkData?.api;
+      this._network = networkData?.network.toLocaleLowerCase() as WalletAdapterNetwork;
     } catch (error: any) {
       this.emit('error', error);
       throw error;

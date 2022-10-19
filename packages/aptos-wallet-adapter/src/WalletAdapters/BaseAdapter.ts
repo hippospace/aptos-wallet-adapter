@@ -14,9 +14,10 @@ export type Address = MaybeHexString;
 export type AuthKey = MaybeHexString;
 
 export interface AccountKeys {
-  publicKey: PublicKey | null;
+  publicKey: PublicKey | PublicKey[] | null;
   address: Address | null;
   authKey: AuthKey | null;
+  minKeysRequired?: number;
 }
 
 export interface WalletAdapterEvents {
