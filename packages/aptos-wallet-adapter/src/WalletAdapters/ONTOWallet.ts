@@ -30,7 +30,7 @@ interface IApotsErrorResult {
 
 type AddressInfo = { address: string; publicKey: string; authKey?: string };
 
-interface IAptosWallet {
+interface IONTOWallet {
   connect: () => Promise<AddressInfo>;
   account: () => Promise<AddressInfo>;
   isConnected: () => Promise<boolean>;
@@ -47,29 +47,32 @@ interface IAptosWallet {
   onNetworkChange: (listener: (network: { networkName: string }) => void) => void;
 }
 
-interface AptosWindow extends Window {
-  aptos?: IAptosWallet;
+interface ONTOWindow extends Window {
+  onto?: {
+    aptos: IONTOWallet;
+  };
 }
 
-declare const window: AptosWindow;
+declare const window: ONTOWindow;
 
-export const AptosWalletName = 'Petra' as WalletName<'Petra'>;
+export const ONTOWalletName = 'ONTO' as WalletName<'ONTO'>;
 
-export interface AptosWalletAdapterConfig {
-  provider?: IAptosWallet;
+export interface ONTOWalletAdapterConfig {
+  provider?: IONTOWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class AptosWalletAdapter extends BaseWalletAdapter {
-  name = AptosWalletName;
+export class ONTOWalletAdapter extends BaseWalletAdapter {
+  name = ONTOWalletName;
 
   url =
-    'https://chrome.google.com/webstore/detail/petra-aptos-wallet/ejjladinnckdgjemekebdpeokbikhfci';
+    'https://onto.app';
 
-  icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/petra.png';
+  icon =
+    'https://app.ont.io/onto/ONTO_logo.png';
 
-  protected _provider: IAptosWallet | undefined;
+  protected _provider: IONTOWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
@@ -92,10 +95,10 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
-  }: AptosWalletAdapterConfig = {}) {
+  }: ONTOWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== 'undefined' ? window.aptos : undefined;
+    this._provider = typeof window !== 'undefined' ? window.onto?.aptos : undefined;
     this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
@@ -103,7 +106,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.aptos) {
+        if (window.onto?.aptos) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -153,7 +156,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       const response = await provider?.connect();
       this._wallet = {
         address: response?.address,
@@ -186,7 +189,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider || window.aptos;
+    const provider = this._provider || window.onto?.aptos;
     if (wallet) {
       this._wallet = null;
 
@@ -203,7 +206,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
       const response = await provider.signTransaction(transaction, options);
@@ -224,7 +227,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
       const response = await provider.signAndSubmitTransaction(transaction, options);
@@ -242,7 +245,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
         throw new WalletSignMessageError('Invalid signMessage Payload');
@@ -263,25 +266,16 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async onAccountChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleAccountChange = async (newAccount: AddressInfo) => {
-        if (newAccount?.publicKey) {
-          this._wallet = {
-            ...this._wallet,
-            publicKey: newAccount.publicKey || this._wallet?.publicKey,
-            authKey: newAccount.authKey || this._wallet?.authKey,
-            address: newAccount.address || this._wallet?.address
-          };
-        } else {
-          const response = await provider?.connect();
-          this._wallet = {
-            ...this._wallet,
-            authKey: response?.authKey || this._wallet?.authKey,
-            address: response?.address || this._wallet?.address,
-            publicKey: response?.publicKey || this._wallet?.publicKey
-          };
-        }
+        console.log('account Changed >>>', newAccount);
+        this._wallet = {
+          ...this._wallet,
+          publicKey: newAccount.publicKey || this._wallet?.publicKey,
+          authKey: newAccount.authKey || this._wallet?.authKey,
+          address: newAccount.address || this._wallet?.address
+        };
         this.emit('accountChange', newAccount.publicKey);
       };
       await provider?.onAccountChange(handleAccountChange);
@@ -295,9 +289,10 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
   async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.aptos;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (newNetwork: { networkName: WalletAdapterNetwork }) => {
+        console.log('network Changed >>>', newNetwork);
         this._network = newNetwork.networkName;
         this.emit('networkChange', this._network);
       };

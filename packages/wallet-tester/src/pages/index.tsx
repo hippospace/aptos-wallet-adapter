@@ -1,13 +1,43 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Types } from 'aptos';
 import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 import nacl from 'tweetnacl';
+
+function handleVerifySignatures(response, account): boolean[] {
+  const fullMessage = response.fullMessage;
+  const bitmap = response.bitmap;
+  const signatures = response.signature;
+
+  const input = new Uint8Array(bitmap);
+  const bits = Array.from(input).flatMap((n) =>
+    Array.from({ length: 8 }).map((_, i) => (n >> i) & 1)
+  );
+  const index = bits.map((_, i) => i).filter((i) => bits[i]);
+
+  let publicKey = [account.publicKey];
+  if (Array.isArray(account.publicKey)) {
+    publicKey = account.publicKey;
+  }
+
+  const publicKeys = publicKey.filter((_: string, i: number) => index.includes(i));
+
+  const result = [];
+  for (let i = 0; i < 2; i++) {
+    const isVerfied = nacl.sign.detached.verify(
+      Buffer.from(fullMessage),
+      Buffer.from(signatures[i], 'hex'),
+      Buffer.from(publicKeys[i] as string, 'hex')
+    );
+    result.push(isVerfied);
+  }
+  return result;
+}
 
 const MainPage = () => {
   const [txLoading, setTxLoading] = useState({
@@ -36,15 +66,8 @@ const MainPage = () => {
     wallet: currentWallet,
     signMessage,
     signTransaction,
-    select,
     network
   } = useWallet();
-
-  useEffect(() => {
-    if (!autoConnect && currentWallet?.adapter) {
-      connect();
-    }
-  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -52,7 +75,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            select(option.name);
+            connect(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
@@ -167,7 +190,11 @@ const MainPage = () => {
 
   const messageToSign = useMemo(
     () =>
-      `Hello from account ${account?.publicKey?.toString() || account?.address?.toString() || ''}`,
+      `Hello from account ${
+        Array.isArray(account?.publicKey)
+          ? JSON.stringify(account.publicKey, null, 2)
+          : account?.publicKey?.toString() || account?.address?.toString() || ''
+      }`,
     [account]
   );
 
@@ -178,9 +205,15 @@ const MainPage = () => {
         sign: true
       });
       const nonce = 'random_string';
-      const msgPayload = ['pontem', 'petra', 'martian', 'fewcha', 'rise wallet', 'snap'].includes(
-        currentWallet?.adapter?.name?.toLowerCase() || ''
-      )
+      const msgPayload = [
+        'pontem',
+        'petra',
+        'martian',
+        'fewcha',
+        'rise wallet',
+        'snap',
+        'blocto'
+      ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
             message: messageToSign,
             nonce
@@ -190,15 +223,20 @@ const MainPage = () => {
       const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
       setSignature(response);
       if (typeof signedMessage !== 'string') {
-        const { publicKey } = account;
-        const key = publicKey!.toString().slice(2, 66);
-        setverified(
-          nacl.sign.detached.verify(
-            Buffer.from(signedMessage.fullMessage),
-            Buffer.from(signedMessage.signature, 'hex'),
-            Buffer.from(key, 'hex')
-          )
-        );
+        if (Array.isArray(signedMessage.signature)) {
+          const result = handleVerifySignatures(signedMessage, account);
+          setverified(result.every((r) => r));
+        } else {
+          const { publicKey } = account;
+          const key = publicKey!.toString().slice(2, 66);
+          setverified(
+            nacl.sign.detached.verify(
+              Buffer.from(signedMessage.fullMessage),
+              Buffer.from(signedMessage.signature, 'hex'),
+              Buffer.from(key, 'hex')
+            )
+          );
+        }
       }
     } catch (err: any) {
       console.log('tx error: ', err.msg);
@@ -241,7 +279,7 @@ const MainPage = () => {
     }
     if (connected && account) {
       return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <strong>
             Wallet: <div id="address">{currentWallet?.adapter.name}</div>
           </strong>
@@ -249,7 +287,12 @@ const MainPage = () => {
             Address: <div id="address">{account?.address?.toString()}</div>
           </strong>
           <strong>
-            Public Key: <div id="publicKey">{account?.publicKey?.toString()}</div>
+            Public Key:{' '}
+            <div id="publicKey" className="whitespace-pre">
+              {Array.isArray(account?.publicKey)
+                ? JSON.stringify(account.publicKey, null, 2)
+                : account?.publicKey?.toString()}
+            </div>
           </strong>
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
@@ -272,7 +315,13 @@ const MainPage = () => {
                   className="w-full"
                   readOnly
                   rows={4}
-                  value={typeof signature !== 'string' ? signature.address : signature}
+                  value={
+                    typeof signature !== 'string' && signature.address
+                      ? signature.address
+                      : Array.isArray(signature)
+                      ? JSON.stringify(signature)
+                      : (signature as string)
+                  }
                 />
               </div>
               <div className="flex gap-2 transaction">
@@ -323,7 +372,7 @@ const MainPage = () => {
   };
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
-      <div className="flex justify-center">{renderContent()}</div>
+      <div className="flex justify-center max-w-2xl">{renderContent()}</div>
     </div>
   );
 };

@@ -282,13 +282,16 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.martian;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      await provider?.onAccountChange((newAccount: string) => {
+      const handleChangeAccount = async (newAccount: string) => {
+        const { publicKey } = await provider?.account();
         this._wallet = {
           ...this._wallet,
-          address: newAccount
+          address: newAccount,
+          publicKey
         };
         this.emit('accountChange', newAccount);
-      });
+      };
+      await provider?.onAccountChange(handleChangeAccount);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
