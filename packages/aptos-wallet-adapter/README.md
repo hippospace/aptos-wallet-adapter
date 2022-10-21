@@ -62,7 +62,8 @@ import {
   FletchWalletAdapter,
   TokenPocketWalletAdapter,
   ONTOWalletAdapter,
-  BloctoWalletAdapter
+  BloctoWalletAdapter,
+  SafePalWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -77,7 +78,8 @@ const wallets = [
   new FletchWalletAdapter(),
   new TokenPocketWalletAdapter(),
   new ONTOWalletAdapter(),
-  new BloctoWalletAdapter()
+  new BloctoWalletAdapter(),
+  new SafePalWalletAdapter(),
 ];
 
 const App: React.FC = () => {

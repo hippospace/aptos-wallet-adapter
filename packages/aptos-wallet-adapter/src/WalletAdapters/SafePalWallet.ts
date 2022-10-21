@@ -22,22 +22,22 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
-interface ConnectMartianAccount {
+interface ConnectSafePalAccount {
   address: MaybeHexString;
   method: string;
   publicKey: MaybeHexString;
   status: number;
 }
 
-interface MartianAccount {
+interface SafePalAccount {
   address: MaybeHexString;
   publicKey: MaybeHexString;
   authKey: MaybeHexString;
   isConnected: boolean;
 }
-interface IMartianWallet {
-  connect: () => Promise<ConnectMartianAccount>;
-  account(): Promise<MartianAccount>;
+interface ISafePalWallet {
+  connect: () => Promise<ConnectSafePalAccount>;
+  account(): Promise<SafePalAccount>;
   isConnected(): Promise<boolean>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
   signAndSubmitTransaction(transaction: Types.TransactionPayload): Promise<Types.HexEncodedBytes>;
@@ -50,28 +50,28 @@ interface IMartianWallet {
   onNetworkChange: (listenr: (network: string) => void) => void;
 }
 
-interface MartianWindow extends Window {
-  martian?: IMartianWallet;
+interface SafePalWindow extends Window {
+  safePal?: ISafePalWallet;
 }
 
-declare const window: MartianWindow;
+declare const window: SafePalWindow;
 
-export const MartianWalletName = 'Martian' as WalletName<'Martian'>;
+export const SafePalWalletName = 'SafePal' as WalletName<'SafePal'>;
 
-export interface MartianWalletAdapterConfig {
-  provider?: IMartianWallet;
+export interface SafePalWalletAdapterConfig {
+  provider?: ISafePalWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class MartianWalletAdapter extends BaseWalletAdapter {
-  name = MartianWalletName;
+export class SafePalWalletAdapter extends BaseWalletAdapter {
+  name = SafePalWalletName;
 
-  url = 'https://chrome.google.com/webstore/detail/martian-wallet/efbglgofoippbgcjepnhiblaibcnclgk';
+  url = 'https://chrome.google.com/webstore/detail/safepal-extension-wallet/lgmpcpglpngdoalbgeoldeajfclnhafa';
 
-  icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/martian.png';
+  icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/safePal.png';
 
-  protected _provider: IMartianWallet | undefined;
+  protected _provider: ISafePalWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
@@ -88,16 +88,16 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   protected _connecting: boolean;
 
-  protected _wallet: MartianAccount | null;
+  protected _wallet: SafePalAccount | null;
 
   constructor({
     // provider,
     // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
-  }: MartianWalletAdapterConfig = {}) {
+  }: SafePalWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== 'undefined' ? window.martian : undefined;
+    this._provider = typeof window !== 'undefined' ? window.safePal : undefined;
     this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
@@ -105,7 +105,8 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.martian) {
+        this._provider = typeof window !== 'undefined' ? window.safePal : undefined;
+        if (this._provider) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -155,7 +156,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       const isConnected = await provider?.isConnected();
       if (isConnected) {
         await provider?.disconnect();
@@ -198,7 +199,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
-    const provider = this._provider || window.martian;
+    const provider = this._provider || window.safePal;
     if (wallet) {
       this._wallet = null;
 
@@ -218,7 +219,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   ): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld, options);
       if (!tx) throw new Error('Cannot generate transaction');
@@ -240,7 +241,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const tx = await provider.generateTransaction(wallet.address || '', transactionPyld, options);
       if (!tx) throw new Error('Cannot generate transaction');
@@ -259,7 +260,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
         throw new WalletSignMessageError('Invalid signMessage Payload');
@@ -280,7 +281,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   async onAccountChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleChangeAccount = async (newAccount: string) => {
         const { publicKey } = await provider?.account();
@@ -302,7 +303,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
   async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.martian;
+      const provider = this._provider || window.safePal;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (newNetwork: WalletAdapterNetwork) => {
         this._network = newNetwork;
