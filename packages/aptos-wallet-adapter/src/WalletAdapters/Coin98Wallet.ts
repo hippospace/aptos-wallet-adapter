@@ -91,13 +91,13 @@ export class Coin98WalletAdapter extends BaseWalletAdapter {
 
   constructor({
     // provider,
-    network = WalletAdapterNetwork.Mainnet,
+    // network = WalletAdapterNetwork.Mainnet,
     timeout = 10000
   }: Coin98WalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.coin98?.aptos : undefined;
-    this._network = network;
+    this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
