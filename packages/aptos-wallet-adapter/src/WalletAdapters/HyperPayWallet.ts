@@ -63,7 +63,7 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
   url = 'https://www.hyperpay.io/';
 
   icon =
-    'https://hyperpay.oss-ap-southeast-1.aliyuncs.com/airdrop/1657188862.png';
+    'https://hyperpay.oss-ap-southeast-1.aliyuncs.com/heperpay/1666601839.png';
 
   protected _provider: IHyperPayWallet | undefined;
 
