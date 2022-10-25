@@ -16,10 +16,7 @@ Supports:
 - [TokenPocket Wallet](https://tokenpocket.pro)
 - [ONTO Wallet](https://onto.app)
 - [Blocto wallet](https://portto.com/download)
-
-Working on (PR welcome):
-
-- [Nightly wallet](https://chrome.google.com/webstore/detail/nightly/injggoambcadlfkkjcgdfbejanmgfgfm/related?hl=en&authuser=0)
+- [Nightly Wallet](https://nightly.app/download)
 
 # Installation
 
