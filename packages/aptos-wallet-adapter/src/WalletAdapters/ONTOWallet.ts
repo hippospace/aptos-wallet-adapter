@@ -2,6 +2,7 @@ import { Types } from 'aptos';
 import {
   WalletAccountChangeError,
   WalletDisconnectionError,
+  WalletGetNetworkError,
   WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
@@ -14,46 +15,64 @@ import {
   BaseWalletAdapter,
   NetworkInfo,
   scopePollingDetectionStrategy,
+  SignMessagePayload,
+  SignMessageResponse,
   WalletAdapterNetwork,
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
 
-interface ISpikaWallet {
-  connect: () => Promise<{ publicKey: string; account: string; authKey: string }>;
-  account: () => Promise<string>;
+interface IApotsErrorResult {
+  code: number;
+  name: string;
+  message: string;
+}
+
+type AddressInfo = { address: string; publicKey: string; authKey?: string };
+
+interface IONTOWallet {
+  connect: () => Promise<AddressInfo>;
+  account: () => Promise<AddressInfo>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(
     transaction: any,
     options?: any
-  ): Promise<{ hash: Types.HexEncodedBytes }>;
-  signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
-  signMessage(message: string): Promise<string>;
+  ): Promise<{ hash: Types.HexEncodedBytes } | IApotsErrorResult>;
+  signTransaction(transaction: any, options?: any): Promise<Uint8Array | IApotsErrorResult>;
+  signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
+  network(): Promise<WalletAdapterNetwork>;
+  requestId: Promise<number>;
+  onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
+  onNetworkChange: (listener: (network: { networkName: string }) => void) => void;
 }
 
-interface SpikaWindow extends Window {
-  spika?: ISpikaWallet;
+interface ONTOWindow extends Window {
+  onto?: {
+    aptos: IONTOWallet;
+  };
 }
 
-declare const window: SpikaWindow;
+declare const window: ONTOWindow;
 
-export const SpikaWalletName = 'Spika' as WalletName<'Spika'>;
+export const ONTOWalletName = 'ONTO' as WalletName<'ONTO'>;
 
-export interface SpikaWalletAdapterConfig {
-  provider?: ISpikaWallet;
+export interface ONTOWalletAdapterConfig {
+  provider?: IONTOWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class SpikaWalletAdapter extends BaseWalletAdapter {
-  name = SpikaWalletName;
+export class ONTOWalletAdapter extends BaseWalletAdapter {
+  name = ONTOWalletName;
 
-  url = 'https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb';
+  url =
+    'https://onto.app';
 
-  icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/spika.svg';
+  icon =
+    'https://app.ont.io/onto/ONTO_logo.png';
 
-  protected _provider: ISpikaWallet | undefined;
+  protected _provider: IONTOWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
@@ -76,10 +95,10 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
-  }: SpikaWalletAdapterConfig = {}) {
+  }: ONTOWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== 'undefined' ? window.spika : undefined;
+    this._provider = typeof window !== 'undefined' ? window.onto?.aptos : undefined;
     this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
@@ -87,7 +106,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
-        if (window.spika) {
+        if (window.onto?.aptos) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -127,10 +146,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   async connect(): Promise<void> {
     try {
-      if (this.connected || this.connecting) {
-        return;
-      }
-
+      if (this.connected || this.connecting) return;
       if (
         !(
           this._readyState === WalletReadyState.Loadable ||
@@ -140,25 +156,26 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = this._provider || window.spika;
-      await provider?.isConnected();
-      // const isConnected = await provider?.isConnected();
-      // if (isConnected === true) {
-      //   await provider?.disconnect();
-      // }
-
+      const provider = this._provider || window.onto?.aptos;
       const response = await provider?.connect();
-      if (response?.publicKey !== undefined) {
-        this._wallet = {
-          publicKey: response?.publicKey,
-          address: response?.account,
-          authKey: response?.authKey,
-          isConnected: true
-        };
-      } else {
-        this._wallet = {
-          isConnected: false
-        };
+      this._wallet = {
+        address: response?.address,
+        publicKey: response?.publicKey,
+        isConnected: true
+      };
+
+      try {
+        const name = await provider?.network();
+        const chainId = null;
+        const api = null;
+
+        this._network = name;
+        this._chainId = chainId;
+        this._api = api;
+      } catch (error: any) {
+        const errMsg = error.message;
+        this.emit('error', new WalletGetNetworkError(errMsg));
+        throw error;
       }
 
       this.emit('connect', this._wallet.publicKey);
@@ -172,11 +189,11 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
+    const provider = this._provider || window.onto?.aptos;
     if (wallet) {
       this._wallet = null;
 
       try {
-        const provider = this._provider || window.spika;
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
@@ -189,15 +206,14 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transaction: Types.TransactionPayload, options?: any): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.spika;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(transaction, options);
-      if (response) {
-        return response;
-      } else {
-        throw new Error('Sign Transaction failed');
+      const response = await provider.signTransaction(transaction, options);
+      if ((response as IApotsErrorResult).code) {
+        throw new Error((response as IApotsErrorResult).message);
       }
+      return response as Uint8Array;
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));
@@ -211,15 +227,14 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.spika;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signAndSubmitTransaction(transaction, options);
-      if (response) {
-        return response;
-      } else {
-        throw new Error('Transaction failed');
+      const response = await provider.signAndSubmitTransaction(transaction, options);
+      if ((response as IApotsErrorResult).code) {
+        throw new Error((response as IApotsErrorResult).message);
       }
+      return response as { hash: Types.HexEncodedBytes };
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
@@ -227,12 +242,15 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.spika;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
+      if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
+        throw new WalletSignMessageError('Invalid signMessage Payload');
+      }
+      const response = await provider?.signMessage(msgPayload);
       if (response) {
         return response;
       } else {
@@ -248,9 +266,19 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   async onAccountChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.spika;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const handleAccountChange = async (newAccount: AddressInfo) => {
+        console.log('account Changed >>>', newAccount);
+        this._wallet = {
+          ...this._wallet,
+          publicKey: newAccount.publicKey || this._wallet?.publicKey,
+          authKey: newAccount.authKey || this._wallet?.authKey,
+          address: newAccount.address || this._wallet?.address
+        };
+        this.emit('accountChange', newAccount.publicKey);
+      };
+      await provider?.onAccountChange(handleAccountChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
@@ -261,9 +289,14 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
   async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.spika;
+      const provider = this._provider || window.onto?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const handleNetworkChange = async (newNetwork: { networkName: WalletAdapterNetwork }) => {
+        console.log('network Changed >>>', newNetwork);
+        this._network = newNetwork.networkName;
+        this.emit('networkChange', this._network);
+      };
+      await provider?.onNetworkChange(handleNetworkChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletNetworkChangeError(errMsg));

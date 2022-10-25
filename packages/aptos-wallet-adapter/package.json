@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/aptos-wallet-adapter",
-  "version": "0.4.4",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -11,10 +11,14 @@
     "build": "rm -rf dist; tsc -p tsconfig.json"
   },
   "peerDependencies": {
+    "aptos": "^1.3.16",
     "react": "^18.X.X || 17.X.X",
     "react-dom": "^18.X.X || 17.X.X"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^18.7.6",
+    "@types/react": "^18.0.17",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -24,12 +28,9 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@fewcha/web3": "^0.1.32",
-    "@keystonehq/aptossnap-adapter": "^0.2.7",
-    "@types/jest": "^27.0.1",
-    "@types/node": "^18.7.6",
-    "@types/react": "^18.0.17",
-    "aptos": "^1.3.14",
+    "@blocto/sdk": "^0.3.0-beta.9",
+    "@fewcha/web3": "0.1.32",
+    "@keystonehq/aptossnap-adapter": "^0.2.8",
     "eventemitter3": "^4.0.7",
     "js-sha3": "^0.8.0"
   }

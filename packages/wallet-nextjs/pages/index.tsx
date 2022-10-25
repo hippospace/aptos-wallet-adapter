@@ -3,7 +3,7 @@ import { Button, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Types } from 'aptos';
-import { useWallet } from '@manahippo/aptos-wallet-adapter';
+import { useWallet, SignMessageResponse} from '@manahippo/aptos-wallet-adapter';
 import { aptosClient, faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
@@ -15,7 +15,7 @@ const MainPage = () => {
   });
   const [txLinks, setTxLinks] = useState<string[]>([]);
   const [faucetTxLinks, setFaucetTxLinks] = useState<string[]>([]);
-  const [signature, setSignature] = useState<string>('');
+  const [signature, setSignature] = useState<string | SignMessageResponse>('');
   const {
     autoConnect,
     connect,
@@ -27,16 +27,9 @@ const MainPage = () => {
     connected,
     disconnecting,
     wallet: currentWallet,
-    select,
     signMessage,
     signTransaction
   } = useWallet();
-
-  useEffect(() => {
-    if (!autoConnect && currentWallet?.adapter) {
-      connect();
-    }
-  }, [autoConnect, currentWallet, connect]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -44,7 +37,7 @@ const MainPage = () => {
       return (
         <Button
           onClick={() => {
-            select(option.name);
+            connect(option.name);
           }}
           id={option.name.split(' ').join('_')}
           key={option.name}
@@ -148,7 +141,11 @@ const MainPage = () => {
 
   const messageToSign = useMemo(
     () =>
-      `Hello from account ${account?.publicKey?.toString() || account?.address?.toString() || ''}`,
+      `Hello from account ${
+        Array.isArray(account?.publicKey)
+        ? JSON.stringify(account?.publicKey, null, 2)
+        : account?.publicKey?.toString() || account?.address?.toString() || ''
+      }`,
     [account]
   );
 
@@ -158,8 +155,26 @@ const MainPage = () => {
         ...txLoading,
         sign: true
       });
-      const signedMessage = await signMessage(messageToSign);
-      setSignature(signedMessage);
+      const nonce = 'random_string';
+      const msgPayload = [
+        'pontem',
+        'petra',
+        'martian',
+        'fewcha',
+        'rise wallet',
+        'snap',
+        'bitkeep',
+        'blocto',
+        'coin98'
+      ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
+        ? {
+            message: messageToSign,
+            nonce
+          }
+        : messageToSign;
+      const signedMessage = await signMessage(msgPayload);
+      const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
+      setSignature(response);
     } catch (err: any) {
       console.log('tx error: ', err.msg);
     } finally {
@@ -201,7 +216,7 @@ const MainPage = () => {
     }
     if (connected && account) {
       return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <strong>
             Wallet: <div id="address">{currentWallet?.adapter.name}</div>
           </strong>
@@ -209,7 +224,12 @@ const MainPage = () => {
             Address: <div id="address">{account?.address?.toString()}</div>
           </strong>
           <strong>
-            Public Key: <div id="publicKey">{account?.publicKey?.toString()}</div>
+            Public Key:{' '}
+            <div id="publicKey" className="whitespace-pre">
+              {Array.isArray(account?.publicKey)
+                ? JSON.stringify(account.publicKey, null, 2)
+                : account?.publicKey?.toString()}
+            </div>
           </strong>
           <strong>
             AuthKey: <div id="authKey">{account?.authKey?.toString()}</div>
@@ -218,7 +238,11 @@ const MainPage = () => {
           {signature ? (
             <div className="flex gap-2 transaction">
               <strong>Signature: </strong>
-              <textarea className="w-full" readOnly rows={4} value={signature} />
+              <textarea className="w-full" readOnly rows={4} value={typeof signature !== 'string' && signature.address
+                      ? signature.address
+                      : Array.isArray(signature)
+                      ? JSON.stringify(signature)
+                      : (signature as string)} />
             </div>
           ) : (
             <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>
@@ -259,7 +283,7 @@ const MainPage = () => {
   };
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
-      <div className="flex justify-center">{renderContent()}</div>
+      <div className="flex justify-center max-w-2xl">{renderContent()}</div>
     </div>
   );
 };
