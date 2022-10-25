@@ -16,6 +16,7 @@ Supports:
 - [TokenPocket Wallet](https://tokenpocket.pro)
 - [ONTO Wallet](https://onto.app)
 - [Blocto wallet](https://portto.com/download)
+- [FoxWallet](https://foxwallet.com)
 
 Working on (PR welcome):
 
@@ -63,7 +64,8 @@ import {
   TokenPocketWalletAdapter,
   ONTOWalletAdapter,
   BloctoWalletAdapter,
-  SafePalWalletAdapter
+  SafePalWalletAdapter,
+  FoxWalletAdapter,
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -80,6 +82,7 @@ const wallets = [
   new ONTOWalletAdapter(),
   new BloctoWalletAdapter(),
   new SafePalWalletAdapter(),
+  new FoxWalletAdapter(),
 ];
 
 const App: React.FC = () => {
