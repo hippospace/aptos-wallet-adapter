@@ -17,3 +17,4 @@ export * from './ONTOWallet';
 export * from './BloctoWallet';
 export * from './Coin98Wallet';
 export * from './SafePalWallet';
+export * from './FoxWallet';
