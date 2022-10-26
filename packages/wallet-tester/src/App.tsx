@@ -16,7 +16,8 @@ import {
   TokenPocketWalletAdapter,
   BloctoWalletAdapter,
   WalletAdapterNetwork,
-  ONTOWalletAdapter
+  ONTOWalletAdapter,
+  FoxWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
 import MainPage from './pages';
@@ -48,7 +49,8 @@ const App: React.FC = () => {
       new BitkeepWalletAdapter(),
       new TokenPocketWalletAdapter(),
       new BloctoWalletAdapter({ network: WalletAdapterNetwork.Testnet }),
-      new ONTOWalletAdapter()
+      new ONTOWalletAdapter(),
+      new FoxWalletAdapter()
     ],
     []
   );
