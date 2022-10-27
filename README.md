@@ -23,6 +23,7 @@ Supports:
 - [Bitkeep wallet](https://bitkeep.com/)
 - [TokenPocket wallet](https://tokenpocket.pro)
 - [Blocto wallet](https://portto.com/download)
+- [Nightly Wallet](https://nightly.app/download)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
