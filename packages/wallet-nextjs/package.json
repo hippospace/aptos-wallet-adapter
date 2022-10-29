@@ -18,6 +18,7 @@
     "react-dom": "^18.X.X || 17.X.X"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.13",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
