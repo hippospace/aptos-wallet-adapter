@@ -124,13 +124,13 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
   }: NightlyWalletAdapterConfig = {}) {
     super();
 
-    this._provider = window.nightly?.aptos;
+    this._provider = typeof window !== 'undefined' ? window.nightly?.aptos : undefined;
     this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
-    if (this._readyState !== WalletReadyState.Unsupported) {
+    if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
       scopePollingDetectionStrategy(() => {
         if (window.nightly?.aptos) {
           this._readyState = WalletReadyState.Installed;
