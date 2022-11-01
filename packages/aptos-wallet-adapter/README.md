@@ -77,7 +77,7 @@ const wallets = [
   new FletchWalletAdapter(),
   new TokenPocketWalletAdapter(),
   new ONTOWalletAdapter(),
-  new BloctoWalletAdapter(),
+  new BloctoWalletAdapter({ bloctoAppId:'6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46' }), /** Must provide bloctoAppId **/
   new SafePalWalletAdapter(),
   new FoxWalletAdapter(),
 ];
