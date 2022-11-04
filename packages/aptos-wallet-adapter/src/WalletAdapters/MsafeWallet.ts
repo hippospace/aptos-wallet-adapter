@@ -34,7 +34,7 @@ interface MsafeAccount {
 export class MsafeWalletAdapter extends BaseWalletAdapter {
   name = MsafeWalletName;
 
-  url = 'app.m-safe.io';
+  url = 'https://app.m-safe.io';
 
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
