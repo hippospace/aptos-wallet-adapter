@@ -32,6 +32,7 @@
     "@fewcha/web3": "0.1.32",
     "@keystonehq/aptossnap-adapter": "^0.2.8",
     "eventemitter3": "^4.0.7",
-    "js-sha3": "^0.8.0"
+    "js-sha3": "^0.8.0",
+    "msafe-iframe": "^1.0.8"
   }
 }
