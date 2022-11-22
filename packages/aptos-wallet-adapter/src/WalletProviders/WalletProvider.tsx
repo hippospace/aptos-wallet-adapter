@@ -1,10 +1,14 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Types } from 'aptos';
 import {
+  WalletConnectionError,
   WalletError,
   WalletNotConnectedError,
   WalletNotReadyError,
-  WalletNotSelectedError
+  WalletNotSelectedError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
+  WalletSignTransactionError
 } from './errors';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import {
@@ -16,6 +20,7 @@ import {
   WalletReadyState
 } from '../WalletAdapters/BaseAdapter';
 import { Wallet, WalletContext } from './useWallet';
+import { timeoutPromise } from '../utilities/util';
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -38,6 +43,8 @@ const initialState: {
   connected: false,
   network: null
 };
+
+const TIMEOUT = 90;
 
 export const WalletProvider: FC<WalletProviderProps> = ({
   children,
@@ -117,6 +124,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     window.addEventListener('beforeunload', listener);
     return () => window.removeEventListener('beforeunload', listener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUnloading, autoConnect]);
 
   // Handle the adapter's connect event
@@ -261,12 +269,17 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       isConnecting.current = true;
       setConnecting(true);
       try {
-        await walletToConnect.adapter.connect();
+        const timeout = timeoutPromise(TIMEOUT * 1000);
+        await Promise.race([walletToConnect.adapter.connect(), timeout.promise]);
+        clearTimeout(timeout.timeoutId);
       } catch (error: any) {
         // Clear the selected wallet
         setName(null);
-        // Rethrow the error, and handleError will also be called
-        throw error;
+        if (error === 'timeout') {
+          throw handleError(new WalletConnectionError(error));
+        } else {
+          throw error;
+        }
       } finally {
         setConnecting(false);
         isConnecting.current = false;
@@ -314,7 +327,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      const response = await adapter.signAndSubmitTransaction(transaction, option);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([
+        adapter.signAndSubmitTransaction(transaction, option),
+        timeout.promise
+      ]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignAndSubmitMessageError('Timeout'));
       return response;
     },
     [adapter, handleError, connected]
@@ -324,7 +343,14 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signTransaction(transaction, option);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([
+        adapter.signTransaction(transaction, option),
+        timeout.promise
+      ]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignTransactionError('Timeout'));
+      return response;
     },
     [adapter, handleError, connected]
   );
@@ -333,7 +359,11 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (msgPayload: string | SignMessagePayload | Uint8Array) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signMessage(msgPayload);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([adapter.signMessage(msgPayload), timeout.promise]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignMessageError('Timeout'));
+      return response;
     },
     [adapter, handleError, connected]
   );
