@@ -28,6 +28,9 @@ interface RiseAccount {
   isConnected: boolean;
 }
 
+type AddressInfo = { address: string; publicKey: string; authKey?: string };
+
+
 interface IRiseWallet {
   connect: () => Promise<{ address: string }>;
   account(): Promise<RiseAccount>;
@@ -37,6 +40,7 @@ interface IRiseWallet {
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
   network(): Promise<NetworkInfo>;
+  onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
 }
 
 interface RiseWindow extends Window {
@@ -275,7 +279,18 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const handleChangeAccount = async (newAccount: AddressInfo) => {
+
+        this._wallet = {
+          ...this._wallet,
+          publicKey: newAccount.publicKey || this._wallet?.publicKey,
+          authKey: newAccount.authKey || this._wallet?.authKey,
+          address: newAccount.address || this._wallet?.address
+        };
+
+        this.emit('accountChange', newAccount.publicKey);
+      };
+      await provider?.onAccountChange(handleChangeAccount);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
