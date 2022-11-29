@@ -197,14 +197,13 @@ export class BloctoWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: Types.TransactionPayload
+    transaction: Types.TransactionPayload,
+    options?: any
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       try {
         const provider = this._provider;
-        const response = await provider?.signAndSubmitTransaction(
-          transaction as Types.EntryFunctionPayload
-        );
+        const response = await provider?.signAndSubmitTransaction(transaction, options);
         if (response) {
           return { hash: response.hash };
         } else {
