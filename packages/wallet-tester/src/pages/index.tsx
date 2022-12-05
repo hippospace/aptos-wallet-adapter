@@ -212,7 +212,8 @@ const MainPage = () => {
         'fewcha',
         'rise wallet',
         'snap',
-        'blocto'
+        'blocto',
+        'clover'
       ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
             message: messageToSign,
