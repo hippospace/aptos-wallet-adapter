@@ -175,7 +175,7 @@ export class AptosWalletAdapter extends BaseWalletAdapter {
         throw error;
       }
 
-      this.emit('connect', this._wallet.publicKey);
+      this.emit('connect', this._wallet.address);
     } catch (error: any) {
       this.emit('error', error);
       throw error;
