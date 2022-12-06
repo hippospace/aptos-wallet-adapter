@@ -31,7 +31,7 @@
     "@blocto/sdk": "^0.3.1",
     "@fewcha/web3": "0.1.32",
     "@keystonehq/aptossnap-adapter": "^0.2.8",
-    "@openblockhq/dappsdk": "^5.0.0",
+    "@openblockhq/dappsdk": "^5.0.2",
     "eventemitter3": "^4.0.7",
     "js-sha3": "^0.8.0",
     "msafe-iframe": "^1.0.8"

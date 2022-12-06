@@ -63,6 +63,7 @@ import {
   BloctoWalletAdapter,
   SafePalWalletAdapter,
   FoxWalletAdapter,
+  CloverWalletAdapter,
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -80,6 +81,7 @@ const wallets = [
   new BloctoWalletAdapter({ bloctoAppId:'6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46' }), /** Must provide bloctoAppId **/
   new SafePalWalletAdapter(),
   new FoxWalletAdapter(),
+  new CloverWalletAdapter()
 ];
 
 const App: React.FC = () => {

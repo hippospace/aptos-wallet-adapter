@@ -230,7 +230,8 @@ const MainPage = () => {
         'rise wallet',
         'snap',
         'blocto',
-        'openblock'
+        'openblock',
+        'clover'
       ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
             message: messageToSign,
