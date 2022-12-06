@@ -19,4 +19,5 @@ export * from './Coin98Wallet';
 export * from './SafePalWallet';
 export * from './FoxWallet';
 export * from './MsafeWallet';
+export * from './OpenBlockWallet';
 export * from './CloverWallet';
