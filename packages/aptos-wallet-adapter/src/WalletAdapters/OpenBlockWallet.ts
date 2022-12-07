@@ -59,7 +59,7 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://openblock.com/';
 
-  icon = 'https://openblock.com/images/new/OpenBlock.png';
+  icon = 'https://obstatic.243096.com/download/dapp/sdk/images/logo_blue.svg';
 
   protected _provider: IOpenBlockWallet;
 
