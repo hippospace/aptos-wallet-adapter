@@ -33,7 +33,6 @@
     "@keystonehq/aptossnap-adapter": "^0.2.8",
     "@openblockhq/dappsdk": "^5.0.2",
     "eventemitter3": "^4.0.7",
-    "js-sha3": "^0.8.0",
-    "msafe-iframe": "^1.0.8"
+    "js-sha3": "^0.8.0"
   }
 }

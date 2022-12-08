@@ -21,7 +21,6 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import '@openblockhq/dappsdk';
 
 type AddressInfo = { address: string; publicKey: string; authKey?: string };
 
@@ -94,6 +93,7 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
     this._wallet = null;
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
+      require('@openblockhq/dappsdk');
       scopePollingDetectionStrategy(() => {
         if (window.openblock?.aptos) {
           this._readyState = WalletReadyState.Installed;
