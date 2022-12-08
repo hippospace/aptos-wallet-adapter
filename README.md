@@ -1,3 +1,6 @@
+# Wallets Functionalities Audit
+https://docs.google.com/spreadsheets/d/1Rve132x3gvPtZVVKtGDnfixiZkUw44kwKN9lLGDht3c
+
 # aptos-wallet-adapter
 
 This is a mono-repo consist of the wallet adapter itself, a simple web app with essential functionalities to demonstrate the implementation of the wallet adapter and an e2e auto integration testers based on puppeteer.
