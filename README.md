@@ -44,7 +44,7 @@ Automatically testing suites based on puppeteer to run E2E integration tests aga
 | Wallet  | Support Network Change | Support Account Change       |
 |---------|------------------------|------------------------------|
 | Petra   | T                      | T                            |
-| Martian | T                      | F (cannot add other wallets) |
+| Martian | T                      | T                            |
 | Fewcha  | F                      | F                            |
 | Pontem  | T                      | T                            |
 | Rise    | F                      | F                            |
