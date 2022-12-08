@@ -1,4 +1,4 @@
-# Wallets Functionalities Audit
+### Wallets Functionalities Audit
 https://docs.google.com/spreadsheets/d/1Rve132x3gvPtZVVKtGDnfixiZkUw44kwKN9lLGDht3c
 
 # aptos-wallet-adapter
