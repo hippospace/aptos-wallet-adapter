@@ -19,7 +19,8 @@ import {
   ONTOWalletAdapter,
   FoxWalletAdapter,
   OpenBlockWalletAdapter,
-  CloverWalletAdapter
+  CloverWalletAdapter,
+  Coin98WalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
 import MainPage from './pages';
@@ -57,7 +58,8 @@ const App: React.FC = () => {
       new ONTOWalletAdapter(),
       new FoxWalletAdapter(),
       new OpenBlockWalletAdapter(),
-      new CloverWalletAdapter()
+      new CloverWalletAdapter(),
+      new Coin98WalletAdapter()
     ],
     []
   );
