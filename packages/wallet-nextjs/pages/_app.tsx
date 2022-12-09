@@ -17,7 +17,8 @@ import {
   BloctoWalletAdapter,
   WalletAdapterNetwork,
   Coin98WalletAdapter,
-  FoxWalletAdapter
+  FoxWalletAdapter,
+  OpenBlockWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { useMemo } from 'react';
 import { message } from 'antd';
@@ -39,7 +40,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       new TokenPocketWalletAdapter(),
       new BloctoWalletAdapter({ network: WalletAdapterNetwork.Testnet, bloctoAppId:'6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46' }),
       new Coin98WalletAdapter(),
-      new FoxWalletAdapter()
+      new FoxWalletAdapter(),
+      new OpenBlockWalletAdapter()
     ],
     []
   );
