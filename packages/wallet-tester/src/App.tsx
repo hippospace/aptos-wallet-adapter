@@ -20,7 +20,8 @@ import {
   FoxWalletAdapter,
   OpenBlockWalletAdapter,
   CloverWalletAdapter,
-  Coin98WalletAdapter
+  Coin98WalletAdapter,
+  SpacecyWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 import { Col, message, Row, Switch, Typography } from 'antd';
 import MainPage from './pages';
@@ -59,7 +60,8 @@ const App: React.FC = () => {
       new FoxWalletAdapter(),
       new OpenBlockWalletAdapter(),
       new CloverWalletAdapter(),
-      new Coin98WalletAdapter()
+      new Coin98WalletAdapter(),
+      new SpacecyWalletAdapter()
     ],
     []
   );
