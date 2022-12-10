@@ -28,8 +28,10 @@ interface RiseAccount {
   isConnected: boolean;
 }
 
+type AddressInfo = { address: string; publicKey: string; authKey?: string };
+
 interface IRiseWallet {
-  connect: () => Promise<{ address: string }>;
+  connect: () => Promise<AddressInfo>;
   account(): Promise<RiseAccount>;
   isConnected: () => Promise<boolean>;
   signAndSubmitTransaction(transaction: any): Promise<{ hash: Types.HexEncodedBytes }>;
@@ -37,6 +39,10 @@ interface IRiseWallet {
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
   network(): Promise<NetworkInfo>;
+  on(event: string, listener: () => any): void;
+  off(event: string, listener: () => any): void;
+  onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
+  onNetworkChange: (listener: (network: NetworkInfo) => void) => void;
 }
 
 interface RiseWindow extends Window {
@@ -156,21 +162,19 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotConnectedError('User has rejected the request');
       }
 
-      // TODO - remove this check in the future
-      //  provider.network is still not live and we want smooth transition
-      if (provider?.network) {
-        try {
-          const { chainId, api, name } = await provider.network();
+      try {
+        const { chainId, api, name } = await provider.network();
 
-          this._network = name;
-          this._chainId = chainId;
-          this._api = api;
-        } catch (error: any) {
-          const errMsg = error.message;
-          this.emit('error', new WalletGetNetworkError(errMsg));
-          throw error;
-        }
+        this._network = name;
+        this._chainId = chainId;
+        this._api = api;
+      } catch (error: any) {
+        const errMsg = error.message;
+        this.emit('error', new WalletGetNetworkError(errMsg));
+        throw error;
       }
+
+      provider?.on('disconnect', this.handleDisconnect);
 
       const account = await provider?.account();
       if (account) {
@@ -200,6 +204,7 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
 
       try {
         const provider = this._provider || window.rise;
+        provider?.off('disconnect', this.handleDisconnect);
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
@@ -275,7 +280,18 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const handleAccountChange = async (newAccount?: AddressInfo) => {
+        if (newAccount?.publicKey) {
+          this._wallet = {
+            ...this._wallet,
+            publicKey: newAccount.publicKey || this._wallet?.publicKey,
+            authKey: newAccount.authKey || this._wallet?.authKey,
+            address: newAccount.address || this._wallet?.address
+          };
+          this.emit('accountChange', newAccount?.publicKey);
+        }
+      };
+      await provider?.onAccountChange?.(handleAccountChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
@@ -288,11 +304,30 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
       const wallet = this._wallet;
       const provider = this._provider || window.rise;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const handleNetworkChange = async (newNetwork: NetworkInfo) => {
+        const { chainId, api, name } = newNetwork;
+        this._network = name;
+        this._chainId = chainId;
+        this._api = api;
+        this.emit('networkChange', this._network);
+      };
+      await provider?.onNetworkChange?.(handleNetworkChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }
+
+  private handleDisconnect = () => {
+    try {
+      const provider = this._provider || window.rise;
+
+      provider?.off('disconnect', this.handleDisconnect);
+
+      this._wallet = null;
+    } finally {
+      this.emit('disconnect');
+    }
+  };
 }
