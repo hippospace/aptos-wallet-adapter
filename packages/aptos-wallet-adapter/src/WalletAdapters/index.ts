@@ -21,3 +21,4 @@ export * from './FoxWallet';
 // export * from './MsafeWallet';
 export * from './OpenBlockWallet';
 export * from './CloverWallet';
+export * from './SpacecyWallet';
