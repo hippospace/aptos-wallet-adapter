@@ -49,9 +49,9 @@ export class BloctoWalletAdapter extends BaseWalletAdapter {
 
   protected _network: Exclude<WalletAdapterNetwork, WalletAdapterNetwork.Devnet>;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -142,16 +142,18 @@ export class BloctoWalletAdapter extends BaseWalletAdapter {
         await provider?.disconnect();
       }
 
-      const { publicKey, ...rest } = await provider?.connect();
+      const connect = await provider?.connect();
+      if (!connect) throw new WalletNotReadyError('fail to connect');
+      const { publicKey, ...rest } = connect;
       this._wallet = {
         ...rest,
         publicKey,
         isConnected: true
       };
 
-      const { api, chainId } = await provider.network();
-      this._api = api;
-      this._chainId = chainId;
+      const resultNetwork = await provider?.network();
+      this._api = resultNetwork?.api;
+      this._chainId = resultNetwork?.chainId;
 
       this.emit('connect', this._wallet);
     } catch (error: any) {

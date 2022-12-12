@@ -72,11 +72,11 @@ export class Coin98WalletAdapter extends BaseWalletAdapter {
 
   protected _provider: ICoin98Wallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -155,7 +155,7 @@ export class Coin98WalletAdapter extends BaseWalletAdapter {
       this._connecting = true;
 
       const provider = this._provider || window.coin98?.aptos;
-      let response = await provider?.connect({ network: this._network });
+      let response = await provider?.connect({ network: this._network || 'mainnet' });
 
       if (typeof response === 'boolean') {
         response = await provider?.account();
@@ -168,8 +168,8 @@ export class Coin98WalletAdapter extends BaseWalletAdapter {
       };
 
       try {
-        const chainId = null;
-        const api = null;
+        const chainId = undefined;
+        const api = undefined;
 
         this._chainId = chainId;
         this._api = api;

@@ -68,11 +68,11 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IRiseWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -163,11 +163,11 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
       }
 
       try {
-        const { chainId, api, name } = await provider.network();
+        const networkPromise = await provider?.network();
 
-        this._network = name;
-        this._chainId = chainId;
-        this._api = api;
+        this._network = networkPromise?.name;
+        this._chainId = networkPromise?.chainId;
+        this._api = networkPromise?.api;
       } catch (error: any) {
         const errMsg = error.message;
         this.emit('error', new WalletGetNetworkError(errMsg));

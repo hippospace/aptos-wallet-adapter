@@ -60,13 +60,13 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
 
   icon = 'https://obstatic.243096.com/download/dapp/sdk/images/logo_blue.svg';
 
-  protected _provider: IOpenBlockWallet;
+  protected _provider: IOpenBlockWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -152,7 +152,7 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
       }
 
       const response = await provider?.connect();
-      if (response.address) {
+      if (response?.address) {
         this._wallet = {
           address: response?.address,
           publicKey: response?.publicKey,
@@ -160,9 +160,9 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
         };
         const network = await provider?.network();
 
-        this._network = network.name;
-        this._chainId = network.chainId;
-        this._api = network.api;
+        this._network = network?.name;
+        this._chainId = network?.chainId;
+        this._api = network?.api;
       } else {
         throw new Error('failed to connect');
       }
@@ -281,6 +281,7 @@ export class OpenBlockWalletAdapter extends BaseWalletAdapter {
         this._network = newNetwork.name;
         this._api = newNetwork.api;
         this._chainId = newNetwork.chainId;
+
         this.emit('networkChange', this._network);
       };
       provider?.onNetworkChange(handleNetworkChange);

@@ -55,7 +55,7 @@ export class SpikaWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: ISpikaWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
   protected _chainId: string;
 

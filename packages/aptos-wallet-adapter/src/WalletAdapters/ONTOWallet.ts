@@ -44,7 +44,7 @@ interface IONTOWallet {
   network(): Promise<WalletAdapterNetwork>;
   requestId: Promise<number>;
   onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
-  onNetworkChange: (listener: (network: { networkName: string }) => void) => void;
+  onNetworkChange: (listener: (network: { networkName: WalletAdapterNetwork }) => void) => void;
 }
 
 interface ONTOWindow extends Window {
@@ -66,19 +66,17 @@ export interface ONTOWalletAdapterConfig {
 export class ONTOWalletAdapter extends BaseWalletAdapter {
   name = ONTOWalletName;
 
-  url =
-    'https://onto.app';
+  url = 'https://onto.app';
 
-  icon =
-    'https://app.ont.io/onto/ONTO_logo.png';
+  icon = 'https://app.ont.io/onto/ONTO_logo.png';
 
   protected _provider: IONTOWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -166,8 +164,8 @@ export class ONTOWalletAdapter extends BaseWalletAdapter {
 
       try {
         const name = await provider?.network();
-        const chainId = null;
-        const api = null;
+        const chainId = undefined;
+        const api = undefined;
 
         this._network = name;
         this._chainId = chainId;

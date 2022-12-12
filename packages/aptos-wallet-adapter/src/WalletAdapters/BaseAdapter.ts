@@ -26,8 +26,8 @@ export interface WalletAdapterEvents {
   error(error: any): void;
   success(value: any): void;
   readyStateChange(readyState: WalletReadyState): void;
-  networkChange(network: WalletAdapterNetwork): void;
-  accountChange(account: string): void;
+  networkChange(network?: WalletAdapterNetwork): void;
+  accountChange(account?: string): void;
 }
 
 export enum WalletReadyState {

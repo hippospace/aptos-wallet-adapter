@@ -43,7 +43,7 @@ interface ICloverWallet {
 }
 
 interface AptosWindow extends Window {
-    clover_aptos:ICloverWallet;
+  clover_aptos: ICloverWallet;
 }
 
 declare const window: AptosWindow;
@@ -61,15 +61,16 @@ export class CloverWalletAdapter extends BaseWalletAdapter {
 
   url = 'https://chrome.google.com/webstore/detail/clv-wallet/nhnkbkgjikgcigadomkphalanndcapjk';
 
-  icon = 'https://raw.githubusercontent.com/clover-network/clv-network-token-lists/main/assets/clover.png';
+  icon =
+    'https://raw.githubusercontent.com/clover-network/clv-network-token-lists/main/assets/clover.png';
 
   protected _provider: ICloverWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -82,9 +83,7 @@ export class CloverWalletAdapter extends BaseWalletAdapter {
 
   protected _wallet: any | null;
 
-  constructor({
-    timeout = 10000
-  }: CloverWalletAdapterConfig = {}) {
+  constructor({ timeout = 10000 }: CloverWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.clover_aptos : undefined;
@@ -159,8 +158,8 @@ export class CloverWalletAdapter extends BaseWalletAdapter {
       };
 
       try {
-        const chainId = null;
-        const api = null;
+        const chainId = undefined;
+        const api = undefined;
 
         this._chainId = chainId;
         this._api = api;

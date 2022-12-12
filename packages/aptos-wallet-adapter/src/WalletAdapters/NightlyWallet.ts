@@ -95,11 +95,11 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: AptosNightly | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -292,7 +292,7 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
   async signMessage(message: string): Promise<string> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.nightly.aptos;
+      const provider = this._provider || window.nightly?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const response = await provider?.signMessage(message);
       if (response) {
@@ -310,7 +310,7 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
   async onAccountChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.nightly.aptos;
+      const provider = this._provider || window.nightly?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       //To be implemented
     } catch (error: any) {
@@ -323,7 +323,7 @@ export class NightlyWalletAdapter extends BaseWalletAdapter {
   async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.nightly.aptos;
+      const provider = this._provider || window.nightly?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       //To be implemented
     } catch (error: any) {
