@@ -44,7 +44,7 @@ interface IFoxWallet {
   network(): Promise<WalletAdapterNetwork>;
   requestId: Promise<number>;
   onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
-  onNetworkChange: (listener: (network: { networkName: string }) => void) => void;
+  onNetworkChange: (listener: (network: { networkName: WalletAdapterNetwork }) => void) => void;
 }
 
 interface AptosWindow extends Window {
@@ -72,11 +72,11 @@ export class FoxWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IFoxWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -164,8 +164,8 @@ export class FoxWalletAdapter extends BaseWalletAdapter {
 
       try {
         const name = await provider?.network();
-        const chainId = null;
-        const api = null;
+        const chainId = undefined;
+        const api = undefined;
 
         this._network = name;
         this._chainId = chainId;

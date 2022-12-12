@@ -47,11 +47,11 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: Web3ProviderType | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -156,8 +156,8 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
       };
       try {
         const { data: name } = await provider?.getNetwork();
-        const chainId = null;
-        const api = null;
+        const chainId = undefined;
+        const api = undefined;
 
         this._network = name as WalletAdapterNetwork;
         this._chainId = chainId;

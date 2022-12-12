@@ -56,7 +56,7 @@ export class HippoExtensionWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IHippoWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
   protected _chainId: string;
 

@@ -54,13 +54,13 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
 
   icon = 'http://fletchwallet.io/img/fletch-white.svg';
 
-  protected _provider: IFletchWallet;
+  protected _provider: IFletchWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -145,7 +145,7 @@ export class FletchWalletAdapter extends BaseWalletAdapter {
       }
 
       const response = await provider?.connect();
-      if (response.code != 200) {
+      if (response && response.code != 200) {
         throw response.error;
       }
       this._wallet = {

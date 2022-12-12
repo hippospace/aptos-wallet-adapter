@@ -4,8 +4,24 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "nuke": "shx rm -rf packages/*/*/node_modules node_modules pnpm-lock.yaml || true",
+    "reinstall": "pnpm run nuke && pnpm install",
+    "build:adapter": "tsc --build --verbose tsconfig.adapter.json",
+    "build:wallets": "tsc --build --verbose tsconfig.wallets.json"
+  },
   "devDependencies": {
-    "lerna": "^5.2.0"
+    "@types/jest": "^27.0.1",
+    "@types/node": "^18.7.6",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "pnpm": "^7.13.4",
+    "prettier": "^2.7.1",
+    "shx": "^0.3.4",
+    "typescript": "^4.7.4"
   },
   "version": "0.0.0"
 }

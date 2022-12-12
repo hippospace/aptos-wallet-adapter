@@ -47,7 +47,7 @@ interface IMartianWallet {
   getChainId(): Promise<{ chainId: number }>;
   network(): Promise<WalletAdapterNetwork>;
   onAccountChange: (listenr: (newAddress: string) => void) => void;
-  onNetworkChange: (listenr: (network: string) => void) => void;
+  onNetworkChange: (listenr: (network: WalletAdapterNetwork) => void) => void;
 }
 
 interface MartianWindow extends Window {
@@ -73,11 +73,11 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IMartianWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -175,11 +175,11 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
 
         try {
           const name = await provider?.network();
-          const { chainId } = await provider?.getChainId();
-          const api = null;
+          const chainIdPromise = await provider?.getChainId();
+          const api = undefined;
 
           this._network = name;
-          this._chainId = chainId.toString();
+          this._chainId = chainIdPromise?.chainId.toString();
           this._api = api;
         } catch (error: any) {
           const errMsg = error.message;
@@ -285,7 +285,7 @@ export class MartianWalletAdapter extends BaseWalletAdapter {
       const handleChangeAccount = async (newAccount: string) => {
         const { publicKey } = await provider?.account();
         this._wallet = {
-          ...this._wallet,
+          ...wallet,
           address: newAccount,
           publicKey
         };

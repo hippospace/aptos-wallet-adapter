@@ -1,0 +1,65 @@
+{
+  "extends": "./tsconfig.root.json",
+  "references": [
+    {
+      "path": "./packages/wallets/petra/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/martian/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/fewcha/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/pontem/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/nightly/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/rise/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/spika/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/hyperPay/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/fletch/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/aptosSnap/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/bitkeep/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/tokenPocket/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/onto/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/blocto/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/coin98/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/safePal/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/fox/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/openBlock/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/clover/tsconfig.all.json"
+    },
+    {
+      "path": "./packages/wallets/spacecy/tsconfig.all.json"
+    }
+  ]
+}

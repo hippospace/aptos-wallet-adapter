@@ -85,11 +85,11 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
   protected _provider: IPontemWallet | undefined;
 
-  protected _network: WalletAdapterNetwork;
+  protected _network: WalletAdapterNetwork | undefined;
 
-  protected _chainId: string;
+  protected _chainId: string | undefined;
 
-  protected _api: string;
+  protected _api: string | undefined;
 
   protected _timeout: number;
 
@@ -189,9 +189,9 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
 
         try {
           const networkInfo = await provider?.network();
-          this._network = networkInfo.name;
-          this._chainId = networkInfo.chainId;
-          this._api = networkInfo.api;
+          this._network = networkInfo?.name;
+          this._chainId = networkInfo?.chainId;
+          this._api = networkInfo?.api;
         } catch (error: any) {
           const errMsg = error.message;
           this.emit('error', new WalletGetNetworkError(errMsg));
@@ -290,19 +290,19 @@ export class PontemWalletAdapter extends BaseWalletAdapter {
         if (newAccount) {
           const newPublicKey = await provider?.publicKey();
           this._wallet = {
-            ...this._wallet,
+            ...wallet,
             address: newAccount,
             publicKey: newPublicKey
           };
         } else {
           const response = await provider?.connect();
           this._wallet = {
-            ...this._wallet,
-            address: response?.address || this._wallet?.address,
+            ...wallet,
+            address: response?.address || wallet?.address,
             publicKey: response?.publicKey || this._wallet?.publicKey
           };
         }
-        this.emit('accountChange', newAccount);
+        this.emit('accountChange', newAccount || '');
       };
       await provider?.onAccountChange(handleAccountChange);
     } catch (error: any) {
