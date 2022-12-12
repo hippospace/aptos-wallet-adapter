@@ -46,9 +46,9 @@ Automatically testing suites based on puppeteer to run E2E integration tests aga
 |---------|------------------------|------------------------------|
 | Petra   | T                      | T                            |
 | Martian | T                      | T                            |
-| Fewcha  | F                      | F                            |
 | Pontem  | T                      | T                            |
-| Rise    | F                      | F                            |
+| Rise    | T                      | T                            |
+| Fewcha  | F                      | F                            |
 | Coin98  | F(cannot test)         | F(cannot test)               |
 | Blocto  | F(cannot test)         | F(cannot test)               |
 | BitKeep | F                      | F                            |
