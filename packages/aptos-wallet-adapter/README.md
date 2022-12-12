@@ -18,7 +18,7 @@ Supports:
 - [Blocto wallet](https://portto.com/download)
 - [Nightly Wallet](https://nightly.app/download)
 - [FoxWallet](https://foxwallet.com)
-
+- [Spacecy wallet](https://spacecywallet.com/)
 # Installation
 
 with `yarn`
@@ -64,6 +64,7 @@ import {
   SafePalWalletAdapter,
   FoxWalletAdapter,
   CloverWalletAdapter,
+  SpacecyWalletAdapter
 } from '@manahippo/aptos-wallet-adapter';
 
 const wallets = [
@@ -81,7 +82,8 @@ const wallets = [
   new BloctoWalletAdapter({ bloctoAppId:'6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46' }), /** Must provide bloctoAppId **/
   new SafePalWalletAdapter(),
   new FoxWalletAdapter(),
-  new CloverWalletAdapter()
+  new CloverWalletAdapter(),
+  new SpacecyWalletAdapter()
 ];
 
 const App: React.FC = () => {
