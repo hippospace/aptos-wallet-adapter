@@ -23,7 +23,7 @@ export interface WalletContextState {
   connecting: boolean;
   connected: boolean;
   disconnecting: boolean;
-  network: NetworkInfo;
+  network: NetworkInfo | null;
   select(walletName?: WalletName): Promise<void>;
   connect(walletName?: WalletName): Promise<void>;
   disconnect(): Promise<void>;
