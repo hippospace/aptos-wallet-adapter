@@ -207,9 +207,10 @@ const MainPage = () => {
 
   const messageToSign = useMemo(
     () =>
-      `Hello from account ${Array.isArray(account?.publicKey)
-        ? JSON.stringify(account.publicKey, null, 2)
-        : account?.publicKey?.toString() || account?.address?.toString() || ''
+      `Hello from account ${
+        Array.isArray(account?.publicKey)
+          ? JSON.stringify(account.publicKey, null, 2)
+          : account?.publicKey?.toString() || account?.address?.toString() || ''
       }`,
     [account]
   );
@@ -234,9 +235,9 @@ const MainPage = () => {
         'spacecy'
       ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
-          message: messageToSign,
-          nonce
-        }
+            message: messageToSign,
+            nonce
+          }
         : messageToSign;
       const signedMessage = await signMessage(msgPayload);
       const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
@@ -341,8 +342,8 @@ const MainPage = () => {
                     typeof signature !== 'string' && signature.address
                       ? signature.address
                       : Array.isArray(signature)
-                        ? JSON.stringify(signature)
-                        : (signature as string)
+                      ? JSON.stringify(signature)
+                      : (signature as string)
                   }
                 />
               </div>

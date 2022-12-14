@@ -1,0 +1,1 @@
+@manahippo/aptos-wallet-msafe
