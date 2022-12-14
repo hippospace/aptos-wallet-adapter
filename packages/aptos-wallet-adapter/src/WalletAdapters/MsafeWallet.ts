@@ -66,11 +66,11 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
     super();
     this._network = undefined;
     this._connecting = false;
-    origin = MsafeNetwork[origin] || origin;
+    const { origin: msafeOrigin } = new URL(MsafeNetwork[origin] || origin);
     const dappUrl = window.location.href;
-    this.url = `${origin}/apps/0?url=${encodeURIComponent(dappUrl)}`;
+    this.url = `${msafeOrigin}/apps/0?url=${encodeURIComponent(dappUrl)}`;
     if (this._readyState === WalletReadyState.NotDetected) {
-      MsafeWallet.new(origin)
+      MsafeWallet.new(msafeOrigin)
         .then((msafe) => {
           this._provider = msafe;
           this._readyState = WalletReadyState.Installed;
