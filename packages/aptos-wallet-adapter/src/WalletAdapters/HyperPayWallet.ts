@@ -5,6 +5,7 @@ import {
   WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletGetNetworkError,
   WalletSignAndSubmitMessageError,
   WalletSignMessageError,
   WalletSignTransactionError
@@ -38,6 +39,8 @@ interface IHyperPayWallet {
   connect: () => Promise<ConnectHyperPayAccount>;
   account(): Promise<HyperPayAccount>;
   isConnected(): Promise<boolean>;
+  getChainId(): Promise<{ chainId: number }>;
+  network(): Promise<WalletAdapterNetwork>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
   signAndSubmitTransaction(transaction: Types.TransactionPayload): Promise<Types.HexEncodedBytes>;
   signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
@@ -168,6 +171,20 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
           ...walletAccount,
           isConnected: true
         };
+
+        try {
+          const name = await provider?.network();
+          const { chainId } = await provider?.getChainId();
+          const api = null;
+
+          this._network = name;
+          this._chainId = chainId.toString();
+          this._api = api;
+        } catch (error: any) {
+          const errMsg = error.message;
+          this.emit('error', new WalletGetNetworkError(errMsg));
+          throw error;
+        }
       }
       this.emit('connect', this._wallet?.address || '');
     } catch (error: any) {
