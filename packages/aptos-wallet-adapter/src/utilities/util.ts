@@ -9,3 +9,16 @@ export const payloadV1ToV0 = (payload: Types.TransactionPayload) => {
     arguments: v1.arguments
   };
 };
+
+export const timeoutPromise = (timeout) => {
+  let timeoutId;
+  const promise: Promise<void> = new Promise((resolve, reject) => {
+    timeoutId = setTimeout(async () => {
+      reject('timeout');
+    }, timeout);
+  });
+  return {
+    timeoutId,
+    promise
+  };
+};

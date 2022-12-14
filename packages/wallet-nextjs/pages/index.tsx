@@ -1,10 +1,15 @@
 /* eslint-disable no-unused-vars */
 import { Button, Spin } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Types } from 'aptos';
-import { useWallet, SignMessageResponse} from '@manahippo/aptos-wallet-adapter';
-import { aptosClient, faucetClient } from '../config/aptosClient';
+import { AptosClient, Types } from 'aptos';
+import {
+  useWallet,
+  SignMessageResponse,
+  WalletAdapterNetwork
+} from '@manahippo/aptos-wallet-adapter';
+import { DEVNET_NODE_URL, MAINNET_NODE_URL } from '../config/aptosConstants';
+import { faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 
 const MainPage = () => {
@@ -28,8 +33,18 @@ const MainPage = () => {
     disconnecting,
     wallet: currentWallet,
     signMessage,
-    signTransaction
+    signTransaction,
+    network
   } = useWallet();
+
+  const { aptosClient } = useMemo(() => {
+    return {
+      aptosClient:
+        network?.name === WalletAdapterNetwork.Mainnet
+          ? new AptosClient(MAINNET_NODE_URL)
+          : new AptosClient(DEVNET_NODE_URL)
+    };
+  }, [network?.name]);
 
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
@@ -71,7 +86,7 @@ const MainPage = () => {
         console.log('test sign transaction: ', transactionRes);
       }
     } catch (err: any) {
-      console.log('tx error: ', err.msg);
+      console.log('tx error: ', err.msg || err.message);
     } finally {
       setTxLoading({
         ...txLoading,
@@ -104,11 +119,14 @@ const MainPage = () => {
         };
         const transactionRes = await signAndSubmitTransaction(payload, txOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
-        const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
+        const links = [
+          ...txLinks,
+          `https://explorer.${network.name}.aptos.dev/txn/${transactionRes?.hash}`
+        ];
         setTxLinks(links);
       }
     } catch (err: any) {
-      console.log('tx error: ', err.msg);
+      console.log('tx error: ', err.msg || err.message);
     } finally {
       setTxLoading({
         ...txLoading,
@@ -143,8 +161,8 @@ const MainPage = () => {
     () =>
       `Hello from account ${
         Array.isArray(account?.publicKey)
-        ? JSON.stringify(account?.publicKey, null, 2)
-        : account?.publicKey?.toString() || account?.address?.toString() || ''
+          ? JSON.stringify(account?.publicKey, null, 2)
+          : account?.publicKey?.toString() || account?.address?.toString() || ''
       }`,
     [account]
   );
@@ -166,7 +184,8 @@ const MainPage = () => {
         'bitkeep',
         'blocto',
         'coin98',
-        'foxwallet'
+        'foxwallet',
+        'openblock'
       ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
             message: messageToSign,
@@ -239,11 +258,18 @@ const MainPage = () => {
           {signature ? (
             <div className="flex gap-2 transaction">
               <strong>Signature: </strong>
-              <textarea className="w-full" readOnly rows={4} value={typeof signature !== 'string' && signature.address
-                      ? signature.address
-                      : Array.isArray(signature)
-                      ? JSON.stringify(signature)
-                      : (signature as string)} />
+              <textarea
+                className="w-full"
+                readOnly
+                rows={4}
+                value={
+                  typeof signature !== 'string' && signature.address
+                    ? signature.address
+                    : Array.isArray(signature)
+                    ? JSON.stringify(signature)
+                    : (signature as string)
+                }
+              />
             </div>
           ) : (
             <Button id="signBtn" onClick={() => signMess()} loading={txLoading.sign}>

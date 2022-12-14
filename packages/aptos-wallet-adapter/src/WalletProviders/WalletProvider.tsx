@@ -1,10 +1,14 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Types } from 'aptos';
 import {
+  WalletConnectionError,
   WalletError,
   WalletNotConnectedError,
   WalletNotReadyError,
-  WalletNotSelectedError
+  WalletNotSelectedError,
+  WalletSignAndSubmitMessageError,
+  WalletSignMessageError,
+  WalletSignTransactionError
 } from './errors';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import {
@@ -16,6 +20,7 @@ import {
   WalletReadyState
 } from '../WalletAdapters/BaseAdapter';
 import { Wallet, WalletContext } from './useWallet';
+import { timeoutPromise } from '../utilities/util';
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -39,6 +44,8 @@ const initialState: {
   network: null
 };
 
+const TIMEOUT = 90;
+
 export const WalletProvider: FC<WalletProviderProps> = ({
   children,
   wallets: adapters,
@@ -51,7 +58,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const readyState = adapter?.readyState || WalletReadyState.Unsupported;
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
-  const isConnecting = useRef(false);
+  // const isConnecting = useRef(false);
   const isDisconnecting = useRef(false);
   const isUnloading = useRef(false);
 
@@ -117,6 +124,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     window.addEventListener('beforeunload', listener);
     return () => window.removeEventListener('beforeunload', listener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUnloading, autoConnect]);
 
   // Handle the adapter's connect event
@@ -218,7 +226,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // Connect the adapter to the wallet
   const connect = useCallback(
     async (walletName?) => {
-      if (isConnecting.current || isDisconnecting.current || connected || !walletName) return;
+      if (isDisconnecting.current || connected || !walletName) return;
       let walletToConnect = initialState;
       if (!adapter || walletName !== adapter?.name) {
         const selectedWallet = wallets.find((wAdapter) => wAdapter.adapter.name === walletName);
@@ -258,18 +266,23 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         throw handleError(new WalletNotReadyError('Wallet Not Ready'));
       }
-      isConnecting.current = true;
+      // isConnecting.current = true;
       setConnecting(true);
       try {
-        await walletToConnect.adapter.connect();
+        const timeout = timeoutPromise(TIMEOUT * 1000);
+        await Promise.race([walletToConnect.adapter.connect(), timeout.promise]);
+        clearTimeout(timeout.timeoutId);
       } catch (error: any) {
         // Clear the selected wallet
         setName(null);
-        // Rethrow the error, and handleError will also be called
-        throw error;
+        if (error === 'timeout') {
+          throw handleError(new WalletConnectionError(error));
+        } else {
+          throw error;
+        }
       } finally {
         setConnecting(false);
-        isConnecting.current = false;
+        // isConnecting.current = false;
       }
     },
     [connected, adapter, handleError, wallets, setName, wallet, account, network]
@@ -278,7 +291,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // If autoConnect is enabled, try to connect when the adapter changes and is ready
   useEffect(() => {
     if (
-      isConnecting.current ||
       connected ||
       !autoConnect ||
       !name ||
@@ -287,7 +299,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     )
       return;
     connect(name);
-  }, [isConnecting, connected, autoConnect, name, connect, adapter, readyState]);
+  }, [connected, autoConnect, name, connect, adapter, readyState]);
 
   // Disconnect the adapter from the wallet
   const disconnect = useCallback(async () => {
@@ -314,7 +326,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      const response = await adapter.signAndSubmitTransaction(transaction, option);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([
+        adapter.signAndSubmitTransaction(transaction, option),
+        timeout.promise
+      ]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignAndSubmitMessageError('Timeout'));
       return response;
     },
     [adapter, handleError, connected]
@@ -324,7 +342,14 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (transaction: Types.TransactionPayload, option?: any) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signTransaction(transaction, option);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([
+        adapter.signTransaction(transaction, option),
+        timeout.promise
+      ]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignTransactionError('Timeout'));
+      return response;
     },
     [adapter, handleError, connected]
   );
@@ -333,7 +358,11 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     async (msgPayload: string | SignMessagePayload | Uint8Array) => {
       if (!adapter) throw handleError(new WalletNotSelectedError());
       if (!connected) throw handleError(new WalletNotConnectedError());
-      return adapter.signMessage(msgPayload);
+      const timeout = timeoutPromise(TIMEOUT * 1000);
+      const response = await Promise.race([adapter.signMessage(msgPayload), timeout.promise]);
+      clearTimeout(timeout.timeoutId);
+      if (!response) throw handleError(new WalletSignMessageError('Timeout'));
+      return response;
     },
     [adapter, handleError, connected]
   );

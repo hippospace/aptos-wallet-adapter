@@ -1,11 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Spin } from 'antd';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Types } from 'aptos';
-import { SignMessageResponse, useWallet } from '@manahippo/aptos-wallet-adapter';
-import { aptosClient, faucetClient } from '../config/aptosClient';
+import { AptosClient, Types } from 'aptos';
+import {
+  SignMessageResponse,
+  useWallet,
+  WalletAdapterNetwork
+} from '@manahippo/aptos-wallet-adapter';
+import { DEVNET_NODE_URL, MAINNET_NODE_URL } from '../config/aptosConstants';
+import { faucetClient } from '../config/aptosClient';
 import { AptosAccount } from 'aptos';
 import nacl from 'tweetnacl';
 
@@ -69,6 +74,15 @@ const MainPage = () => {
     network
   } = useWallet();
 
+  const { aptosClient } = useMemo(() => {
+    return {
+      aptosClient:
+        network?.name === WalletAdapterNetwork.Mainnet
+          ? new AptosClient(MAINNET_NODE_URL)
+          : new AptosClient(DEVNET_NODE_URL)
+    };
+  }, [network?.name]);
+
   const renderWalletConnectorGroup = () => {
     return wallets.map((wallet) => {
       const option = wallet.adapter;
@@ -109,7 +123,7 @@ const MainPage = () => {
         console.log('test sign transaction: ', transactionRes);
       }
     } catch (err: any) {
-      console.log('tx error: ', err.msg);
+      console.log('tx error: ', err.msg || err.message);
     } finally {
       setTxLoading({
         ...txLoading,
@@ -142,11 +156,14 @@ const MainPage = () => {
         };
         const transactionRes = await signAndSubmitTransaction(payload, txOptions);
         await aptosClient.waitForTransaction(transactionRes?.hash || '');
-        const links = [...txLinks, `https://explorer.devnet.aptos.dev/txn/${transactionRes?.hash}`];
+        const links = [
+          ...txLinks,
+          `https://explorer.${network.name}.aptos.dev/txn/${transactionRes?.hash}`
+        ];
         setTxLinks(links);
       }
     } catch (err: any) {
-      console.log('tx error: ', err.msg);
+      console.log('tx error: ', err.msg || err.message);
     } finally {
       setTxLoading({
         ...txLoading,
@@ -190,10 +207,9 @@ const MainPage = () => {
 
   const messageToSign = useMemo(
     () =>
-      `Hello from account ${
-        Array.isArray(account?.publicKey)
-          ? JSON.stringify(account.publicKey, null, 2)
-          : account?.publicKey?.toString() || account?.address?.toString() || ''
+      `Hello from account ${Array.isArray(account?.publicKey)
+        ? JSON.stringify(account.publicKey, null, 2)
+        : account?.publicKey?.toString() || account?.address?.toString() || ''
       }`,
     [account]
   );
@@ -212,12 +228,15 @@ const MainPage = () => {
         'fewcha',
         'rise wallet',
         'snap',
-        'blocto'
+        'blocto',
+        'openblock',
+        'clover',
+        'spacecy'
       ].includes(currentWallet?.adapter?.name?.toLowerCase() || '')
         ? {
-            message: messageToSign,
-            nonce
-          }
+          message: messageToSign,
+          nonce
+        }
         : messageToSign;
       const signedMessage = await signMessage(msgPayload);
       const response = typeof signedMessage === 'string' ? signedMessage : signedMessage.signature;
@@ -229,17 +248,20 @@ const MainPage = () => {
         } else {
           const { publicKey } = account;
           const key = publicKey!.toString().slice(2, 66);
+          const sign = signedMessage.signature.startsWith('0x')
+            ? signedMessage.signature.slice(2)
+            : signedMessage.signature;
           setverified(
             nacl.sign.detached.verify(
               Buffer.from(signedMessage.fullMessage),
-              Buffer.from(signedMessage.signature, 'hex'),
+              Buffer.from(sign, 'hex'),
               Buffer.from(key, 'hex')
             )
           );
         }
       }
     } catch (err: any) {
-      console.log('tx error: ', err.msg);
+      console.log('tx error: ', err.msg || err.message);
     } finally {
       setTxLoading({
         ...txLoading,
@@ -319,8 +341,8 @@ const MainPage = () => {
                     typeof signature !== 'string' && signature.address
                       ? signature.address
                       : Array.isArray(signature)
-                      ? JSON.stringify(signature)
-                      : (signature as string)
+                        ? JSON.stringify(signature)
+                        : (signature as string)
                   }
                 />
               </div>

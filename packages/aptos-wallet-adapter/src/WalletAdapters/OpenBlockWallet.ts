@@ -1,14 +1,15 @@
-import { MaybeHexString, Types } from 'aptos';
+import { Types } from 'aptos';
 import {
   WalletAccountChangeError,
   WalletDisconnectionError,
-  WalletGetNetworkError,
   WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletSignAndSubmitMessageError,
   WalletSignMessageError,
   WalletSignTransactionError
-} from '../WalletProviders';
+} from '../WalletProviders/errors';
+
 import {
   AccountKeys,
   BaseWalletAdapter,
@@ -21,52 +22,45 @@ import {
   WalletReadyState
 } from './BaseAdapter';
 
-interface RiseAccount {
-  address: MaybeHexString;
-  publicKey: MaybeHexString;
-  authKey: MaybeHexString;
-  isConnected: boolean;
-}
-
 type AddressInfo = { address: string; publicKey: string; authKey?: string };
 
-interface IRiseWallet {
+interface IOpenBlockWallet {
   connect: () => Promise<AddressInfo>;
-  account(): Promise<RiseAccount>;
+  account: () => Promise<AddressInfo>;
+  network: () => Promise<NetworkInfo>;
   isConnected: () => Promise<boolean>;
-  signAndSubmitTransaction(transaction: any): Promise<{ hash: Types.HexEncodedBytes }>;
-  signTransaction(transaction: any, options?: any): Promise<Uint8Array>;
+  signAndSubmitTransaction(transaction: any): Promise<{ hash: string }>;
+  signTransaction(payload: any): Promise<string>;
   signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
-  network(): Promise<NetworkInfo>;
-  on(event: string, listener: () => any): void;
-  off(event: string, listener: () => any): void;
   onAccountChange: (listener: (newAddress: AddressInfo) => void) => void;
   onNetworkChange: (listener: (network: NetworkInfo) => void) => void;
 }
 
-interface RiseWindow extends Window {
-  rise?: IRiseWallet;
+interface OpenBlockWindow extends Window {
+  openblock?: {
+    aptos?: IOpenBlockWallet;
+  };
 }
 
-declare const window: RiseWindow;
+declare const window: OpenBlockWindow;
 
-export const RiseWalletName = 'Rise Wallet' as WalletName<'Rise Wallet'>;
+export const OpenBlockWalletName = 'OpenBlock' as WalletName<'OpenBlock'>;
 
-export interface RiseWalletAdapterConfig {
-  provider?: IRiseWallet;
+export interface OpenBlockWalletAdapterConfig {
+  provider?: IOpenBlockWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
 
-export class RiseWalletAdapter extends BaseWalletAdapter {
-  name = RiseWalletName;
+export class OpenBlockWalletAdapter extends BaseWalletAdapter {
+  name = OpenBlockWalletName;
 
-  url = 'https://risewallet.io';
+  url = 'https://openblock.com/';
 
-  icon = 'https://static.risewallet.io/logo.png';
+  icon = 'https://obstatic.243096.com/download/dapp/sdk/images/logo_blue.svg';
 
-  protected _provider: IRiseWallet | undefined;
+  protected _provider: IOpenBlockWallet;
 
   protected _network: WalletAdapterNetwork;
 
@@ -89,18 +83,19 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
-  }: RiseWalletAdapterConfig = {}) {
+  }: OpenBlockWalletAdapterConfig = {}) {
     super();
 
-    this._provider = typeof window !== 'undefined' ? window.rise : undefined;
+    this._provider = typeof window !== 'undefined' ? window.openblock?.aptos : undefined;
     this._network = undefined;
     this._timeout = timeout;
     this._connecting = false;
     this._wallet = null;
 
     if (typeof window !== 'undefined' && this._readyState !== WalletReadyState.Unsupported) {
+      require('@openblockhq/dappsdk');
       scopePollingDetectionStrategy(() => {
-        if (window.rise) {
+        if (window.openblock?.aptos) {
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
           return true;
@@ -150,45 +145,28 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
         throw new WalletNotReadyError();
       this._connecting = true;
 
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       const isConnected = await this._provider?.isConnected();
       if (isConnected === true) {
         await provider?.disconnect();
       }
 
       const response = await provider?.connect();
-
-      if (!response) {
-        throw new WalletNotConnectedError('User has rejected the request');
-      }
-
-      try {
-        const { chainId, api, name } = await provider.network();
-
-        this._network = name;
-        this._chainId = chainId;
-        this._api = api;
-      } catch (error: any) {
-        const errMsg = error.message;
-        this.emit('error', new WalletGetNetworkError(errMsg));
-        throw error;
-      }
-
-      provider?.on('disconnect', this.handleDisconnect);
-
-      const account = await provider?.account();
-      if (account) {
-        const { publicKey, address, authKey } = account;
-
+      if (response.address) {
         this._wallet = {
-          publicKey,
-          address,
-          authKey,
+          address: response?.address,
+          publicKey: response?.publicKey,
           isConnected: true
         };
+        const network = await provider?.network();
 
-        this.emit('connect', this._wallet.publicKey);
+        this._network = network.name;
+        this._chainId = network.chainId;
+        this._api = network.api;
+      } else {
+        throw new Error('failed to connect');
       }
+      this.emit('connect', this._wallet.publicKey);
     } catch (error: any) {
       this.emit('error', error);
       throw error;
@@ -199,12 +177,11 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
 
   async disconnect(): Promise<void> {
     const wallet = this._wallet;
+    const provider = this._provider || window?.openblock?.aptos;
     if (wallet) {
       this._wallet = null;
 
       try {
-        const provider = this._provider || window.rise;
-        provider?.off('disconnect', this.handleDisconnect);
         await provider?.disconnect();
       } catch (error: any) {
         this.emit('error', new WalletDisconnectionError(error?.message, error));
@@ -217,15 +194,14 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   async signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
 
-      const response = await provider?.signTransaction(transaction);
+      const response = await provider.signTransaction(transaction);
       if (response) {
-        return response;
-      } else {
-        throw new Error('Sign Transaction failed');
+        return new TextEncoder().encode(response);
       }
+      throw new Error('failed to SignTransaction');
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignTransactionError(errMsg));
@@ -238,18 +214,16 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-
-      const response = await provider?.signAndSubmitTransaction(transaction);
+      const response = await provider.signAndSubmitTransaction(transaction);
       if (response) {
         return response;
-      } else {
-        throw new Error('Transaction failed');
       }
+      throw new Error('Failed to SignAndSubmitTransaction');
     } catch (error: any) {
       const errMsg = error.message;
-      this.emit('error', new WalletSignTransactionError(errMsg));
+      this.emit('error', new WalletSignAndSubmitMessageError(errMsg));
       throw error;
     }
   }
@@ -257,17 +231,18 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
         throw new WalletSignMessageError('Invalid signMessage Payload');
       }
+
       const response = await provider?.signMessage(msgPayload);
       if (response) {
         return response;
-      } else {
-        throw new Error('Sign Message failed');
       }
+
+      throw new Error('Failed to signMessage');
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletSignMessageError(errMsg));
@@ -278,20 +253,18 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   async onAccountChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const handleAccountChange = async (newAccount?: AddressInfo) => {
-        if (newAccount?.publicKey) {
-          this._wallet = {
-            ...this._wallet,
-            publicKey: newAccount.publicKey || this._wallet?.publicKey,
-            authKey: newAccount.authKey || this._wallet?.authKey,
-            address: newAccount.address || this._wallet?.address
-          };
-          this.emit('accountChange', newAccount?.publicKey);
-        }
+      const handleAccountChange = async (newAccount: AddressInfo) => {
+        this._wallet = {
+          ...this._wallet,
+          publicKey: newAccount.publicKey || this._wallet?.publicKey,
+          authKey: newAccount.authKey || this._wallet?.authKey,
+          address: newAccount.address || this._wallet?.address
+        };
+        this.emit('accountChange', newAccount.publicKey);
       };
-      await provider?.onAccountChange?.(handleAccountChange);
+      provider?.onAccountChange(handleAccountChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
@@ -302,32 +275,19 @@ export class RiseWalletAdapter extends BaseWalletAdapter {
   async onNetworkChange(): Promise<void> {
     try {
       const wallet = this._wallet;
-      const provider = this._provider || window.rise;
+      const provider = this._provider || window?.openblock?.aptos;
       if (!wallet || !provider) throw new WalletNotConnectedError();
       const handleNetworkChange = async (newNetwork: NetworkInfo) => {
-        const { chainId, api, name } = newNetwork;
-        this._network = name;
-        this._chainId = chainId;
-        this._api = api;
+        this._network = newNetwork.name;
+        this._api = newNetwork.api;
+        this._chainId = newNetwork.chainId;
         this.emit('networkChange', this._network);
       };
-      await provider?.onNetworkChange?.(handleNetworkChange);
+      provider?.onNetworkChange(handleNetworkChange);
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }
-
-  private handleDisconnect = () => {
-    try {
-      const provider = this._provider || window.rise;
-
-      provider?.off('disconnect', this.handleDisconnect);
-
-      this._wallet = null;
-    } finally {
-      this.emit('disconnect');
-    }
-  };
 }

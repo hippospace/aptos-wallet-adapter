@@ -26,9 +26,9 @@ export const BloctoWalletName = 'Blocto' as WalletName<'Blocto'>;
 
 export interface BloctoWalletAdapterConfig {
   provider?: IBloctoAptos;
-  network: Exclude<WalletAdapterNetwork, WalletAdapterNetwork.Devnet>;
+  network?: Exclude<WalletAdapterNetwork, WalletAdapterNetwork.Devnet>;
   timeout?: number;
-  bloctoAppId?: string;
+  bloctoAppId: string;
 }
 
 export const APTOS_NETWORK_CHAIN_ID_MAPPING = {
@@ -64,11 +64,11 @@ export class BloctoWalletAdapter extends BaseWalletAdapter {
 
   protected _wallet: any | null;
 
-  constructor(
-    { network, timeout = 10000, bloctoAppId = '' }: BloctoWalletAdapterConfig = {
-      network: WalletAdapterNetwork.Testnet
-    }
-  ) {
+  constructor({
+    network = WalletAdapterNetwork.Mainnet,
+    timeout = 10000,
+    bloctoAppId
+  }: BloctoWalletAdapterConfig) {
     super();
 
     const sdk = new BloctoSDK({
@@ -197,14 +197,13 @@ export class BloctoWalletAdapter extends BaseWalletAdapter {
   }
 
   async signAndSubmitTransaction(
-    transaction: Types.TransactionPayload
+    transaction: Types.TransactionPayload,
+    options?: any
   ): Promise<{ hash: Types.HexEncodedBytes }> {
     try {
       try {
         const provider = this._provider;
-        const response = await provider?.signAndSubmitTransaction(
-          transaction as Types.EntryFunctionPayload
-        );
+        const response = await provider?.signAndSubmitTransaction(transaction, options);
         if (response) {
           return { hash: response.hash };
         } else {
