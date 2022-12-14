@@ -20,7 +20,7 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { Account, MsafeWallet } from 'msafe-iframe';
+import { Account, MsafeWallet } from 'msafe-wallet';
 
 export const MsafeWalletName = 'Msafe' as WalletName<'Msafe'>;
 
@@ -31,10 +31,15 @@ interface MsafeAccount {
   isConnected: boolean;
 }
 
+const MsafeNetwork = {
+  Mainnet: 'https://app.m-safe.io',
+  Testnet: 'https://testnet.m-safe.io'
+};
+
 export class MsafeWalletAdapter extends BaseWalletAdapter {
   name = MsafeWalletName;
 
-  url = 'https://app.m-safe.io';
+  url = MsafeNetwork.Mainnet;
 
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
@@ -43,8 +48,6 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
   protected _network: WalletAdapterNetwork;
 
   protected _chainId: string;
-
-  protected _api: string;
 
   protected _readyState: WalletReadyState =
     typeof window === 'undefined' ||
@@ -59,11 +62,13 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
 
   protected _wallet: MsafeAccount | null;
 
-  constructor(origin?: string) {
+  constructor(origin: 'Mainnet' | 'Testnet' | string = 'Mainnet') {
     super();
-
     this._network = undefined;
     this._connecting = false;
+    origin = MsafeNetwork[origin] || origin;
+    const dappUrl = window.location.href;
+    this.url = `${origin}/apps/0?url=${encodeURIComponent(dappUrl)}`;
     if (this._readyState === WalletReadyState.NotDetected) {
       MsafeWallet.new(origin)
         .then((msafe) => {
