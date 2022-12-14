@@ -1,7 +1,6 @@
 {
   "name": "@manahippo/wallet-tester",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@manahippo/aptos-wallet-adapter": "file:../aptos-wallet-adapter",
