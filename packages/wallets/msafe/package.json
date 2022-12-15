@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@manahippo/aptos-wallet-adapter": "workspace:^",
-    "msafe-iframe": "^1.1.7"
+    "msafe-wallet": "^1.1.9"
   },
   "author": "",
   "license": "ISC"
