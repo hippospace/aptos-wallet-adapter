@@ -1272,9 +1272,9 @@
     minimatch "^3.0.4"
 
 "@humanwhocodes/config-array@^0.11.6":
-  version "0.11.7"
-  resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.7.tgz#38aec044c6c828f6ed51d5d7ae3d9b9faf6dbb0f"
-  integrity sha512-kBbPWzN8oVMLb0hOUYXhmxggL/1cJE6ydvjDIGi9EnAGUyA7cLVKQg+d/Dsm+KZwx2czGHrCmMVLiyg8s5JPKw==
+  version "0.11.8"
+  resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
+  integrity sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==
   dependencies:
     "@humanwhocodes/object-schema" "^1.2.1"
     debug "^4.1.1"
@@ -1785,7 +1785,7 @@
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
 "@manahippo/aptos-wallet-adapter@file:packages/aptos-wallet-adapter":
-  version "1.0.6"
+  version "1.0.8"
   dependencies:
     eventemitter3 "^4.0.7"
 
@@ -1793,101 +1793,101 @@
   version "1.0.0"
   dependencies:
     "@keystonehq/aptossnap-adapter" "^0.2.8"
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-aptossnap-1.0.0-e48b43b6-846f-4ea7-962d-b5feae600e09-1670973992156/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-bitkeep@file:packages/wallets/bitkeep":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-bitkeep-1.0.0-a7a1d845-ba32-4a2c-aa5b-cb637d59cb00-1670973992154/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-blocto@file:packages/wallets/blocto":
   version "1.0.0"
   dependencies:
     "@blocto/sdk" "^0.3.1"
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-blocto-1.0.0-9e5cc4fa-90e6-45a8-8a86-3277be3a910f-1670973992152/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-clover@file:packages/wallets/clover":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-clover-1.0.0-319f746a-5f4f-440e-af84-02830bc9e05e-1670973992152/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-coin98@file:packages/wallets/coin98":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-coin98-1.0.0-0f1cf09b-2662-4696-a65a-b966b0900e75-1670973992152/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-fewcha@file:packages/wallets/fewcha":
   version "1.0.0"
   dependencies:
     "@fewcha/web3" "0.1.32"
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-fewcha-1.0.0-0186f4ca-df81-4d3d-b8e1-8478121070d6-1670973992149/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-fletch@file:packages/wallets/fletch":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-fletch-1.0.0-35cab78f-506b-41ff-9ce6-42b9ff6ec4f1-1670973992151/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-fox@file:packages/wallets/fox":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-fox-1.0.0-db7604ed-7acb-4a1a-93df-5f246b917d17-1670973992154/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-hyperPay@file:packages/wallets/hyperPay":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-hyper-ay-1.0.0-1a7f1464-b995-415c-8c54-d42ab3a235f0-1670973992153/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-martian@file:packages/wallets/martian":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-martian-1.0.0-d50adbd4-8720-4991-a37f-f60df1cec65a-1670973992155/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-nightly@file:packages/wallets/nightly":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-nightly-1.0.0-5bebc293-89ad-4c60-8a1d-9a93eac9fcf7-1670973992154/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
     js-sha3 "^0.8.0"
 
 "@manahippo/aptos-wallet-onto@file:packages/wallets/onto":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-onto-1.0.0-1d49bb7d-126c-49e5-8695-443197b624dd-1670973992152/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-openblock@file:packages/wallets/openblock":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-openblock-1.0.0-cdb1ce96-df27-4814-8ad3-479433cf57d4-1670973992155/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
     "@openblockhq/dappsdk" "^5.0.2"
 
 "@manahippo/aptos-wallet-petra@file:packages/wallets/petra":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-petra-1.0.0-663ee4b5-2af2-4bd9-ad9d-439b20bc1562-1670973992155/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-pontem@file:packages/wallets/pontem":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-pontem-1.0.0-95ad9f90-bd22-4787-bd03-e72805d27c53-1670973992154/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-rise@file:packages/wallets/rise":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-rise-1.0.0-cbf1065e-6903-4401-9644-2f9a79d063c6-1670973992154/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-spacecy@file:packages/wallets/spacecy":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-spacecy-1.0.0-9f10e70a-d840-43af-94d3-1f771eadb28e-1670973992156/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-spika@file:packages/wallets/spika":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-spika-1.0.0-86627f26-d60f-426f-a038-8d31ae9d0fc2-1670973992156/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@manahippo/aptos-wallet-tokenpocket@file:packages/wallets/tokenpocket":
   version "1.0.0"
   dependencies:
-    "@manahippo/aptos-wallet-adapter" "file:../../../Library/Caches/Yarn/v6/npm-@manahippo-aptos-wallet-tokenpocket-1.0.0-414ea3b6-0087-4955-a75c-576e3410bb0c-1670973992156/node_modules/aptos-wallet-adapter"
+    "@manahippo/aptos-wallet-adapter" "*"
 
 "@next/env@12.2.5":
   version "12.2.5"
@@ -2431,7 +2431,7 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz#cfd70924a25a3fd32b218e5e420e6897e1ac4f40"
   integrity sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==
 
-"@types/express-serve-static-core@*", "@types/express-serve-static-core@^4.17.18":
+"@types/express-serve-static-core@*", "@types/express-serve-static-core@^4.17.31":
   version "4.17.31"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.31.tgz#a1139efeab4e7323834bb0226e62ac019f474b2f"
   integrity sha512-DxMhY+NAsTwMMFHBTtJFNp5qiHKJ7TeqOo23zVEM9alT1Ml27Q3xcTH0xwxn7Q0BbMcVEJOs/7aQtUWupUQN3Q==
@@ -2441,12 +2441,12 @@
     "@types/range-parser" "*"
 
 "@types/express@*", "@types/express@^4.17.13":
-  version "4.17.14"
-  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.14.tgz#143ea0557249bc1b3b54f15db4c81c3d4eb3569c"
-  integrity sha512-TEbt+vaPFQ+xpxFLFssxUDXj5cWCxZJjIcB7Yg0k0GMHGtgtQgpvx/MUQUeAkNbA9AAGrwkAsoeItdTgS7FMyg==
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.15.tgz#9290e983ec8b054b65a5abccb610411953d417ff"
+  integrity sha512-Yv0k4bXGOH+8a+7bELd2PqHQsuiANB+A8a4gnQrkRWzrkKlb6KHaVvyXhqs04sVW/OWlbPyYxRgYlIXLfrufMQ==
   dependencies:
     "@types/body-parser" "*"
-    "@types/express-serve-static-core" "^4.17.18"
+    "@types/express-serve-static-core" "^4.17.31"
     "@types/qs" "*"
     "@types/serve-static" "*"
 
@@ -3302,9 +3302,9 @@ available-typed-arrays@^1.0.5:
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
 axe-core@^4.4.3:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.6.0.tgz#1d07514866fa51262734b3357932fcf86961383a"
-  integrity sha512-L3ZNbXPTxMrl0+qTXAzn9FBRvk5XdO56K8CvcCKtlxv44Aw2w2NCclGuvCWxHPw1Riiq3ncP/sxFYj2nUqdoTw==
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.6.1.tgz#79cccdee3e3ab61a8f42c458d4123a6768e6fbce"
+  integrity sha512-lCZN5XRuOnpG4bpMq8v0khrWtUOn+i8lZSb6wHZH56ZfbIEv6XwJV84AAueh9/zi7qPVJ/E4yz6fmsiyOmXR4w==
 
 axios@0.27.2:
   version "0.27.2"
@@ -4127,12 +4127,12 @@ css-has-pseudo@^3.0.4:
     postcss-selector-parser "^6.0.9"
 
 css-loader@^6.5.1:
-  version "6.7.2"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.2.tgz#26bc22401b5921686a10fbeba75d124228302304"
-  integrity sha512-oqGbbVcBJkm8QwmnNzrFrWTnudnRZC+1eXikLJl0n4ljcfotgRifpg2a1lKy8jTrc4/d9A/ap1GFq1jDKG7J+Q==
+  version "6.7.3"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.3.tgz#1e8799f3ccc5874fdd55461af51137fcc5befbcd"
+  integrity sha512-qhOH1KlBMnZP8FzRO6YCH9UHXQhVMcEGLyNdb7Hv2cpcmJbW0YrddO+tG1ab5nT41KpHIYGsbeHqxB9xPu1pKQ==
   dependencies:
     icss-utils "^5.1.0"
-    postcss "^8.4.18"
+    postcss "^8.4.19"
     postcss-modules-extract-imports "^3.0.0"
     postcss-modules-local-by-default "^4.0.0"
     postcss-modules-scope "^3.0.0"
@@ -5686,7 +5686,7 @@ glob@7.1.7:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.0, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.2.0:
+glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.2.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
@@ -6060,11 +6060,6 @@ internal-slot@^1.0.3:
     get-intrinsic "^1.1.3"
     has "^1.0.3"
     side-channel "^1.0.4"
-
-interpret@^1.0.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.4.0.tgz#665ab8bc4da27a774a40584e812e3e0fa45b1a1e"
-  integrity sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
@@ -7652,7 +7647,7 @@ minimatch@^5.0.1:
   dependencies:
     brace-expansion "^2.0.1"
 
-minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.6:
+minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.7.tgz#daa1c4d91f507390437c6a8bc01078e7000c4d18"
   integrity sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==
@@ -8145,11 +8140,6 @@ pkg-up@^3.1.0:
   integrity sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==
   dependencies:
     find-up "^3.0.0"
-
-pnpm@^7.13.4:
-  version "7.18.2"
-  resolved "https://registry.yarnpkg.com/pnpm/-/pnpm-7.18.2.tgz#c00528a40825c54771a091835605ee551f190f33"
-  integrity sha512-k3LCdsrTPqL4dVgCgjpdWHcwzhEA/YCu2ZFR/+EiFy91azuRQcWgQbYf5rPkYu5x1Dl8+2KtXKTlDcrSx5hnQw==
 
 postcss-attribute-case-insensitive@^5.0.2:
   version "5.0.2"
@@ -8703,7 +8693,7 @@ postcss@^7.0.35:
     picocolors "^0.2.1"
     source-map "^0.6.1"
 
-postcss@^8.3.5, postcss@^8.4.14, postcss@^8.4.18, postcss@^8.4.4:
+postcss@^8.3.5, postcss@^8.4.14, postcss@^8.4.18, postcss@^8.4.19, postcss@^8.4.4:
   version "8.4.20"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.20.tgz#64c52f509644cecad8567e949f4081d98349dc56"
   integrity sha512-6Q04AXR1212bXr5fh03u8aAwbLxAQNGQ/Q1LNa0VfOI06ZAlhPHtQvE4OIdpj4kLThXilalPnmDSOD65DcHt+g==
@@ -8974,9 +8964,9 @@ rc-dialog@~9.0.0, rc-dialog@~9.0.2:
     rc-util "^5.21.0"
 
 rc-drawer@~6.0.0:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/rc-drawer/-/rc-drawer-6.0.1.tgz#437040ac7ba305b5d964ba51e88f30797671e8f8"
-  integrity sha512-ibWXGf8I+KRPXE03X4s0/xXzQI37YWXUV+oPy+R29GKxkjr98UTMgwvoQDKlZTm5AiaRuVFqhTKm0kNHqJh+TQ==
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/rc-drawer/-/rc-drawer-6.0.3.tgz#09993ecdf88ddd569d5a3341d907e3ab258096bb"
+  integrity sha512-u4RajgrnREKQH/21gB2JHZiA6ZECo0X0BbmDxAJEhKD9jUhlAbqMN5I9VWa4PSzi9ceLHUShqQcPAh2EJswffw==
   dependencies:
     "@babel/runtime" "^7.10.1"
     "@rc-component/portal" "^1.0.0-6"
@@ -9283,9 +9273,9 @@ rc-util@^5.0.1, rc-util@^5.0.6, rc-util@^5.12.0, rc-util@^5.15.0, rc-util@^5.16.
     shallowequal "^1.1.0"
 
 rc-virtual-list@^3.2.0, rc-virtual-list@^3.4.8:
-  version "3.4.12"
-  resolved "https://registry.yarnpkg.com/rc-virtual-list/-/rc-virtual-list-3.4.12.tgz#b8ca42ba9a3808a8031656518372533ee227fc66"
-  integrity sha512-wH+3+vT6JMYUHEl1c39fPDNu1NDvHh6K/BCXYHiG0jXce3pZcbDfuEKdrlnai75JdJPV85YqrHnQL3UB4c1HPg==
+  version "3.4.13"
+  resolved "https://registry.yarnpkg.com/rc-virtual-list/-/rc-virtual-list-3.4.13.tgz#20acc934b263abcf7b7c161f50ef82281b2f7e8d"
+  integrity sha512-cPOVDmcNM7rH6ANotanMDilW/55XnFPw0Jh/GQYtrzZSy3AmWvCnqVNyNC/pgg3lfVmX2994dlzAhuUrd4jG7w==
   dependencies:
     "@babel/runtime" "^7.20.0"
     classnames "^2.2.6"
@@ -9472,13 +9462,6 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
-rechoir@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
-  integrity sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==
-  dependencies:
-    resolve "^1.1.6"
-
 recursive-readdir@^2.2.2:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/recursive-readdir/-/recursive-readdir-2.2.3.tgz#e726f328c0d69153bcabd5c322d3195252379372"
@@ -9630,7 +9613,7 @@ resolve.exports@^1.1.0:
   resolved "https://registry.yarnpkg.com/resolve.exports/-/resolve.exports-1.1.0.tgz#5ce842b94b05146c0e03076985d1d0e7e48c90c9"
   integrity sha512-J1l+Zxxp4XK3LUDZ9m60LRJF/mAe4z6a4xyabPHk7pvK5t35dACV32iIjJDFeWZFfZlO29w6SZ67knR0tHzJtQ==
 
-resolve@^1.1.6, resolve@^1.1.7, resolve@^1.14.2, resolve@^1.19.0, resolve@^1.20.0, resolve@^1.22.0, resolve@^1.22.1:
+resolve@^1.1.7, resolve@^1.14.2, resolve@^1.19.0, resolve@^1.20.0, resolve@^1.22.0, resolve@^1.22.1:
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.1.tgz#27cb2ebb53f91abb49470a928bba7558066ac177"
   integrity sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==
@@ -9923,23 +9906,6 @@ shell-quote@^1.7.3:
   version "1.7.4"
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.4.tgz#33fe15dee71ab2a81fcbd3a52106c5cfb9fb75d8"
   integrity sha512-8o/QEhSSRb1a5i7TFR0iM4G16Z0vYB2OQVs4G3aAFXjn3T6yEx8AZxy1PgDF7I00LZHYA3WxaSYIf5e5sAX8Rw==
-
-shelljs@^0.8.5:
-  version "0.8.5"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.5.tgz#de055408d8361bed66c669d2f000538ced8ee20c"
-  integrity sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==
-  dependencies:
-    glob "^7.0.0"
-    interpret "^1.0.0"
-    rechoir "^0.6.2"
-
-shx@^0.3.4:
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/shx/-/shx-0.3.4.tgz#74289230b4b663979167f94e1935901406e40f02"
-  integrity sha512-N6A9MLVqjxZYcVn8hLmtneQWIJtp8IKzMP4eMnx+nqkvXoqinUPCbUFLp2UcWTEIUONhlk0ewxr/jaVGlc+J+g==
-  dependencies:
-    minimist "^1.2.3"
-    shelljs "^0.8.5"
 
 side-channel@^1.0.4:
   version "1.0.4"

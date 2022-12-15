@@ -17,7 +17,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@manahippo/aptos-wallet-adapter": "workspace:^",
+    "@manahippo/aptos-wallet-adapter": "*",
     "@openblockhq/dappsdk": "^5.0.2"
   },
   "author": "",
