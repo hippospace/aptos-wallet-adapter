@@ -20,7 +20,7 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { Account, MsafeWallet } from 'msafe-iframe';
+import { Account, MsafeWallet } from 'msafe-wallet';
 
 export const MsafeWalletName = 'Msafe' as WalletName<'Msafe'>;
 
@@ -34,7 +34,7 @@ interface MsafeAccount {
 export class MsafeWalletAdapter extends BaseWalletAdapter {
   name = MsafeWalletName;
 
-  url = 'https://app.m-safe.io';
+  url = MsafeWallet.getOrigin();
 
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
@@ -44,28 +44,23 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
 
   protected _chainId: string;
 
-  protected _api: string;
-
-  protected _readyState: WalletReadyState =
-    typeof window === 'undefined' ||
-    typeof document === 'undefined' ||
-    typeof parent === 'undefined' ||
-    typeof parent.window === 'undefined' ||
-    parent.window === window // MsafeWallet only works in msafe appstore iframe
-      ? WalletReadyState.Unsupported
-      : WalletReadyState.NotDetected;
+  // MsafeWallet only works in msafe appstore iframe
+  protected _readyState: WalletReadyState = MsafeWallet.inMsafeWallet()
+    ? WalletReadyState.NotDetected
+    : WalletReadyState.Unsupported;
 
   protected _connecting: boolean;
 
   protected _wallet: MsafeAccount | null;
 
-  constructor(origin?: string) {
+  constructor(origin: 'Mainnet' | 'Testnet' | string = 'Mainnet') {
     super();
-
     this._network = undefined;
     this._connecting = false;
+    const msafeOrigin = MsafeWallet.getOrigin(origin);
+    this.url = MsafeWallet.getAppUrl(origin);
     if (this._readyState === WalletReadyState.NotDetected) {
-      MsafeWallet.new(origin)
+      MsafeWallet.new(msafeOrigin)
         .then((msafe) => {
           this._provider = msafe;
           this._readyState = WalletReadyState.Installed;

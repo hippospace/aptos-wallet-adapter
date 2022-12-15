@@ -34,6 +34,6 @@
     "@openblockhq/dappsdk": "^5.0.2",
     "eventemitter3": "^4.0.7",
     "js-sha3": "^0.8.0",
-    "msafe-iframe": "^1.1.7"
+    "msafe-wallet": "^1.1.9"
   }
 }
