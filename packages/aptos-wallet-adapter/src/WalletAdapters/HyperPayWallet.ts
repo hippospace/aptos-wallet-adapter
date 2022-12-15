@@ -5,6 +5,7 @@ import {
   WalletNetworkChangeError,
   WalletNotConnectedError,
   WalletNotReadyError,
+  WalletGetNetworkError,
   WalletSignAndSubmitMessageError,
   WalletSignMessageError,
   WalletSignTransactionError
@@ -16,6 +17,8 @@ import {
   scopePollingDetectionStrategy,
   WalletAdapterNetwork,
   WalletName,
+  SignMessageResponse,
+  SignMessagePayload,
   WalletReadyState
 } from './BaseAdapter';
 
@@ -36,10 +39,12 @@ interface IHyperPayWallet {
   connect: () => Promise<ConnectHyperPayAccount>;
   account(): Promise<HyperPayAccount>;
   isConnected(): Promise<boolean>;
+  getChainId(): Promise<{ chainId: number }>;
+  network(): Promise<WalletAdapterNetwork>;
   generateTransaction(sender: MaybeHexString, payload: any, options?: any): Promise<any>;
   signAndSubmitTransaction(transaction: Types.TransactionPayload): Promise<Types.HexEncodedBytes>;
   signTransaction(transaction: Types.TransactionPayload): Promise<Uint8Array>;
-  signMessage(message: string): Promise<{ signature: string }>;
+  signMessage(message: SignMessagePayload): Promise<SignMessageResponse>;
   disconnect(): Promise<void>;
 }
 
@@ -166,6 +171,20 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
           ...walletAccount,
           isConnected: true
         };
+
+        try {
+          const name = await provider?.network();
+          const { chainId } = await provider?.getChainId();
+          const api = null;
+
+          this._network = name;
+          this._chainId = chainId.toString();
+          this._api = api;
+        } catch (error: any) {
+          const errMsg = error.message;
+          this.emit('error', new WalletGetNetworkError(errMsg));
+          throw error;
+        }
       }
       this.emit('connect', this._wallet?.address || '');
     } catch (error: any) {
@@ -236,14 +255,17 @@ export class HyperPayWalletAdapter extends BaseWalletAdapter {
     }
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(msgPayload: SignMessagePayload): Promise<SignMessageResponse> {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.hyperpay;
       if (!wallet || !provider) throw new WalletNotConnectedError();
-      const response = await provider?.signMessage(message);
-      if (response?.signature) {
-        return response?.signature;
+      if (typeof msgPayload !== 'object' || !msgPayload.nonce) {
+        throw new WalletSignMessageError('Invalid signMessage Payload');
+      }
+      const response = await provider?.signMessage(msgPayload);
+      if (response) {
+        return response;
       } else {
         throw new Error('Sign Message failed');
       }
