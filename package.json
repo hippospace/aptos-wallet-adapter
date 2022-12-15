@@ -7,8 +7,7 @@
   "scripts": {
     "nuke": "shx rm -rf packages/*/*/node_modules node_modules pnpm-lock.yaml || true",
     "reinstall": "pnpm run nuke && pnpm install",
-    "build:adapter": "tsc --build --verbose tsconfig.adapter.json",
-    "build:wallets": "tsc --build --verbose tsconfig.wallets.json"
+    "build:ts": "tsc --build --verbose tsconfig.all.json"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

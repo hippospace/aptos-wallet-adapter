@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.wallets.json",
+  "extends": "./tsconfig.all.json",
   "include": ["./packages/*/*/src", "./packages/*/*/package.json"],
   "exclude": ["./packages/wallet-tester", "./packages/wallet-nextjs", "./packages/auto-tester"],
   "compilerOptions": {

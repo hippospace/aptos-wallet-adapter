@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.root.json",
-  "references": [
-    {
-      "path": "./packages/aptos-wallet-adapter/tsconfig.all.json"
-    }
-  ]
-}
