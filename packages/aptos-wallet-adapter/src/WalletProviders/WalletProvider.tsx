@@ -58,7 +58,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   const readyState = adapter?.readyState || WalletReadyState.Unsupported;
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
-  // const isConnecting = useRef(false);
+  const isConnecting = useRef(false);
   const isDisconnecting = useRef(false);
   const isUnloading = useRef(false);
 
@@ -266,7 +266,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         throw handleError(new WalletNotReadyError('Wallet Not Ready'));
       }
-      // isConnecting.current = true;
+      isConnecting.current = true;
       setConnecting(true);
       try {
         const timeout = timeoutPromise(TIMEOUT * 1000);
@@ -282,7 +282,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         }
       } finally {
         setConnecting(false);
-        // isConnecting.current = false;
+        isConnecting.current = false;
       }
     },
     [connected, adapter, handleError, wallets, setName, wallet, account, network]
@@ -291,6 +291,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   // If autoConnect is enabled, try to connect when the adapter changes and is ready
   useEffect(() => {
     if (
+      isConnecting.current ||
       connected ||
       !autoConnect ||
       !name ||
@@ -299,7 +300,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     )
       return;
     connect(name);
-  }, [connected, autoConnect, name, connect, adapter, readyState]);
+  }, [isConnecting, connected, autoConnect, name, connect, adapter, readyState]);
 
   // Disconnect the adapter from the wallet
   const disconnect = useCallback(async () => {
