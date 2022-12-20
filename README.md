@@ -26,6 +26,7 @@ Supports:
 - [Nightly Wallet](https://nightly.app/download)
 - [OpenBlock Wallet](https://openblock.com)
 - [Spacecy wallet](https://spacecywallet.com/)
+- [Msafe wallet](https://app.m-safe.io)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
@@ -53,3 +54,4 @@ Automatically testing suites based on puppeteer to run E2E integration tests aga
 | Blocto  | F(cannot test)         | F(cannot test)               |
 | BitKeep | F                      | F                            |
 | Spacecy | T                      | T                            |
+| Msafe   | T(cannot test)         | T(cannot test)               |
