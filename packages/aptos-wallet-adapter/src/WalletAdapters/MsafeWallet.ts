@@ -35,8 +35,6 @@ interface MsafeAccount {
 export class MsafeWalletAdapter extends BaseWalletAdapter {
   name = MsafeWalletName;
 
-  url = MsafeWallet.getOrigin();
-
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
   protected _provider: MsafeWallet | undefined;
@@ -54,21 +52,30 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
 
   protected _wallet: MsafeAccount | null;
 
-  constructor(origin: 'Mainnet' | 'Testnet' | string = 'Mainnet') {
+  private _origin?: string | string[];
+
+  constructor(origin?: string | string[]) {
     super();
     this._network = undefined;
     this._connecting = false;
-    const msafeOrigin = MsafeWallet.getOrigin(origin);
-    this.url = MsafeWallet.getAppUrl(origin);
+    this._origin = origin;
     if (this._readyState === WalletReadyState.NotDetected) {
-      MsafeWallet.new(msafeOrigin)
+      MsafeWallet.new(origin)
         .then((msafe) => {
           this._provider = msafe;
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
         })
-        .catch((e) => console.log(e));
+        .catch((e) => {
+          this._readyState = WalletReadyState.Unsupported;
+          this.emit('readyStateChange', this._readyState);
+          console.log(e);
+        });
     }
+  }
+
+  get url() {
+    return MsafeWallet.getAppUrl(this._origin instanceof Array ? this._origin[0] : this._origin);
   }
 
   get publicAccount(): AccountKeys {
