@@ -20,11 +20,11 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { Account, MsafeWallet } from 'msafe-wallet';
+import { Account, MSafeWallet } from 'msafe-wallet';
 
-export const MsafeWalletName = 'Msafe' as WalletName<'Msafe'>;
+export const MSafeWalletName = 'MSafe' as WalletName<'MSafe'>;
 
-interface MsafeAccount {
+interface MSafeAccount {
   address: MaybeHexString;
   publicKey: MaybeHexString[];
   authKey: MaybeHexString;
@@ -32,25 +32,25 @@ interface MsafeAccount {
   isConnected: boolean;
 }
 
-export class MsafeWalletAdapter extends BaseWalletAdapter {
-  name = MsafeWalletName;
+export class MSafeWalletAdapter extends BaseWalletAdapter {
+  name = MSafeWalletName;
 
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
-  protected _provider: MsafeWallet | undefined;
+  protected _provider: MSafeWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
   protected _chainId: string;
 
-  // MsafeWallet only works in msafe appstore iframe
-  protected _readyState: WalletReadyState = MsafeWallet.inMsafeWallet()
+  // MSafeWallet only works in msafe appstore iframe
+  protected _readyState: WalletReadyState = MSafeWallet.inMSafeWallet()
     ? WalletReadyState.NotDetected
     : WalletReadyState.Unsupported;
 
   protected _connecting: boolean;
 
-  protected _wallet: MsafeAccount | null;
+  protected _wallet: MSafeAccount | null;
 
   private _origin?: string | string[];
 
@@ -60,7 +60,7 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
     this._connecting = false;
     this._origin = origin;
     if (this._readyState === WalletReadyState.NotDetected) {
-      MsafeWallet.new(origin)
+      MSafeWallet.new(origin)
         .then((msafe) => {
           this._provider = msafe;
           this._readyState = WalletReadyState.Installed;
@@ -75,7 +75,7 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
   }
 
   get url() {
-    return MsafeWallet.getAppUrl(this._origin instanceof Array ? this._origin[0] : this._origin);
+    return MSafeWallet.getAppUrl(this._origin instanceof Array ? this._origin[0] : this._origin);
   }
 
   get publicAccount(): AccountKeys {
@@ -269,3 +269,8 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
     }
   }
 }
+
+/**
+ * @deprecated Use `MsafeWalletAdapter` instead.
+ */
+export const MsafeWalletAdapter = MSafeWalletAdapter;
