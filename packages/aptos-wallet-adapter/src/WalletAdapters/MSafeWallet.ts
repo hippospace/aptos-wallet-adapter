@@ -273,4 +273,4 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
 /**
  * @deprecated Use `MsafeWalletAdapter` instead.
  */
-export const MsafeWalletAdapter = MSafeWalletAdapter;
+export class MsafeWalletAdapter extends MSafeWalletAdapter {}
