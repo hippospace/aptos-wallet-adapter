@@ -271,6 +271,10 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
 }
 
 /**
+ * @deprecated Use `MSafeWalletName` instead.
+ */
+export const MsafeWalletName = MSafeWalletName;
+/**
  * @deprecated Use `MsafeWalletAdapter` instead.
  */
 export class MsafeWalletAdapter extends MSafeWalletAdapter {}
