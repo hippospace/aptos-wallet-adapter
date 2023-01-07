@@ -26,8 +26,9 @@ export const MsafeWalletName = 'Msafe' as WalletName<'Msafe'>;
 
 interface MsafeAccount {
   address: MaybeHexString;
-  publicKey: MaybeHexString;
+  publicKey: MaybeHexString[];
   authKey: MaybeHexString;
+  minKeysRequired: number;
   isConnected: boolean;
 }
 
@@ -72,9 +73,10 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
 
   get publicAccount(): AccountKeys {
     return {
-      publicKey: this._wallet?.publicKey || null,
-      address: this._wallet?.address || null,
-      authKey: this._wallet?.authKey || null
+      publicKey: this._wallet?.publicKey,
+      address: this._wallet?.address,
+      authKey: this._wallet?.authKey,
+      minKeysRequired: this._wallet?.minKeysRequired
     };
   }
 
