@@ -54,6 +54,21 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
 
   private _origin?: string | string[];
 
+  /**
+   * @description create a MSafeWalletAdapter
+   * @param origin allowlist of msafe website url, omit means accpets all msafe websites. you can pass a single url or an array of urls.
+   * @example
+   *  // 1. Initialize MSafeWalletAdapter with default allowlist:
+   *      new MSafeWalletAdapter();
+   *  // 2. Initialize MSafeWalletAdapter with a single MSafe url:
+   *      new MSafeWalletAdapter('https://app.m-safe.io');
+   *  // 3. Initialize MSafeWalletAdapter with an array of MSafe urls:
+   *      new MSafeWalletAdapter(['https://app.m-safe.io', 'https://testnet.m-safe.io', 'https://partner.m-safe.io']);
+   *  // 4. Initialize MSafeWalletAdapter with a single network type:
+   *      new MSafeWalletAdapter('Mainnet');
+   *  // 5. Initialize MSafeWalletAdapter with an array of network types:
+   *      new MSafeWalletAdapter(['Mainnet', 'Testnet', 'Partner']);
+   */
   constructor(origin?: string | string[]) {
     super();
     this._network = undefined;
@@ -275,6 +290,6 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
  */
 export const MsafeWalletName = MSafeWalletName;
 /**
- * @deprecated Use `MsafeWalletAdapter` instead.
+ * @deprecated Use `MSafeWalletAdapter` instead.
  */
 export class MsafeWalletAdapter extends MSafeWalletAdapter {}
