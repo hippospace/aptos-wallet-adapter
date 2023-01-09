@@ -89,6 +89,7 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
     }
   }
 
+  /// fix issue of next.js: access url via getter to avoid access window object in constructor
   get url() {
     return MSafeWallet.getAppUrl(this._origin instanceof Array ? this._origin[0] : this._origin);
   }
