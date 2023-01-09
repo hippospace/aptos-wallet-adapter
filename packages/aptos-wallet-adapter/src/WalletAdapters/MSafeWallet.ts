@@ -84,7 +84,7 @@ export class MSafeWalletAdapter extends BaseWalletAdapter {
         .catch((e) => {
           this._readyState = WalletReadyState.Unsupported;
           this.emit('readyStateChange', this._readyState);
-          console.log(e);
+          console.error('MSafe connect error:', e);
         });
     }
   }
