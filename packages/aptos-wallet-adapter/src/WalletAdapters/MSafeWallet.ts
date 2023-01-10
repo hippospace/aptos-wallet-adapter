@@ -20,11 +20,11 @@ import {
   WalletName,
   WalletReadyState
 } from './BaseAdapter';
-import { Account, MsafeWallet } from 'msafe-wallet';
+import { Account, MSafeWallet } from 'msafe-wallet';
 
-export const MsafeWalletName = 'Msafe' as WalletName<'Msafe'>;
+export const MSafeWalletName = 'MSafe' as WalletName<'MSafe'>;
 
-interface MsafeAccount {
+interface MSafeAccount {
   address: MaybeHexString;
   publicKey: MaybeHexString[];
   authKey: MaybeHexString;
@@ -32,43 +32,66 @@ interface MsafeAccount {
   isConnected: boolean;
 }
 
-export class MsafeWalletAdapter extends BaseWalletAdapter {
-  name = MsafeWalletName;
-
-  url = MsafeWallet.getOrigin();
+export class MSafeWalletAdapter extends BaseWalletAdapter {
+  name = MSafeWalletName;
 
   icon = 'https://raw.githubusercontent.com/hippospace/aptos-wallet-adapter/main/logos/msafe.png';
 
-  protected _provider: MsafeWallet | undefined;
+  protected _provider: MSafeWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
   protected _chainId: string;
 
-  // MsafeWallet only works in msafe appstore iframe
-  protected _readyState: WalletReadyState = MsafeWallet.inMsafeWallet()
+  // MSafeWallet only works in msafe appstore iframe
+  protected _readyState: WalletReadyState = MSafeWallet.inMSafeWallet()
     ? WalletReadyState.NotDetected
     : WalletReadyState.Unsupported;
 
   protected _connecting: boolean;
 
-  protected _wallet: MsafeAccount | null;
+  protected _wallet: MSafeAccount | null;
 
-  constructor(origin: 'Mainnet' | 'Testnet' | string = 'Mainnet') {
+  private _origin?: string | string[];
+
+  /**
+   * @description create a MSafeWalletAdapter
+   * @param origin allowlist of msafe website url, omit means accpets all msafe websites. you can pass a single url or an array of urls.
+   * @example
+   *  // 1. Initialize MSafeWalletAdapter with default allowlist:
+   *      new MSafeWalletAdapter();
+   *  // 2. Initialize MSafeWalletAdapter with a single MSafe url:
+   *      new MSafeWalletAdapter('https://app.m-safe.io');
+   *  // 3. Initialize MSafeWalletAdapter with an array of MSafe urls:
+   *      new MSafeWalletAdapter(['https://app.m-safe.io', 'https://testnet.m-safe.io', 'https://partner.m-safe.io']);
+   *  // 4. Initialize MSafeWalletAdapter with a single network type:
+   *      new MSafeWalletAdapter('Mainnet');
+   *  // 5. Initialize MSafeWalletAdapter with an array of network types:
+   *      new MSafeWalletAdapter(['Mainnet', 'Testnet', 'Partner']);
+   */
+  constructor(origin?: string | string[]) {
     super();
     this._network = undefined;
     this._connecting = false;
-    const msafeOrigin = MsafeWallet.getOrigin(origin);
-    this.url = MsafeWallet.getAppUrl(origin);
+    this._origin = origin;
     if (this._readyState === WalletReadyState.NotDetected) {
-      MsafeWallet.new(msafeOrigin)
+      MSafeWallet.new(origin)
         .then((msafe) => {
           this._provider = msafe;
           this._readyState = WalletReadyState.Installed;
           this.emit('readyStateChange', this._readyState);
         })
-        .catch((e) => console.log(e));
+        .catch((e) => {
+          this._readyState = WalletReadyState.Unsupported;
+          this.emit('readyStateChange', this._readyState);
+          console.error('MSafe connect error:', e);
+        });
     }
+  }
+
+  /// fix issue of next.js: access url via getter to avoid access window object in constructor
+  get url() {
+    return MSafeWallet.getAppUrl(this._origin instanceof Array ? this._origin[0] : this._origin);
   }
 
   get publicAccount(): AccountKeys {
@@ -262,3 +285,12 @@ export class MsafeWalletAdapter extends BaseWalletAdapter {
     }
   }
 }
+
+/**
+ * @deprecated Use `MSafeWalletName` instead.
+ */
+export const MsafeWalletName = MSafeWalletName;
+/**
+ * @deprecated Use `MSafeWalletAdapter` instead.
+ */
+export class MsafeWalletAdapter extends MSafeWalletAdapter {}
