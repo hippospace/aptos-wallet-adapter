@@ -1,3 +1,7 @@
+# Official adapter
+
+Note that Aptos Labs has an official implementation of wallet adapter [here](https://github.com/aptos-labs/aptos-wallet-adapter).
+
 # aptos-wallet-adapter
 
 This is a mono-repo consist of the wallet adapter itself, a simple web app with essential functionalities to demonstrate the implementation of the wallet adapter and an e2e auto integration testers based on puppeteer.
