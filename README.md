@@ -31,6 +31,7 @@ Supports:
 - [OpenBlock Wallet](https://openblock.com)
 - [Spacecy wallet](https://spacecywallet.com/)
 - [MSafe wallet](https://app.m-safe.io)
+- [CLV Wallet](https://clv.org/)
 
 **Please refer to the readme within aptos-wallet-adapter pacakages**
 
