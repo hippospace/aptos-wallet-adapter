@@ -27,10 +27,27 @@ import { Types } from 'aptos';
 export const FewchaWalletName = 'Fewcha' as WalletName<'Fewcha'>;
 
 interface FewchaWindow extends Window {
-  fewcha: Web3ProviderType;
+  fewcha: Web3ProviderType & FewchaWallet;
 }
 
 declare const window: FewchaWindow;
+
+interface PublicAccount {
+  address: string;
+  publicKey: string;
+  blockchainType: string;
+}
+type Response<Data> = { data: Data };
+
+interface FewchaWallet {
+  account(): Promise<Response<PublicAccount>>;
+  getNetworkType(): Promise<Response<string>>;
+  getNetwork(): Promise<Response<string>>;
+  onChangeAccount: (listener: (newAddress: string) => void) => void;
+  onChangeNetwork: (
+    listener: (network: { network: string; name: string; type: string }) => void
+  ) => void;
+}
 
 export interface FewchaAdapterConfig {
   provider?: string;
@@ -159,7 +176,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
         const chainId = null;
         const api = null;
 
-        this._network = name as WalletAdapterNetwork;
+        this._network = getNetwork(name);
         this._chainId = chainId;
         this._api = api;
       } catch (error: any) {
@@ -271,8 +288,19 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.fewcha;
-      if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const fewcha = window.fewcha;
+      if (!wallet || !provider || !fewcha) throw new WalletNotConnectedError();
+      fewcha.onChangeAccount(async (newAccount) => {
+        if (newAccount) {
+          const { data: accountDetail } = await fewcha.account();
+          this._wallet = {
+            ...this._wallet,
+            address: accountDetail.address,
+            publicKey: accountDetail.publicKey
+          };
+        }
+        this.emit('accountChange', this._wallet.address);
+      });
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletAccountChangeError(errMsg));
@@ -284,12 +312,32 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
     try {
       const wallet = this._wallet;
       const provider = this._provider || window.fewcha;
-      if (!wallet || !provider) throw new WalletNotConnectedError();
-      //To be implemented
+      const fewcha = window.fewcha;
+      if (!wallet || !provider || !fewcha) throw new WalletNotConnectedError();
+      fewcha.onChangeNetwork(async (newNetwork) => {
+        if (newNetwork) {
+          const { data: accountDetail } = await fewcha.account();
+          if (accountDetail.address !== this._wallet.address) {
+            this._wallet = {
+              ...this._wallet,
+              address: accountDetail.address,
+              publicKey: accountDetail.publicKey
+            };
+            this.emit('accountChange', this._wallet.address);
+          }
+        }
+        this._network = getNetwork(newNetwork?.name);
+        this.emit('networkChange', this._network);
+      });
     } catch (error: any) {
       const errMsg = error.message;
       this.emit('error', new WalletNetworkChangeError(errMsg));
       throw error;
     }
   }
+}
+
+function getNetwork(name: string): WalletAdapterNetwork | undefined {
+  const networks = WalletAdapterNetwork as Record<string, WalletAdapterNetwork>;
+  return networks[name];
 }
