@@ -145,7 +145,7 @@ export class FewchaWalletAdapter extends BaseWalletAdapter {
 
       if (!accountDetail.publicKey) {
         const accountResp = await provider.account();
-        if (!accountResp.data.publicKey) {
+        if (!accountResp?.data?.publicKey) {
           throw new WalletConnectionError('Wallet connect issue', response.data);
         }
         accountDetail = { ...accountResp.data };
