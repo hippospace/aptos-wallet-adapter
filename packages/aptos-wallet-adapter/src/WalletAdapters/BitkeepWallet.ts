@@ -30,7 +30,7 @@ interface IApotsErrorResult {
 
 type AddressInfo = { address: string; publicKey: string; authKey?: string };
 
-interface IBitkeepWallet {
+interface IBitgetWallet {
   connect: () => Promise<AddressInfo>;
   account: () => Promise<AddressInfo>;
   isConnected: () => Promise<boolean>;
@@ -47,32 +47,30 @@ interface IBitkeepWallet {
   onNetworkChange: (listener: (network: { networkName: string }) => void) => void;
 }
 
-interface BitkeepWindow extends Window {
+interface BitgetWindow extends Window {
   bitkeep?: {
-    aptos: IBitkeepWallet;
+    aptos: IBitgetWallet;
   };
 }
 
-declare const window: BitkeepWindow;
+declare const window: BitgetWindow;
 
-export const BitkeepWalletName = 'BitKeep' as WalletName<'BitKeep'>;
-
-export interface BitkeepWalletAdapterConfig {
-  provider?: IBitkeepWallet;
+export const BitgetWalletName = 'Bitget Wallet' as WalletName<'Bitget Wallet'>;
+export interface BitgetWalletAdapterConfig {
+  provider?: IBitgetWallet;
   // network?: WalletAdapterNetwork;
   timeout?: number;
 }
-
-export class BitkeepWalletAdapter extends BaseWalletAdapter {
-  name = BitkeepWalletName;
+export class BitgetWalletAdapter extends BaseWalletAdapter {
+  name = BitgetWalletName;
 
   url =
-    'https://chrome.google.com/webstore/detail/bitkeep-bitcoin-crypto-wa/jiidiaalihmmhddjgbnbgdfflelocpak';
+    'https://web3.bitget.com';
 
   icon =
-    'https://raw.githubusercontent.com/bitkeepwallet/download/main/logo-png/BitKeep_logo_circle.png';
+    'https://static-web.bitkeep.com/76c7b36410ec25d9cefeac5ba2ffa58f/bitget-icon.png';
 
-  protected _provider: IBitkeepWallet | undefined;
+  protected _provider: IBitgetWallet | undefined;
 
   protected _network: WalletAdapterNetwork;
 
@@ -95,7 +93,7 @@ export class BitkeepWalletAdapter extends BaseWalletAdapter {
     // provider,
     // network = WalletAdapterNetwork.Testnet,
     timeout = 10000
-  }: BitkeepWalletAdapterConfig = {}) {
+  }: BitgetWalletAdapterConfig = {}) {
     super();
 
     this._provider = typeof window !== 'undefined' ? window.bitkeep?.aptos : undefined;
@@ -305,3 +303,15 @@ export class BitkeepWalletAdapter extends BaseWalletAdapter {
     }
   }
 }
+/**
+ * @deprecated Use 'BitgetWalletName' instead."
+ */
+export const BitkeepWalletName = BitgetWalletName;
+/**
+ * @deprecated Use 'BitgetWalletAdapterConfig' instead."
+ */
+export type BitkeepWalletAdapterConfig = BitgetWalletAdapterConfig;
+/**
+ * @deprecated Use 'BitgetWalletAdapter' instead."
+ */
+export const BitkeepWalletAdapter = BitgetWalletAdapter;
